@@ -33,6 +33,9 @@ drug discovery · медицинская визуализация (DICOM/рад�
 vector-health/
 ├── skills/               # 1508 навыков, по одному каталогу на навык
 │   └── <name>/SKILL.md   # + references/, scripts/, templates/, assets/ (если есть)
+├── skills-index.json     # каталог: имя + описание каждого навыка (для поиска)
+├── scripts/              # build_index.py (генерация каталога), validate_skills.py (валидация+скан)
+├── .github/workflows/    # CI: валидация frontmatter + скан секретов/PII на каждый push
 ├── assets/               # логотип Vector
 ├── README.md
 └── NOTICE.md             # атрибуция и лицензии источников

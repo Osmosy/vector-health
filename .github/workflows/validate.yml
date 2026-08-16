@@ -1,0 +1,26 @@
+name: validate-skills
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate skills (frontmatter + secret/PII scan)
+        run: python scripts/validate_skills.py
+
+      - name: Rebuild index (verify it is current)
+        run: |
+          python scripts/build_index.py
+          git diff --exit-code skills-index.json || \
+            (echo "::error::skills-index.json устарел — перегенерируй scripts/build_index.py" && exit 1)
