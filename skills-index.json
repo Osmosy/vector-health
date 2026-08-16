@@ -1,7 +1,7 @@
 {
   "project": "vector-health",
   "generated": "2026-08-16",
-  "total": 1508,
+  "total": 1509,
   "skills": [
     {
       "name": "aav-vector-design-agent",
@@ -166,6 +166,10 @@
     {
       "name": "assembling-fhir-bundles",
       "description": "Package multiple FHIR R4 resources produced from OpenMed output into a single valid transaction Bundle ready to POST to an EHR, using OpenMed's verified bundle assembler openmed.clinical.exporters.fhir.to_bundle. Covers deterministic urn:uuid fullUrls, automatic in-Bundle reference rewriting, request blocks (method/url) for transaction vs batch, and conditional create. Use after exporting-to-fhir when the user has several Condition/Observation/MedicationStatement resources and wants one transaction Bundle, mentions Bundle, transaction, references, or posting to a FHIR server. Builds on exporting-to-fhir; pairs after."
+    },
+    {
+      "name": "atrial-fibrillation-treatment",
+      "description": "Atrial fibrillation treatment — rhythm control (catheter ablation PFA/cryo/RF, cardioversion, antiarrhythmics), rate control, and stroke prevention (CHA2DS2-VA, DOAC, LAAO). Use when managing AF or answering how to treat/eliminate fibrillation."
     },
     {
       "name": "auditing-deid-leakage",
