@@ -1,0 +1,1501 @@
+{
+  "molecular": {
+    "dna": {
+      "en": "DNA",
+      "abbrev": "DNA",
+      "full_form": "deoxyribonucleic acid",
+      "domain": "biology",
+      "variants": [
+        "Deoxyribonucleic acid",
+        "deoxyribonucleic acid",
+        "D N A"
+      ],
+      "related_terms": [
+        "RNA",
+        "gene",
+        "chromosome"
+      ],
+      "source": "IUPAC"
+    },
+    "rna": {
+      "en": "RNA",
+      "abbrev": "RNA",
+      "full_form": "ribonucleic acid",
+      "domain": "biology",
+      "variants": [
+        "Ribonucleic acid",
+        "ribonucleic acid",
+        "R N A"
+      ],
+      "related_terms": [
+        "DNA",
+        "mRNA",
+        "transcription"
+      ],
+      "source": "IUPAC"
+    },
+    "mrna": {
+      "en": "mRNA",
+      "abbrev": "mRNA",
+      "full_form": "messenger RNA",
+      "domain": "biology",
+      "variants": [
+        "messenger RNA",
+        "Messenger RNA",
+        "m R N A"
+      ],
+      "related_terms": [
+        "RNA",
+        "translation",
+        "protein"
+      ],
+      "source": "IUPAC"
+    },
+    "trna": {
+      "en": "tRNA",
+      "abbrev": "tRNA",
+      "full_form": "transfer RNA",
+      "domain": "biology",
+      "variants": [
+        "transfer RNA",
+        "Transfer RNA",
+        "t R N A"
+      ],
+      "related_terms": [
+        "RNA",
+        "amino acid",
+        "translation"
+      ],
+      "source": "IUPAC"
+    },
+    "rrna": {
+      "en": "rRNA",
+      "abbrev": "rRNA",
+      "full_form": "ribosomal RNA",
+      "domain": "biology",
+      "variants": [
+        "ribosomal RNA",
+        "Ribosomal RNA",
+        "r R N A"
+      ],
+      "related_terms": [
+        "RNA",
+        "ribosome",
+        "translation"
+      ],
+      "source": "IUPAC"
+    },
+    "gene": {
+      "en": "gene",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Gene",
+        "genes"
+      ],
+      "related_terms": [
+        "DNA",
+        "chromosome",
+        "allele"
+      ],
+      "source": "IUPAC"
+    },
+    "protein": {
+      "en": "protein",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Protein",
+        "proteins"
+      ],
+      "related_terms": [
+        "amino acid",
+        "polypeptide",
+        "enzyme"
+      ],
+      "source": "IUPAC"
+    },
+    "enzyme": {
+      "en": "enzyme",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Enzyme",
+        "enzymes"
+      ],
+      "related_terms": [
+        "catalyst",
+        "substrate",
+        "reaction"
+      ],
+      "source": "IUPAC"
+    },
+    "amino_acid": {
+      "en": "amino acid",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "aminoacid",
+        "amino-acid"
+      ],
+      "related_terms": [
+        "protein",
+        "peptide",
+        "nitrogen"
+      ],
+      "source": "IUPAC"
+    },
+    "nucleotide": {
+      "en": "nucleotide",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Nucleotide",
+        "nucleotides"
+      ],
+      "related_terms": [
+        "DNA",
+        "RNA",
+        "nucleoside"
+      ],
+      "source": "IUPAC"
+    },
+    "polypeptide": {
+      "en": "polypeptide",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Polypeptide",
+        "polypeptides"
+      ],
+      "related_terms": [
+        "protein",
+        "amino acid",
+        "peptide"
+      ],
+      "source": "IUPAC"
+    },
+    "peptide": {
+      "en": "peptide",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Peptide",
+        "peptides"
+      ],
+      "related_terms": [
+        "amino acid",
+        "polypeptide",
+        "protein"
+      ],
+      "source": "IUPAC"
+    },
+    "chromatin": {
+      "en": "chromatin",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Chromatin"
+      ],
+      "related_terms": [
+        "DNA",
+        "histone",
+        "chromosome"
+      ],
+      "source": "IUPAC"
+    },
+    "histone": {
+      "en": "histone",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Histone",
+        "histones"
+      ],
+      "related_terms": [
+        "chromatin",
+        "DNA",
+        "nucleosome"
+      ],
+      "source": "IUPAC"
+    },
+    "nucleosome": {
+      "en": "nucleosome",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Nucleosome",
+        "nucleosomes"
+      ],
+      "related_terms": [
+        "chromatin",
+        "histone",
+        "DNA"
+      ],
+      "source": "IUPAC"
+    },
+    "plasmid": {
+      "en": "plasmid",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Plasmid",
+        "plasmids"
+      ],
+      "related_terms": [
+        "DNA",
+        "bacterial",
+        "vector"
+      ],
+      "source": "IUPAC"
+    },
+    "vector": {
+      "en": "vector",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Vector",
+        "vectors"
+      ],
+      "related_terms": [
+        "plasmid",
+        "DNA",
+        "transfection"
+      ],
+      "source": "IUPAC"
+    },
+    "polymerase": {
+      "en": "polymerase",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Polymerase",
+        "polymerases"
+      ],
+      "related_terms": [
+        "DNA",
+        "RNA",
+        "transcription"
+      ],
+      "source": "IUPAC"
+    },
+    "ligase": {
+      "en": "ligase",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Ligase",
+        "ligases"
+      ],
+      "related_terms": [
+        "DNA",
+        "plasmid",
+        "recombination"
+      ],
+      "source": "IUPAC"
+    },
+    "restriction_enzyme": {
+      "en": "restriction enzyme",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "restriction endonuclease",
+        "restriction enzyme"
+      ],
+      "related_terms": [
+        "DNA",
+        "plasmid",
+        "cloning"
+      ],
+      "source": "IUPAC"
+    }
+  },
+  "cellular": {
+    "cell": {
+      "en": "cell",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Cell",
+        "cells"
+      ],
+      "related_terms": [
+        "tissue",
+        "organelle",
+        "membrane"
+      ],
+      "source": "IUPAC"
+    },
+    "organelle": {
+      "en": "organelle",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Organelle",
+        "organelles"
+      ],
+      "related_terms": [
+        "cell",
+        "mitochondria",
+        "nucleus"
+      ],
+      "source": "IUPAC"
+    },
+    "mitochondria": {
+      "en": "mitochondrion",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "mitochondria",
+        "Mitochondria",
+        "mitochondrion"
+      ],
+      "related_terms": [
+        "cell",
+        "ATP",
+        "respiration"
+      ],
+      "source": "IUPAC"
+    },
+    "nucleus": {
+      "en": "nucleus",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Nucleus",
+        "nuclei"
+      ],
+      "related_terms": [
+        "cell",
+        "DNA",
+        "chromosome"
+      ],
+      "source": "IUPAC"
+    },
+    "membrane": {
+      "en": "membrane",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Membrane",
+        "membranes"
+      ],
+      "related_terms": [
+        "cell",
+        "lipid",
+        "protein"
+      ],
+      "source": "IUPAC"
+    },
+    "cytoplasm": {
+      "en": "cytoplasm",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Cytoplasm",
+        "cytosol"
+      ],
+      "related_terms": [
+        "cell",
+        "organelle",
+        "cytoskeleton"
+      ],
+      "source": "IUPAC"
+    },
+    "ribosome": {
+      "en": "ribosome",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Ribosome",
+        "ribosomes"
+      ],
+      "related_terms": [
+        "RNA",
+        "protein",
+        "translation"
+      ],
+      "source": "IUPAC"
+    },
+    "chromosome": {
+      "en": "chromosome",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Chromosome",
+        "chromosomes"
+      ],
+      "related_terms": [
+        "DNA",
+        "gene",
+        "nucleus"
+      ],
+      "source": "IUPAC"
+    },
+    "endoplasmic_reticulum": {
+      "en": "endoplasmic reticulum",
+      "abbrev": "ER",
+      "full_form": "endoplasmic reticulum",
+      "domain": "biology",
+      "variants": [
+        "ER",
+        "endoplasmic reticulum"
+      ],
+      "related_terms": [
+        "cell",
+        "protein",
+        "Golgi"
+      ],
+      "source": "IUPAC"
+    },
+    "golgi": {
+      "en": "Golgi apparatus",
+      "abbrev": "Golgi",
+      "full_form": "Golgi apparatus",
+      "domain": "biology",
+      "variants": [
+        "Golgi body",
+        "Golgi complex"
+      ],
+      "related_terms": [
+        "ER",
+        "protein",
+        "secretion"
+      ],
+      "source": "IUPAC"
+    },
+    "lysosome": {
+      "en": "lysosome",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Lysosome",
+        "lysosomes"
+      ],
+      "related_terms": [
+        "cell",
+        "enzyme",
+        "digestion"
+      ],
+      "source": "IUPAC"
+    },
+    "peroxisome": {
+      "en": "peroxisome",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Peroxisome",
+        "peroxisomes"
+      ],
+      "related_terms": [
+        "cell",
+        "lipid",
+        "metabolism"
+      ],
+      "source": "IUPAC"
+    },
+    "cytoskeleton": {
+      "en": "cytoskeleton",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Cytoskeleton"
+      ],
+      "related_terms": [
+        "cell",
+        "actin",
+        "microtubule"
+      ],
+      "source": "IUPAC"
+    },
+    "actin": {
+      "en": "actin",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Actin",
+        "F-actin",
+        "G-actin"
+      ],
+      "related_terms": [
+        "cytoskeleton",
+        "muscle",
+        "motility"
+      ],
+      "source": "IUPAC"
+    },
+    "microtubule": {
+      "en": "microtubule",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Microtubule",
+        "microtubules"
+      ],
+      "related_terms": [
+        "cytoskeleton",
+        "tubulin",
+        "cilium"
+      ],
+      "source": "IUPAC"
+    },
+    "cilium": {
+      "en": "cilium",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Cilium",
+        "cilia"
+      ],
+      "related_terms": [
+        "microtubule",
+        "motility",
+        "flagellum"
+      ],
+      "source": "IUPAC"
+    },
+    "flagellum": {
+      "en": "flagellum",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Flagellum",
+        "flagella"
+      ],
+      "related_terms": [
+        "cilium",
+        "motility",
+        "bacterial"
+      ],
+      "source": "IUPAC"
+    },
+    "cell_wall": {
+      "en": "cell wall",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Cell wall"
+      ],
+      "related_terms": [
+        "cell",
+        "cellulose",
+        "peptidoglycan"
+      ],
+      "source": "IUPAC"
+    },
+    "extracellular_matrix": {
+      "en": "extracellular matrix",
+      "abbrev": "ECM",
+      "full_form": "extracellular matrix",
+      "domain": "biology",
+      "variants": [
+        "ECM",
+        "extracellular matrix"
+      ],
+      "related_terms": [
+        "cell",
+        "tissue",
+        "collagen"
+      ],
+      "source": "IUPAC"
+    }
+  },
+  "genetics": {
+    "genome": {
+      "en": "genome",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Genome",
+        "genomes"
+      ],
+      "related_terms": [
+        "gene",
+        "DNA",
+        "chromosome"
+      ],
+      "source": "IUPAC"
+    },
+    "mutation": {
+      "en": "mutation",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Mutation",
+        "mutations"
+      ],
+      "related_terms": [
+        "gene",
+        "DNA",
+        "variation"
+      ],
+      "source": "IUPAC"
+    },
+    "allele": {
+      "en": "allele",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Allele",
+        "alleles"
+      ],
+      "related_terms": [
+        "gene",
+        "genotype",
+        "phenotype"
+      ],
+      "source": "IUPAC"
+    },
+    "genotype": {
+      "en": "genotype",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Genotype",
+        "genotypes"
+      ],
+      "related_terms": [
+        "allele",
+        "phenotype",
+        "gene"
+      ],
+      "source": "IUPAC"
+    },
+    "phenotype": {
+      "en": "phenotype",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Phenotype",
+        "phenotypes"
+      ],
+      "related_terms": [
+        "genotype",
+        "trait",
+        "gene"
+      ],
+      "source": "IUPAC"
+    },
+    "transcription": {
+      "en": "transcription",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Transcription"
+      ],
+      "related_terms": [
+        "RNA",
+        "DNA",
+        "gene expression"
+      ],
+      "source": "IUPAC"
+    },
+    "translation": {
+      "en": "translation",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Translation"
+      ],
+      "related_terms": [
+        "RNA",
+        "protein",
+        "ribosome"
+      ],
+      "source": "IUPAC"
+    },
+    "replication": {
+      "en": "replication",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Replication"
+      ],
+      "related_terms": [
+        "DNA",
+        "cell division",
+        "polymerase"
+      ],
+      "source": "IUPAC"
+    },
+    "recombination": {
+      "en": "recombination",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Recombination"
+      ],
+      "related_terms": [
+        "DNA",
+        "genetic",
+        "crossing over"
+      ],
+      "source": "IUPAC"
+    },
+    "expression": {
+      "en": "gene expression",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "expression",
+        "gene expression"
+      ],
+      "related_terms": [
+        "transcription",
+        "translation",
+        "regulation"
+      ],
+      "source": "IUPAC"
+    },
+    "regulation": {
+      "en": "regulation",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Regulation"
+      ],
+      "related_terms": [
+        "gene expression",
+        "transcription factor",
+        "promoter"
+      ],
+      "source": "IUPAC"
+    },
+    "promoter": {
+      "en": "promoter",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Promoter",
+        "promoters"
+      ],
+      "related_terms": [
+        "transcription",
+        "gene",
+        "regulation"
+      ],
+      "source": "IUPAC"
+    },
+    "operon": {
+      "en": "operon",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Operon",
+        "operons"
+      ],
+      "related_terms": [
+        "promoter",
+        "gene",
+        "bacterial"
+      ],
+      "source": "IUPAC"
+    },
+    "epigenetics": {
+      "en": "epigenetics",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Epigenetics"
+      ],
+      "related_terms": [
+        "DNA methylation",
+        "histone",
+        "gene expression"
+      ],
+      "source": "IUPAC"
+    },
+    "methylation": {
+      "en": "methylation",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Methylation"
+      ],
+      "related_terms": [
+        "DNA",
+        "epigenetics",
+        "gene expression"
+      ],
+      "source": "IUPAC"
+    },
+    "silencing": {
+      "en": "gene silencing",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "silencing",
+        "gene silencing"
+      ],
+      "related_terms": [
+        "methylation",
+        "RNAi",
+        "transcription"
+      ],
+      "source": "IUPAC"
+    },
+    "knockout": {
+      "en": "knockout",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Knockout",
+        "knock-out"
+      ],
+      "related_terms": [
+        "gene",
+        "mutation",
+        "model organism"
+      ],
+      "source": "IUPAC"
+    },
+    "knockin": {
+      "en": "knockin",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Knockin",
+        "knock-in"
+      ],
+      "related_terms": [
+        "gene",
+        "transgenic",
+        "mutation"
+      ],
+      "source": "IUPAC"
+    },
+    "crispr": {
+      "en": "CRISPR",
+      "abbrev": "CRISPR",
+      "full_form": "clustered regularly interspaced short palindromic repeats",
+      "domain": "biology",
+      "variants": [
+        "CRISPR-Cas9",
+        "CRISPR/Cas9"
+      ],
+      "related_terms": [
+        "gene editing",
+        "Cas9",
+        "genome engineering"
+      ],
+      "source": "IUPAC"
+    },
+    "cas9": {
+      "en": "Cas9",
+      "abbrev": "Cas9",
+      "full_form": "CRISPR-associated protein 9",
+      "domain": "biology",
+      "variants": [
+        "Cas 9"
+      ],
+      "related_terms": [
+        "CRISPR",
+        "gene editing",
+        "nuclease"
+      ],
+      "source": "IUPAC"
+    }
+  },
+  "ecology": {
+    "ecosystem": {
+      "en": "ecosystem",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Ecosystem",
+        "ecosystems"
+      ],
+      "related_terms": [
+        "ecology",
+        "habitat",
+        "species"
+      ],
+      "source": "IUPAC"
+    },
+    "habitat": {
+      "en": "habitat",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Habitat",
+        "habitats"
+      ],
+      "related_terms": [
+        "ecosystem",
+        "species",
+        "environment"
+      ],
+      "source": "IUPAC"
+    },
+    "species": {
+      "en": "species",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Species",
+        "spp."
+      ],
+      "related_terms": [
+        "population",
+        "genus",
+        "biodiversity"
+      ],
+      "source": "IUPAC"
+    },
+    "biodiversity": {
+      "en": "biodiversity",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Biodiversity",
+        "biological diversity"
+      ],
+      "related_terms": [
+        "species",
+        "ecosystem",
+        "conservation"
+      ],
+      "source": "IUPAC"
+    },
+    "population": {
+      "en": "population",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Population",
+        "populations"
+      ],
+      "related_terms": [
+        "species",
+        "community",
+        "ecology"
+      ],
+      "source": "IUPAC"
+    },
+    "community": {
+      "en": "community",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Community",
+        "communities"
+      ],
+      "related_terms": [
+        "population",
+        "ecosystem",
+        "species"
+      ],
+      "source": "IUPAC"
+    },
+    "niche": {
+      "en": "niche",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Niche",
+        "niches"
+      ],
+      "related_terms": [
+        "species",
+        "habitat",
+        "competition"
+      ],
+      "source": "IUPAC"
+    },
+    "succession": {
+      "en": "succession",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Succession"
+      ],
+      "related_terms": [
+        "ecosystem",
+        "community",
+        "primary",
+        "secondary"
+      ],
+      "source": "IUPAC"
+    },
+    "symbiosis": {
+      "en": "symbiosis",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Symbiosis"
+      ],
+      "related_terms": [
+        "mutualism",
+        "parasitism",
+        "commensalism"
+      ],
+      "source": "IUPAC"
+    },
+    "mutualism": {
+      "en": "mutualism",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Mutualism"
+      ],
+      "related_terms": [
+        "symbiosis",
+        "species interaction",
+        "cooperation"
+      ],
+      "source": "IUPAC"
+    },
+    "parasitism": {
+      "en": "parasitism",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Parasitism"
+      ],
+      "related_terms": [
+        "symbiosis",
+        "host",
+        "parasite"
+      ],
+      "source": "IUPAC"
+    },
+    "predation": {
+      "en": "predation",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Predation"
+      ],
+      "related_terms": [
+        "predator",
+        "prey",
+        "food chain"
+      ],
+      "source": "IUPAC"
+    },
+    "food_chain": {
+      "en": "food chain",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Food chain"
+      ],
+      "related_terms": [
+        "food web",
+        "predation",
+        "trophic"
+      ],
+      "source": "IUPAC"
+    },
+    "food_web": {
+      "en": "food web",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Food web"
+      ],
+      "related_terms": [
+        "food chain",
+        "ecosystem",
+        "trophic"
+      ],
+      "source": "IUPAC"
+    },
+    "trophic": {
+      "en": "trophic level",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "trophic level",
+        "trophic"
+      ],
+      "related_terms": [
+        "food chain",
+        "energy",
+        "biomass"
+      ],
+      "source": "IUPAC"
+    },
+    "carrying_capacity": {
+      "en": "carrying capacity",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "carrying capacity",
+        "K value"
+      ],
+      "related_terms": [
+        "population",
+        "logistic growth",
+        "resources"
+      ],
+      "source": "IUPAC"
+    }
+  },
+  "biochemistry": {
+    "metabolism": {
+      "en": "metabolism",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Metabolism"
+      ],
+      "related_terms": [
+        "enzyme",
+        "energy",
+        "catabolism",
+        "anabolism"
+      ],
+      "source": "IUPAC"
+    },
+    "catabolism": {
+      "en": "catabolism",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Catabolism"
+      ],
+      "related_terms": [
+        "metabolism",
+        "energy",
+        "catabolic"
+      ],
+      "source": "IUPAC"
+    },
+    "anabolism": {
+      "en": "anabolism",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Anabolism"
+      ],
+      "related_terms": [
+        "metabolism",
+        "energy",
+        "anabolic"
+      ],
+      "source": "IUPAC"
+    },
+    "atp": {
+      "en": "ATP",
+      "abbrev": "ATP",
+      "full_form": "adenosine triphosphate",
+      "domain": "biology",
+      "variants": [
+        "adenosine triphosphate",
+        "A.T.P."
+      ],
+      "related_terms": [
+        "energy",
+        "mitochondria",
+        "respiration"
+      ],
+      "source": "IUPAC"
+    },
+    "nad": {
+      "en": "NAD",
+      "abbrev": "NAD",
+      "full_form": "nicotinamide adenine dinucleotide",
+      "domain": "biology",
+      "variants": [
+        "nicotinamide adenine dinucleotide",
+        "NAD+",
+        "NADH"
+      ],
+      "related_terms": [
+        "respiration",
+        "metabolism",
+        "electron transport"
+      ],
+      "source": "IUPAC"
+    },
+    "fad": {
+      "en": "FAD",
+      "abbrev": "FAD",
+      "full_form": "flavin adenine dinucleotide",
+      "domain": "biology",
+      "variants": [
+        "flavin adenine dinucleotide",
+        "FAD+",
+        "FADH2"
+      ],
+      "related_terms": [
+        "respiration",
+        "metabolism",
+        "electron transport"
+      ],
+      "source": "IUPAC"
+    },
+    "coenzyme": {
+      "en": "coenzyme",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Coenzyme",
+        "coenzymes"
+      ],
+      "related_terms": [
+        "enzyme",
+        "vitamin",
+        "metabolism"
+      ],
+      "source": "IUPAC"
+    },
+    "cofactor": {
+      "en": "cofactor",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Cofactor",
+        "cofactors"
+      ],
+      "related_terms": [
+        "enzyme",
+        "metal ion",
+        "coenzyme"
+      ],
+      "source": "IUPAC"
+    },
+    "substrate": {
+      "en": "substrate",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Substrate",
+        "substrates"
+      ],
+      "related_terms": [
+        "enzyme",
+        "catalysis",
+        "reaction"
+      ],
+      "source": "IUPAC"
+    },
+    "product": {
+      "en": "product",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Product",
+        "products"
+      ],
+      "related_terms": [
+        "substrate",
+        "reaction",
+        "enzyme"
+      ],
+      "source": "IUPAC"
+    },
+    "kinetics": {
+      "en": "kinetics",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Kinetics"
+      ],
+      "related_terms": [
+        "enzyme",
+        "reaction rate",
+        "Michaelis-Menten"
+      ],
+      "source": "IUPAC"
+    },
+    "inhibition": {
+      "en": "inhibition",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Inhibition"
+      ],
+      "related_terms": [
+        "enzyme",
+        "inhibitor",
+        "kinetics"
+      ],
+      "source": "IUPAC"
+    },
+    "allosteric": {
+      "en": "allosteric",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Allosteric"
+      ],
+      "related_terms": [
+        "enzyme",
+        "regulation",
+        "conformation"
+      ],
+      "source": "IUPAC"
+    },
+    "conformational": {
+      "en": "conformational change",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "conformational change",
+        "conformation"
+      ],
+      "related_terms": [
+        "protein",
+        "structure",
+        "function"
+      ],
+      "source": "IUPAC"
+    },
+    "glycolysis": {
+      "en": "glycolysis",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Glycolysis"
+      ],
+      "related_terms": [
+        "glucose",
+        "ATP",
+        "pyruvate"
+      ],
+      "source": "IUPAC"
+    },
+    "krebs": {
+      "en": "Krebs cycle",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "citric acid cycle",
+        "TCA cycle",
+        "Krebs cycle"
+      ],
+      "related_terms": [
+        "mitochondria",
+        "ATP",
+        "acetyl-CoA"
+      ],
+      "source": "IUPAC"
+    },
+    "oxidative_phosphorylation": {
+      "en": "oxidative phosphorylation",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "oxidative phosphorylation"
+      ],
+      "related_terms": [
+        "mitochondria",
+        "ATP",
+        "electron transport"
+      ],
+      "source": "IUPAC"
+    },
+    "photosynthesis": {
+      "en": "photosynthesis",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Photosynthesis"
+      ],
+      "related_terms": [
+        "chlorophyll",
+        "light",
+        "carbon fixation"
+      ],
+      "source": "IUPAC"
+    },
+    "calvin_cycle": {
+      "en": "Calvin cycle",
+      "abbrev": null,
+      "full_form": null,
+      "domain": "biology",
+      "variants": [
+        "Calvin-Benson cycle",
+        "Calvin cycle"
+      ],
+      "related_terms": [
+        "photosynthesis",
+        "carbon fixation",
+        "RuBisCO"
+      ],
+      "source": "IUPAC"
+    }
+  }
+}

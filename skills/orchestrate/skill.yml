@@ -1,0 +1,45 @@
+schema_version: 2
+name: orchestrate
+layer: D
+owner_domain: orchestration
+maturity: official
+when_to_use:
+  - User describes a research goal without naming a specific skill
+  - Task spans multiple skills and the right pipeline is non-obvious
+  - End-to-end (`--e2e`) single-shot run from screening through manuscript draft
+  - Routing ambiguous "what should I do next" / "where do I start" prompts
+when_NOT_to_use:
+  - The right skill is unambiguous (call that skill directly — no wrapper)
+  - Direct file authoring (worker outputs) — orchestrate routes, it does not generate
+  - Bypassing artifact validation gates declared in skill contracts (forbidden)
+inputs:
+  - project.yaml
+  - artifact_manifest.json
+  - qc/status.json
+outputs:
+  - qc/_pipeline_log.md
+deterministic_scripts:
+  - scripts/validate_skill_contracts.py
+  - scripts/validate_project_contract.py
+side_effects:
+  - routes_to_worker_skills
+downstream_consumers:
+  - write-paper
+  - verify-refs
+  - sync-submission
+forbidden_actions:
+  - generate_worker_outputs_directly
+  - bypass_artifact_validation
+
+# v2.1 quality card
+purpose: "Single entry point for the bundle: classify a request and route to the right skill, or chain skills for multi-step and end-to-end (--e2e) workflows."
+safety_boundaries:
+  - "Never generates worker-skill outputs directly; routes to and invokes the owning skill."
+  - "Does not bypass per-skill artifact validation in the chain."
+known_limitations:
+  - "Routing is heuristic; an ambiguous request may need explicit skill selection."
+  - "--e2e halts on missing expected outputs rather than proceeding with gaps."
+validation_commands:
+  - "python3 scripts/validate_skill_contracts.py"
+  - "python3 scripts/validate_project_contract.py"
+evidence_surface: demo

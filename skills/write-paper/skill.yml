@@ -1,0 +1,55 @@
+schema_version: 2
+name: write-paper
+layer: C
+owner_domain: manuscript_drafting
+maturity: official
+when_to_use:
+  - Drafting an original medical/scientific manuscript from outline (8-phase IMRAD workflow)
+  - Original article, case report, meta-analysis report, AI validation study, animal study, or technical note
+  - Step 7.3a numerical claim audit before submission
+  - Step 7.6 reference handoff to /manage-refs for journal CSL render
+when_NOT_to_use:
+  - Self-criticism on the user's own draft (use /self-review — explicitly different routing)
+  - Reviewer-response writing (use /revise)
+  - Reviewing external manuscripts (use /peer-review)
+  - Generating references from memory (forbidden — use /search-lit + /verify-refs)
+  - Silently editing a frozen submission docx (forbidden — branch to v_(N+1))
+inputs:
+  - project.yaml
+  - analysis/_analysis_outputs.md
+  - analysis/figures/_figure_manifest.md
+outputs:
+  - manuscript/manuscript.md
+  - manuscript/title_page.md
+  - qc/_pipeline_log.md
+deterministic_scripts:
+  - scripts/gate_backbone_fulltext.py
+  - scripts/build_title_page_affiliations.py
+  - scripts/check_placeholders.py
+side_effects:
+  - writes_project_artifacts
+downstream_consumers:
+  - self-review
+  - verify-refs
+  - sync-submission
+forbidden_actions:
+  - generate_references_from_memory
+  - silently_edit_frozen_submission
+
+# v2.1 quality card
+purpose: "Draft a submission-ready IMRAD manuscript or section from approved project inputs (8-phase workflow)."
+safety_boundaries:
+  - "Never generates references from memory; citations come from search-lit and are checked by verify-refs."
+  - "Never silently edits a frozen submission; branches to v_(N+1) instead."
+  - "Numerical claims are audited against approved tables before submission (Step 7.3a)."
+known_limitations:
+  - "Reference integrity depends on verify-refs (PubMed/CrossRef); offline runs degrade to manual checking."
+  - "Drafts the user's own manuscript only; not for self-critique (self-review), reviewer response (revise), or external review (peer-review)."
+validation_commands:
+  - "/verify-refs --strict"
+  - "/self-review"
+  - "python3 scripts/gate_backbone_fulltext.py --project project.yaml --refs manuscript/_src/refs.bib --fulltext-dir pdfs/ --strict"
+  - "python3 scripts/build_title_page_affiliations.py --check manuscript/title_page.md --strict"
+  - "bash tests/test_backbone_fulltext.sh"
+  - "bash tests/test_title_page_affiliations.sh"
+evidence_surface: demo

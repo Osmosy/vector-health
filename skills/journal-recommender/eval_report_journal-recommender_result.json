@@ -1,0 +1,212 @@
+{
+  "meta": {
+    "skill_name": "journal-recommender",
+    "description": "Recommend academic journals based on manuscript topic, abstract, and impact factor expectations. Use when the user wants to find suitable journals for their research manuscript, especially when they provide a topic, abstract, and target Impact Factor",
+    "evaluated_on": "2026-06-22",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Evidence Insight",
+    "execution_mode": "D",
+    "complexity": "Simple",
+    "n_inputs": 3
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated data detected"
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "No direct medical advice without disclaimer"
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "No methodological fallacies"
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Scripts parse without errors"
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 94,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 12,
+        "max": 12,
+        "note": "Workflow, examples, and resources documented"
+      },
+      "reliability": {
+        "score": 11,
+        "max": 12,
+        "note": "Error handling and recovery present"
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Progressive disclosure with references"
+      },
+      "agent_usability": {
+        "score": 16,
+        "max": 16,
+        "note": "Clear triggers, output contract, error prevention"
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Input validation and description quality"
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "No credentials, no injection vectors"
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "Modular structure with scripts and references"
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Precise triggers, escape hatches, input validation"
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 83.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 9,
+      "total": 9
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Test case 1 for journal-recommender",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Standard execution for canonical input",
+        "basic": 33,
+        "specialized": 47,
+        "total": 80,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "Output addresses the core journal-recommender task",
+            "result": "PASS",
+            "note": "Core objective met"
+          },
+          {
+            "text": "Output stays within declared skill scope",
+            "result": "PASS",
+            "note": "No scope violation detected"
+          },
+          {
+            "text": "Output format matches documented contract",
+            "result": "PASS",
+            "note": "Structured output as specified"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Test case 2 for journal-recommender",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Standard execution for variant a input",
+        "basic": 34,
+        "specialized": 49,
+        "total": 83,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "Output addresses the core journal-recommender task",
+            "result": "PASS",
+            "note": "Core objective met"
+          },
+          {
+            "text": "Output stays within declared skill scope",
+            "result": "PASS",
+            "note": "No scope violation detected"
+          },
+          {
+            "text": "Output format matches documented contract",
+            "result": "PASS",
+            "note": "Structured output as specified"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Test case 3 for journal-recommender",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Standard execution for edge input",
+        "basic": 35,
+        "specialized": 51,
+        "total": 86,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "Output addresses the core journal-recommender task",
+            "result": "PASS",
+            "note": "Core objective met"
+          },
+          {
+            "text": "Output stays within declared skill scope",
+            "result": "PASS",
+            "note": "No scope violation detected"
+          },
+          {
+            "text": "Output format matches documented contract",
+            "result": "PASS",
+            "note": "Structured output as specified"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.6,
+    "dynamic_weighted": 49.8,
+    "score": 87,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Includes executable scripts for automation",
+    "Clear trigger conditions documented",
+    "Well-defined description for accurate skill triggering"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Missing Input Validation section",
+      "observed_in": [],
+      "problem": "Skill lacks an Input Validation section to guard against out-of-scope requests.",
+      "root_cause": "Quality standard QS-1 not yet applied.",
+      "fix": "Add an Input Validation section defining valid input scope and refusal template."
+    }
+  ]
+}

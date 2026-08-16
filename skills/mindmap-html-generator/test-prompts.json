@@ -1,0 +1,4 @@
+[
+ {"id": 1, "prompt": "pleaseGenerate：'（2026.6.16）\n1： - Complete，currentlyAPI，620Complete\n2： - 30%，，3bug\n3：QA - 95%，2bug，618\n4： - CompleteallAPI，Start，QA'", "expected": "Generate、、HTML，Topic，42-3"},
+ {"id": 2, "prompt": "Generate：\nTitle：\n1. - ，\n2. - CNN，U-Net，Transformer\n3. - U-Net+Attention，：BraTS 2023，：Dice Loss + Cross Entropy\n4. - U-Net、Attention U-Net、TransUNet，Dice0.89，HD95 5.2mm\n5. - ，Validate", "expected": "Generate，part，partand"}
+]

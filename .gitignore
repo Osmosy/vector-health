@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+*.pyo
+*.bak
+*.pre-polish*
+.DS_Store
+node_modules/
+.venv/
+venv/
+.pytest_cache/
+.ipynb_checkpoints/

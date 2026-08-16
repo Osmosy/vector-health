@@ -1,0 +1,111 @@
+# PPT Master Dependencies / PPT Master 
+# =============================================
+#
+# Most tools use only the Python standard library. Below are optional dependencies.
+# part Python ，Optional。
+#
+# Install / ：
+# pip install -r requirements.txt
+
+# ─────────────────────────────────────────────────────────────
+# SVG to PPTX tool / SVG PPTX (skills/ppt-master/scripts/svg_to_pptx.py)
+# ─────────────────────────────────────────────────────────────
+# Batch-convert SVG files to PowerPoint presentations.
+# SVG PowerPoint 
+# Uses Office-compatible mode (PNG + SVG dual format) by default, supports all Office versions.
+# Default Office （PNG + SVG ），all Office 
+python-pptx>=0.6.21
+
+# Recorded narration / and
+# notes_to_audio.py generates per-slide narration audio on macOS/Linux/Windows.
+# notes_to_audio.py macOS/Linux/Windows Generate。
+edge-tts>=7.2.8
+
+# Office compatibility dependencies (choose one, CairoSVG preferred)
+# Office （， cairosvg）
+# Converts SVG to PNG fallback images for Office LTSC 2021 etc.
+# SVG PNG Image， Office LTSC 2021 
+#
+# Option A / A: CairoSVG (recommended / , ~25MB, full gradient/filter support)
+# pip install cairosvg
+# macOS: brew install cairo
+#
+# Option B / B: svglib (lightweight / , ~5MB, some gradients may be lost)
+svglib>=1.5.0
+reportlab>=4.0.0
+
+# ─────────────────────────────────────────────────────────────
+# PDF to Markdown tool / PDF Markdown (skills/ppt-master/scripts/source_to_md/pdf_to_md.py)
+# ─────────────────────────────────────────────────────────────
+# Converts PDF to Markdown with text, image, and table extraction.
+# PDF Markdown ，、Image、
+PyMuPDF>=1.23.0
+
+# ─────────────────────────────────────────────────────────────
+# Document to Markdown tool / Markdown (skills/ppt-master/scripts/source_to_md/doc_to_md.py)
+# ─────────────────────────────────────────────────────────────
+# Native (pure-Python) paths — no external binary required:
+# （ Python，）：
+# .docx → mammoth
+# .html → markdownify (+ beautifulsoup4, listed below)
+# .epub → ebooklib (+ markdownify)
+# .ipynb → nbconvert
+mammoth>=1.6.0
+markdownify>=0.11.6
+ebooklib>=0.18
+nbconvert>=7.0.0
+
+# ─────────────────────────────────────────────────────────────
+# Excel to Markdown tool / Excel Markdown (skills/ppt-master/scripts/source_to_md/excel_to_md.py)
+# ─────────────────────────────────────────────────────────────
+# Converts .xlsx/.xlsm workbooks to Markdown while preserving sheet structure.
+# .xlsx/.xlsm Markdown，。
+openpyxl>=3.1.0
+#
+# Fallback path — only needed for less common formats
+# (.doc .odt .rtf .tex/.latex .rst .org .typ).
+# Not required if you only convert the four native formats above.
+# —— 
+# (.doc .odt .rtf .tex/.latex .rst .org .typ)。
+# ，。
+# macOS: brew install pandoc
+# Ubuntu: sudo apt install pandoc
+# Windows: https://pandoc.org/installing.html
+
+# ─────────────────────────────────────────────────────────────
+# Image processing tools / Image
+# ─────────────────────────────────────────────────────────────
+# fix_image_aspect.py - Fix image aspect ratio (prevent stretching during PPT shape conversion)
+# fix_image_aspect.py - Image（ PPT ）
+# gemini_watermark_remover.py - Remove watermarks from Gemini-generated images
+# gemini_watermark_remover.py - Gemini GenerateImage
+Pillow>=9.0.0
+numpy>=1.20.0
+
+# ─────────────────────────────────────────────────────────────
+# Web to Markdown tool / Markdown (skills/ppt-master/scripts/source_to_md/web_to_md.py)
+# ─────────────────────────────────────────────────────────────
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+# Optional — TLS fingerprint impersonation for sites that block Python's
+# default TLS fingerprint (e.g., WeChat mp.weixin.qq.com). If installed,
+# web_to_md.py uses it automatically; otherwise falls back to requests.
+# Install this to avoid needing Node.js for WeChat / portal pages.
+# Optional —— TLS （）。 web_to_md.py
+# ； requests。 Node.js。
+curl_cffi>=0.7.0
+
+# ─────────────────────────────────────────────────────────────
+# AI image generation tool / AI ImageGenerate (skills/ppt-master/scripts/image_gen.py)
+# ─────────────────────────────────────────────────────────────
+# Gemini backend / Gemini (IMAGE_BACKEND=gemini)
+google-genai>=1.0.0
+# OpenAI-compatible backend uses requests from the web tooling section above.
+# OpenAI requests。
+
+# ─────────────────────────────────────────────────────────────
+# SVG Editor / SVG (skills/ppt-master/scripts/svg_editor/server.py)
+# ─────────────────────────────────────────────────────────────
+# Localhost web editor for annotating SVG elements with edit instructions.
+# Web ， SVG 
+flask>=3.0.0

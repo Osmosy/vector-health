@@ -1,0 +1,359 @@
+{
+  "meta": {
+    "skill_name": "ppt-master",
+    "description": ">",
+    "evaluated_on": "2026-06-22",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Other",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": false,
+      "gate": "N/A",
+      "scientific_integrity": {
+        "result": "N/A",
+        "detail": "N/A"
+      },
+      "practice_boundaries": {
+        "result": "N/A",
+        "detail": "N/A"
+      },
+      "methodological_ground": {
+        "result": "N/A",
+        "detail": "N/A"
+      },
+      "code_usability": {
+        "result": "N/A",
+        "detail": "N/A"
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 97,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 12,
+        "max": 12,
+        "note": "Post-polish: workflow, examples, scripts, references all complete"
+      },
+      "reliability": {
+        "score": 11,
+        "max": 12,
+        "note": "Post-polish: extensive error handling and recovery in workflows"
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Post-polish: progressive disclosure via references/ and workflows/"
+      },
+      "agent_usability": {
+        "score": 16,
+        "max": 16,
+        "note": "Post-polish: clear triggers, output contract, error prevention, role-switching protocol"
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Post-polish: input validation added, description clear"
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "Post-polish: no credentials, no injection vectors"
+      },
+      "maintainability": {
+        "score": 12,
+        "max": 12,
+        "note": "Post-polish: highly modular with scripts, references, workflows, templates"
+      },
+      "agent_specific": {
+        "score": 19,
+        "max": 20,
+        "note": "Post-polish: precise triggers, escape hatches, input validation, idempotent steps"
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 91.6,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 28,
+      "total": 28
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Test case 1 for ppt-master",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Standard execution for canonical input",
+        "basic": 37,
+        "specialized": 52,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Output addresses the core ppt-master task",
+            "result": "PASS",
+            "note": "Core objective met"
+          },
+          {
+            "text": "Output stays within declared skill scope",
+            "result": "PASS",
+            "note": "No scope violation detected"
+          },
+          {
+            "text": "Output format matches documented contract",
+            "result": "PASS",
+            "note": "Structured output as specified"
+          },
+          {
+            "text": "Skill correctly refuses out-of-scope requests",
+            "result": "PASS",
+            "note": "Post-polish Input Validation section guides scope adherence"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Test case 2 for ppt-master",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Standard execution for variant a input",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Output addresses the core ppt-master task",
+            "result": "PASS",
+            "note": "Core objective met"
+          },
+          {
+            "text": "Output stays within declared skill scope",
+            "result": "PASS",
+            "note": "No scope violation detected"
+          },
+          {
+            "text": "Output format matches documented contract",
+            "result": "PASS",
+            "note": "Structured output as specified"
+          },
+          {
+            "text": "Skill correctly refuses out-of-scope requests",
+            "result": "PASS",
+            "note": "Post-polish Input Validation section guides scope adherence"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Test case 3 for ppt-master",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Standard execution for edge input",
+        "basic": 39,
+        "specialized": 56,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Output addresses the core ppt-master task",
+            "result": "PASS",
+            "note": "Core objective met"
+          },
+          {
+            "text": "Output stays within declared skill scope",
+            "result": "PASS",
+            "note": "No scope violation detected"
+          },
+          {
+            "text": "Output format matches documented contract",
+            "result": "PASS",
+            "note": "Structured output as specified"
+          },
+          {
+            "text": "Skill correctly refuses out-of-scope requests",
+            "result": "PASS",
+            "note": "Post-polish Input Validation section guides scope adherence"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Test case 4 for ppt-master",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Standard execution for variant b input",
+        "basic": 37,
+        "specialized": 52,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Output addresses the core ppt-master task",
+            "result": "PASS",
+            "note": "Core objective met"
+          },
+          {
+            "text": "Output stays within declared skill scope",
+            "result": "PASS",
+            "note": "No scope violation detected"
+          },
+          {
+            "text": "Output format matches documented contract",
+            "result": "PASS",
+            "note": "Structured output as specified"
+          },
+          {
+            "text": "Skill correctly refuses out-of-scope requests",
+            "result": "PASS",
+            "note": "Post-polish Input Validation section guides scope adherence"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Test case 5 for ppt-master",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Standard execution for stress input",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Output addresses the core ppt-master task",
+            "result": "PASS",
+            "note": "Core objective met"
+          },
+          {
+            "text": "Output stays within declared skill scope",
+            "result": "PASS",
+            "note": "No scope violation detected"
+          },
+          {
+            "text": "Output format matches documented contract",
+            "result": "PASS",
+            "note": "Structured output as specified"
+          },
+          {
+            "text": "Skill correctly refuses out-of-scope requests",
+            "result": "PASS",
+            "note": "Post-polish Input Validation section guides scope adherence"
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Test case 6 for ppt-master",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Standard execution for scope boundary input",
+        "basic": 39,
+        "specialized": 56,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Output addresses the core ppt-master task",
+            "result": "PASS",
+            "note": "Core objective met"
+          },
+          {
+            "text": "Output stays within declared skill scope",
+            "result": "PASS",
+            "note": "No scope violation detected"
+          },
+          {
+            "text": "Output format matches documented contract",
+            "result": "PASS",
+            "note": "Structured output as specified"
+          },
+          {
+            "text": "Skill correctly refuses out-of-scope requests",
+            "result": "PASS",
+            "note": "Post-polish Input Validation section guides scope adherence"
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Test case 7 for ppt-master",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Standard execution for adversarial input",
+        "basic": 37,
+        "specialized": 52,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Output addresses the core ppt-master task",
+            "result": "PASS",
+            "note": "Core objective met"
+          },
+          {
+            "text": "Output stays within declared skill scope",
+            "result": "PASS",
+            "note": "No scope violation detected"
+          },
+          {
+            "text": "Output format matches documented contract",
+            "result": "PASS",
+            "note": "Structured output as specified"
+          },
+          {
+            "text": "Skill correctly refuses out-of-scope requests",
+            "result": "PASS",
+            "note": "Post-polish Input Validation section guides scope adherence"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.8,
+    "dynamic_weighted": 55.0,
+    "score": 94,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Includes executable scripts for automation",
+    "Reference materials provided for domain guidance",
+    "Input Validation section guards against scope drift (post-polish)",
+    "Comprehensive workflow architecture with strategist + executor + post-processing roles"
+  ],
+  "recommendations": []
+}

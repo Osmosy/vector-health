@@ -1,0 +1,46 @@
+schema_version: 2
+name: peer-review
+layer: C
+owner_domain: external_peer_review
+maturity: official
+when_to_use:
+  - User received a journal review invitation and needs a structured review draft
+  - Drafting reviewer comments for a specific journal's review template (RYAI / INSI / EURE / AJR / KJR)
+  - Constructive developmental feedback on an external manuscript PDF
+when_NOT_to_use:
+  - Reviewing the user's own manuscript (use /self-review)
+  - Drafting the user's manuscript (use /write-paper)
+  - Generating references from memory or modifying the external paper (forbidden)
+inputs:
+  - external_manuscript.pdf
+outputs:
+  - review/{manuscript_id}/{manuscript_id}_review_draft.md
+  - review/{manuscript_id}/{manuscript_id}_submission.md
+  - review/{manuscript_id}/{manuscript_id}.manifest.json (PDF span manifest, when scanning for hidden text)
+  - review/{manuscript_id}/{manuscript_id}.sanitized.txt (visible-only text, safe to feed an LLM)
+deterministic_scripts:
+  - scripts/scan_pdf_layers.py
+  - scripts/check_pdf_injection.py
+side_effects:
+  - writes_review_artifacts
+downstream_consumers:
+  - none
+forbidden_actions:
+  - edit_users_own_manuscript
+  - generate_references_from_memory
+
+# v2.1 quality card
+purpose: "Draft a structured peer-review for a journal-assigned manuscript following the MedSci peer-review guideline (v2.5), with journal-specific formatting."
+safety_boundaries:
+  - "Reviews assigned external manuscripts only; never edits the user's own manuscript."
+  - "References are not generated from memory."
+known_limitations:
+  - "A review is one reviewer's judgement, not an editorial decision."
+  - "No standalone demo; quality depends on the manuscript supplied."
+  - "The injection scan catches formatting-hidden text (colour/size/position/render-mode/metadata) deterministically; a phrase in visible prose is flagged for a human, not auto-removed."
+validation_commands:
+  - "confirm the draft addresses each section against the guideline rubric"
+  - "python3 scripts/check_domain_probe_sync.py --strict"
+  - "python3 scripts/scan_pdf_layers.py <manuscript.pdf> | python3 scripts/check_pdf_injection.py - --strict  # hidden-text / prompt-injection guard (extractor needs PyMuPDF)"
+  - "bash scripts/check_pdf_injection_challenge/verify.sh  # deterministic, network-free, PyMuPDF-free"
+evidence_surface: ci_validator

@@ -1,0 +1,106 @@
+{
+  "patient_info": {
+    "name": "Patient Zhang",
+    "gender": "male",
+    "age": 68,
+    "medical_record_number": "20250205001",
+    "admission_date": "2025-01-28",
+    "discharge_date": "2025-02-05",
+    "department": "Cardiology Department",
+    "attending_physician": "Dr. Li"
+  },
+  "admission_data": {
+    "chief_complaint": "Chest tightness and chest pain for 3 days",
+    "present_illness_history": "Patient presented 3 days ago with substernal dull pain without obvious precipitating factors, crushing in nature, radiating to left shoulder and left upper limb, lasting about 10-15 minutes, relieved by rest. Accompanied by palpitations and dyspnea, no syncope. Presented to our emergency department, ECG showed V1-V4 leads ST elevation, elevated cardiac enzymes, admitted with diagnosis of acute anterior wall myocardial infarction.",
+    "past_medical_history": "Hypertension for 10 years, highest blood pressure 160/95mmHg, taking amlodipine 5mg qd, blood pressure fairly well controlled. Type 2 diabetes mellitus for 5 years, taking metformin 0.5g bid, blood glucose control fair. Denies history of hepatitis, tuberculosis, or other infectious diseases.",
+    "physical_examination": "T 36.5C, P 88 bpm, R 20 breaths/min, BP 135/85mmHg. Alert, fair general condition. Bilateral lung sounds clear, no rales. Heart rate 88 bpm, regular rhythm, normal heart sounds, no pathological murmurs at any valve area. Abdomen soft, non-tender. No lower extremity edema.",
+    "admission_diagnosis": [
+      "Coronary heart disease - Acute anterior wall ST-elevation myocardial infarction",
+      "Killip Class I",
+      "Hypertension Grade 2 (high risk)",
+      "Type 2 diabetes mellitus"
+    ]
+  },
+  "hospital_course": {
+    "treatment_summary": "Patient was immediately placed on the chest pain center green pathway upon admission, and pre-procedural workup was completed. Emergency coronary angiography was performed 2 hours after admission, showing 95% stenosis of the proximal left anterior descending artery, and one drug-eluting stent was implanted. Post-procedure, patient received dual antiplatelet therapy (aspirin 100mg qd + clopidogrel 75mg qd), statin for lipid management, ACEI for ventricular remodeling, and beta-blocker for heart rate control. Hospital course was uneventful, no chest pain episodes, no complications.",
+    "procedures_performed": [
+      "2025-01-28 Emergency coronary angiography",
+      "2025-01-28 Coronary artery stent implantation (left anterior descending artery)"
+    ],
+    "significant_findings": "Coronary angiography: Left main artery no significant stenosis; proximal LAD 95% stenosis, TIMI flow grade 2; mid left circumflex artery 30% stenosis; right coronary artery no significant stenosis. Post-procedure TIMI flow grade 3. Cardiac enzymes: CK-MB peak 186U/L, cTnI peak 12.5ng/mL. Echocardiography: Left ventricular anterior wall hypokinesis, EF 52%.",
+    "complications": [],
+    "consultations": []
+  },
+  "discharge_status": {
+    "discharge_diagnosis": [
+      "Coronary heart disease - Acute anterior wall ST-elevation myocardial infarction",
+      "Post-PCI status",
+      "Hypertension Grade 2 (high risk)",
+      "Type 2 diabetes mellitus"
+    ],
+    "discharge_condition": "Improved. Patient has no chest pain, no chest tightness, no shortness of breath. Good spirits and appetite, sleeping well, normal bowel and bladder function. Physical examination: vital signs stable, cardiopulmonary auscultation unremarkable, no lower extremity edema."
+  },
+  "medications": {
+    "discharge_medications": [
+      {
+        "name": "Aspirin enteric-coated tablets",
+        "dosage": "100mg",
+        "frequency": "Once daily",
+        "route": "Oral",
+        "duration": "Long-term"
+      },
+      {
+        "name": "Clopidogrel bisulfate tablets",
+        "dosage": "75mg",
+        "frequency": "Once daily",
+        "route": "Oral",
+        "duration": "At least 12 months"
+      },
+      {
+        "name": "Atorvastatin calcium tablets",
+        "dosage": "20mg",
+        "frequency": "Once nightly",
+        "route": "Oral",
+        "duration": "Long-term"
+      },
+      {
+        "name": "Perindopril tablets",
+        "dosage": "4mg",
+        "frequency": "Once daily",
+        "route": "Oral",
+        "duration": "Long-term"
+      },
+      {
+        "name": "Metoprolol sustained-release tablets",
+        "dosage": "47.5mg",
+        "frequency": "Once daily",
+        "route": "Oral",
+        "duration": "Long-term"
+      },
+      {
+        "name": "Metformin tablets",
+        "dosage": "0.5g",
+        "frequency": "Twice daily",
+        "route": "Oral",
+        "duration": "Long-term"
+      }
+    ]
+  },
+  "follow_up": {
+    "instructions": "Take medications regularly, do not discontinue without medical advice. Low-salt, low-fat, diabetic diet. Quit smoking, limit alcohol, control weight. Monitor blood pressure and blood glucose, maintain BP <130/80mmHg, fasting glucose <7mmol/L. Moderate exercise, avoid strenuous activity and heavy physical labor. Maintain emotional stability, avoid agitation.",
+    "follow_up_appointments": [
+      "Cardiology outpatient: 1 week after discharge (2025-02-12), Tuesday morning, bring discharge summary",
+      "Cardiology outpatient: 1 month after discharge, recheck complete blood count, liver and kidney function, lipid panel, ECG",
+      "Cardiology outpatient: 3-6 months after discharge, recheck echocardiography"
+    ],
+    "warning_signs": [
+      "Chest pain or chest tightness, especially if persistent and unrelieved for more than 15 minutes",
+      "Severe dyspnea, inability to lie flat",
+      "Palpitations, syncope",
+      "Gum bleeding, skin bruising (possible adverse reaction to antiplatelet medication)",
+      "Muscle soreness, fatigue (possible adverse reaction to statin medication)"
+    ],
+    "activity_restrictions": "Avoid strenuous exercise and heavy physical labor for 1 month after discharge. Light activities such as walking are permitted. Resume normal activities gradually after physician evaluation at 3 months post-procedure.",
+    "diet_instructions": "Low-salt (less than 6g per day), low-fat, low-sugar diet. Eat more vegetables, fruits, whole grains, and fish. Reduce organ meats, fatty meats, and fried foods. Quit smoking and limit alcohol."
+  }
+}

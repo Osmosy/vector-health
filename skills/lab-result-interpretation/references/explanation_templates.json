@@ -1,0 +1,192 @@
+{
+  "templates": {
+    "general": {
+      "normal": "Your {test_name} is within normal range. This is good news.",
+      "slight_abnormal": "Your {test_name} is slightly {direction}. Recommendation: monitor but no need for excessive worry.",
+      "moderate_abnormal": "Your {test_name} shows moderate {direction}. Recommendation: consult a doctor for further evaluation.",
+      "significant_abnormal": "Your {test_name} is significantly {direction}. Recommendation: see a doctor as soon as possible.",
+      "critical": "Your {test_name} is at a critical level. Seek immediate medical attention!"
+    },
+    "by_test": {
+      "WBC Count": {
+        "low": {
+          "mild": "WBC count is mildly decreased, possibly caused by viral infection, medication effects, or mild nutritional deficiency.",
+          "moderate": "WBC count is significantly decreased, immunity may be compromised, making you susceptible to infections. Recommendation: recheck and consult a doctor.",
+          "severe": "WBC count is severely decreased, infection risk exists, medical intervention is needed."
+        },
+        "high": {
+          "mild": "WBC count is mildly elevated, possibly indicating minor infection, stress response, or post-exercise state.",
+          "moderate": "WBC count is significantly elevated, possibly indicating bacterial infection, inflammation, or tissue damage.",
+          "severe": "WBC count is severely elevated, possibly indicating serious infection, leukemia, etc. Urgent evaluation needed."
+        }
+      },
+      "Hemoglobin": {
+        "low": {
+          "mild": "Mild anemia, may present with slight fatigue. Recommendation: increase iron-rich foods.",
+          "moderate": "Moderate anemia, may present with dizziness, fatigue, and other symptoms. Recommendation: determine the cause and treat.",
+          "severe": "Severe anemia, immediate medical intervention needed, may require blood transfusion."
+        },
+        "high": {
+          "mild": "Hemoglobin is mildly elevated, possibly due to dehydration or high-altitude environment. Recommendation: increase water intake.",
+          "moderate": "Hemoglobin is significantly elevated, polycythemia or other conditions may be present.",
+          "severe": "Hemoglobin is severely elevated, blood viscosity is increased, thrombosis risk is high."
+        }
+      },
+      "Platelet Count": {
+        "low": {
+          "mild": "Platelet count is mildly decreased, coagulation function is essentially normal, avoid trauma.",
+          "moderate": "Platelet count is significantly decreased, bleeding risk is increased, avoid strenuous exercise and injury.",
+          "severe": "Platelet count is severely decreased, bleeding risk is high, medical intervention is needed."
+        },
+        "high": {
+          "mild": "Platelet count is mildly elevated, generally no special treatment needed.",
+          "moderate": "Platelet count is significantly elevated, thrombosis risk is increased. Recommendation: further evaluation.",
+          "severe": "Platelet count is severely elevated, thrombosis risk is very high, treatment is needed."
+        }
+      },
+      "Total Cholesterol": {
+        "high": {
+          "mild": "Total cholesterol is slightly high, borderline elevated. Recommendation: adjust diet and increase physical activity.",
+          "moderate": "Total cholesterol is significantly elevated, cardiovascular disease risk is increased. Recommendation: low-fat diet and recheck.",
+          "severe": "Total cholesterol is severely elevated, medication and lifestyle changes are needed."
+        }
+      },
+      "LDL Cholesterol": {
+        "high": {
+          "mild": "LDL (bad) cholesterol is mildly elevated. Recommendation: reduce saturated fat intake.",
+          "moderate": "LDL (bad) cholesterol is significantly elevated, atherosclerosis risk is increased.",
+          "severe": "LDL (bad) cholesterol is severely elevated, medication is strongly recommended."
+        }
+      },
+      "HDL Cholesterol": {
+        "low": {
+          "mild": "HDL (good) cholesterol is slightly low. Recommendation: increase aerobic exercise.",
+          "moderate": "HDL (good) cholesterol is significantly low, cardiovascular protective effect is diminished.",
+          "severe": "HDL (good) cholesterol is severely insufficient, cardiovascular risk is increased."
+        }
+      },
+      "Triglycerides": {
+        "high": {
+          "mild": "Triglycerides are mildly elevated. Recommendation: reduce sugar and refined carbohydrates.",
+          "moderate": "Triglycerides are significantly elevated, pancreatitis risk is increased. Limit alcohol intake.",
+          "severe": "Triglycerides are severely elevated, acute pancreatitis risk is high, medication is needed."
+        }
+      },
+      "ALT": {
+        "high": {
+          "mild": "ALT (transaminase) is mildly elevated, possibly caused by fatty liver, alcohol, or medication.",
+          "moderate": "ALT (transaminase) is significantly elevated, indicating hepatocellular damage. Recommendation: check liver function and ultrasound.",
+          "severe": "ALT (transaminase) is severely elevated, acute hepatitis or other serious liver disease may be present."
+        }
+      },
+      "AST": {
+        "high": {
+          "mild": "AST is mildly elevated, possibly caused by muscle damage or mild liver disease.",
+          "moderate": "AST is significantly elevated, need to differentiate between liver or myocardial damage.",
+          "severe": "AST is severely elevated, serious liver damage or myocardial infarction may be present."
+        }
+      },
+      "Creatinine": {
+        "low": {
+          "mild": "Creatinine is mildly low, possibly due to low muscle mass or insufficient protein intake."
+        },
+        "high": {
+          "mild": "Creatinine is mildly elevated, possibly indicating mild decline in kidney function.",
+          "moderate": "Creatinine is significantly elevated, kidney function is impaired, nephrology evaluation needed.",
+          "severe": "Creatinine is severely elevated, renal failure may be present, urgent treatment needed."
+        }
+      },
+      "Uric Acid": {
+        "high": {
+          "mild": "Uric acid is mildly elevated. Increase water intake and reduce high-purine food consumption.",
+          "moderate": "Uric acid is significantly elevated, gout risk is increased. Recommendation: low-purine diet.",
+          "severe": "Uric acid is severely elevated, gout and kidney stone risk is high, medication is needed."
+        }
+      },
+      "Fasting Glucose": {
+        "low": {
+          "mild": "Blood glucose is mildly low, possibly from prolonged fasting. Have something to eat.",
+          "moderate": "Blood glucose is significantly low, hypoglycemic symptoms may occur. Carry candy with you.",
+          "severe": "Blood glucose is severely low, immediate sugar supplementation needed."
+        },
+        "high": {
+          "mild": "Fasting glucose is mildly elevated, in prediabetes range. Recommendation: dietary control and exercise.",
+          "moderate": "Fasting glucose is significantly elevated, may indicate diabetes. Recommendation: further glucose tolerance testing.",
+          "severe": "Fasting glucose is severely elevated, diabetes confirmed, standardized treatment needed."
+        }
+      },
+      "Glycated Hemoglobin": {
+        "high": {
+          "mild": "Glycated hemoglobin is mildly elevated, blood glucose control has been fair over the past 3 months.",
+          "moderate": "Glycated hemoglobin is significantly elevated, blood glucose control has been poor recently. Treatment plan adjustment needed.",
+          "severe": "Glycated hemoglobin is severely elevated, long-term poor glucose control, complication risk is high."
+        }
+      },
+      "TSH": {
+        "low": {
+          "mild": "TSH is mildly decreased, possible subclinical hyperthyroidism.",
+          "moderate": "TSH is significantly decreased, possible hyperthyroidism. Recommendation: check thyroid hormones.",
+          "severe": "TSH is severely decreased, hyperthyroidism is likely."
+        },
+        "high": {
+          "mild": "TSH is mildly elevated, possible subclinical hypothyroidism.",
+          "moderate": "TSH is significantly elevated, possible hypothyroidism. Recommendation: thyroid hormone supplementation.",
+          "severe": "TSH is severely elevated, hypothyroidism is likely, treatment needed."
+        }
+      },
+      "CRP": {
+        "high": {
+          "mild": "CRP is mildly elevated, mild inflammation may be present.",
+          "moderate": "CRP is significantly elevated, indicating inflammation or infection.",
+          "severe": "CRP is severely elevated, serious infection or autoimmune disease may be present."
+        }
+      }
+    }
+  },
+  "recommendations": {
+    "general": {
+      "diet": "Maintain a balanced diet, eat more vegetables and fruits, reduce processed foods.",
+      "exercise": "At least 150 minutes of moderate-intensity aerobic exercise per week.",
+      "lifestyle": "Maintain a regular schedule, avoid staying up late, quit smoking and limit alcohol.",
+      "followup": "Recommendation: regular follow-up to monitor indicator trends.",
+      "medical": "Recommendation: consult a specialist to develop a personalized treatment plan."
+    },
+    "by_category": {
+      "blood_routine": {
+        "low_wbc": "Pay attention to personal hygiene, avoid crowded places, prevent colds.",
+        "high_wbc": "Get more rest, increase water intake. Seek medical attention promptly if fever occurs.",
+        "low_hgb": "Eat more lean meat, animal liver, spinach, and other iron-rich foods.",
+        "low_plt": "Avoid strenuous exercise, use a soft-bristled toothbrush, prevent injury."
+      },
+      "lipid": {
+        "high_ldl": "Reduce animal fats, choose olive oil, eat more deep-sea fish.",
+        "high_tg": "Limit alcohol, reduce refined sugar and sweets, control weight.",
+        "low_hdl": "Increase aerobic exercise, quit smoking, moderate red wine consumption (if you already drink)."
+      },
+      "liver": {
+        "high_alt": "Abstain from alcohol, avoid hepatotoxic medications, regularly recheck liver function.",
+        "fatty_liver": "Control weight, low-fat diet, increase physical activity."
+      },
+      "kidney": {
+        "high_crea": "Low-salt, low-protein diet, control blood pressure and blood glucose, avoid nephrotoxic medications.",
+        "high_ua": "Increase water intake (at least 2000ml per day), reduce seafood and organ meat consumption."
+      },
+      "diabetes": {
+        "high_glucose": "Control staple food portions, choose low glycemic index foods, walk after meals.",
+        "monitor": "Regularly monitor blood glucose, learn self-management of blood sugar."
+      }
+    }
+  },
+  "severity_descriptions": {
+    "none": "normal",
+    "mild": "mildly abnormal",
+    "moderate": "moderately abnormal",
+    "severe": "severely abnormal",
+    "critical": "critical"
+  },
+  "direction_descriptions": {
+    "low": "low",
+    "high": "elevated",
+    "normal": "normal"
+  }
+}

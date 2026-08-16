@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.vscode/
+.idea/
+references.json
+outline.md
+introduction.md
+section_*.md
+conclusion.md
+abstract.md
+Review_Final*.md
+!assets/Review_Final.md

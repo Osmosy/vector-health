@@ -1,0 +1,64 @@
+{
+  "skill_name": "bioinfo_analysis_plan",
+  "evals": [
+    {
+      "id": 1,
+      "name": "Extract analysis workflow from literature",
+      "prompt": "Analyze the analysis workflow of this paper in the working directory and summarize its technical roadmap.",
+      "expected_output": "Output analysis_workflow_summary.md file containing a structured summary of the literature analysis workflow, including analysis stages, methods/tools, key parameters, validation strategies, and reusable analysis patterns.",
+      "files": ["evals/files/40779_2025_Article_679.pdf"],
+      "expectations": [
+        "Produced analysis_workflow_summary.md file",
+        "File contains at least 3 major analysis stages",
+        "Each stage is annotated with its purpose and methods/tools used",
+        "Includes description of key validation strategies",
+        "Includes summary of reusable analysis patterns",
+        "Content is in structured Markdown format and written in Chinese",
+        "Output file",
+        "If the Read tool cannot fully read the PDF, used scripts/extract_pdf.py to extract text"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Extract workflow then adapt to new disease",
+      "prompt": "There is a paper in my working directory. Please analyze its analysis workflow, then generate a customized gastric cancer bioinformatics analysis plan based on the extracted workflow.",
+      "expected_output": "First output analysis_workflow_summary.md extracting the original workflow, then output custom_analysis_plan_gastric_cancer.md with a customized gastric cancer plan.",
+      "files": ["evals/files/40779_2025_Article_679.pdf"],
+      "expectations": [
+        "Produced analysis_workflow_summary.md file",
+        "Output file",
+        "Customized plan retains the original paper's analysis logic framework",
+        "Customized plan adapts data sources and recommendations for gastric cancer",
+        "Customized plan includes adaptation notes for each stage",
+        "Both files are in structured Chinese Markdown"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Pure protocol design (no literature, user directly provides disease)",
+      "prompt": "I don't really know how to read papers. Can you just tell me how I could design a bioinformatics analysis plan for diabetes-related research?",
+      "expected_output": "This is a test that should NOT trigger the skill - the user did not ask to extract a literature workflow. The skill should not be triggered, and the AI should answer the bioinformatics analysis protocol design question in a general manner without generating analysis_workflow_summary.md.",
+      "files": [],
+      "expectations": [
+        "Did not generate analysis_workflow_summary.md file",
+        "Did not mention needing the user to provide a paper file (unless the user brought it up)",
+        "Provided diabetes bioinformatics analysis suggestions based on general knowledge",
+        "No workflow extraction process occurred"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "PDF extraction + multi-method cross-validation",
+      "prompt": "There is a literature PDF in the working directory. Please analyze its analysis workflow.",
+      "expected_output": "Output analysis_workflow_summary.md with content based on complete PDF text extraction. If the Read tool cannot fully read it, should use scripts/extract_pdf.py to assist with extraction.",
+      "files": ["evals/files/40779_2025_Article_679.pdf"],
+      "expectations": [
+        "Produced analysis_workflow_summary.md file",
+        "Extracted analysis workflow covers all major analysis stages in the paper",
+        "Identified methodological details (e.g., statistical test methods, threshold settings, software versions)",
+        "Reusable analysis patterns reflect the paper's core methodological innovations",
+        "If the Read tool had limited reading capability, used scripts/extract_pdf.py script"
+      ]
+    }
+  ]
+}

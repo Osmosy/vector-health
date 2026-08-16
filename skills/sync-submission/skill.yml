@@ -1,0 +1,52 @@
+schema_version: 2
+name: sync-submission
+layer: A
+owner_domain: submission_packaging
+maturity: official
+when_to_use:
+  - Auditing SSOT-to-submission drift before freezing a journal package
+  - Building a journal-specific submission manifest from canonical manuscript artifacts
+  - Retargeting an existing submission to a new journal (cascade rejection)
+  - Refreshing artifact_manifest.json to reflect the current canonical state
+when_NOT_to_use:
+  - Drafting or editing the canonical manuscript (use /write-paper or /revise)
+  - Choosing the target journal (use /find-journal)
+  - Freezing a submission while drift is detected (forbidden — fix drift first)
+inputs:
+  - project.yaml
+  - manuscript/manuscript.md
+outputs:
+  - submission/{journal}/.journal_meta.json
+  - qc/submission_sync_{journal}.json
+  - artifact_manifest.json
+deterministic_scripts:
+  - scripts/check_credit_integrity.py
+  - scripts/check_portal_mirror.py
+  - scripts/sync_submission.py
+side_effects:
+  - writes_project_artifacts
+downstream_consumers:
+  - orchestrate
+  - find-journal
+forbidden_actions:
+  - silently_edit_canonical_manuscript
+  - freeze_drifted_submission
+
+# v2.1 quality card
+purpose: "Audit SSOT-to-submission drift and build journal submission manifests from canonical manuscript artifacts."
+safety_boundaries:
+  - "Never silently edits the canonical manuscript; a drifted submission is not frozen until reconciled."
+  - "Submission packages are derived from canonical sources, not hand-assembled."
+known_limitations:
+  - "Detects drift it is configured to scan (counts, cover-letter fields, scope); portal free-text fields still need a human check."
+  - "A clean audit is necessary, not sufficient, for acceptance."
+  - "Building a marked (tracked-changes) manuscript drives Microsoft Word and therefore needs macOS + Word; the round-trip verification of a marked file is portable and runs anywhere."
+validation_commands:
+  - "python3 scripts/sync_submission.py"
+  - "python3 scripts/cross_document_n_check.py"
+  - "bash tests/test_marked_manuscript.sh"
+  - "bash tests/test_wordcount_cap.sh"
+  - "bash tests/test_assemble_supplement.sh"
+  - "bash tests/test_disclosure_availability.sh"
+  - "bash scripts/check_portal_field_residue_challenge/verify.sh  # deterministic, network-free"
+evidence_surface: bundled_script

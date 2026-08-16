@@ -1,0 +1,17 @@
+{
+  "_comment": "PUBLIC author-guideline facts expressed as booleans — NOT verbatim journal text. data_required: a Data Availability statement is expected; code_required_if_ai: a Code Availability statement is expected for AI/ML studies; repository_required: data/code sharing should point to a repository rather than only 'available on reasonable request'. These are conventions; verify current instructions-to-authors at the journal site before relying on a value.",
+  "schema_version": 1,
+  "default": {
+    "data_required": true,
+    "code_required_if_ai": true,
+    "repository_required": false
+  },
+  "journals": {
+    "radiology": {"data_required": true, "code_required_if_ai": true, "repository_required": true},
+    "radiology-ai": {"data_required": true, "code_required_if_ai": true, "repository_required": true},
+    "ryai": {"data_required": true, "code_required_if_ai": true, "repository_required": true},
+    "npj-digital-medicine": {"data_required": true, "code_required_if_ai": true, "repository_required": false},
+    "nature-medicine": {"data_required": true, "code_required_if_ai": true, "repository_required": true},
+    "lancet-digital-health": {"data_required": true, "code_required_if_ai": true, "repository_required": false}
+  }
+}

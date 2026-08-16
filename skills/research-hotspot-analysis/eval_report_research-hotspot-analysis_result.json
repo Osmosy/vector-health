@@ -1,0 +1,220 @@
+{
+  "meta": {
+    "skill_name": "research-hotspot-analysis",
+    "description": "Analyze research hotspots for a disease or topic and recommend representative literature. Use when users need to identify trending directions, topic clusters, or generate hotspot review reports. Input is a disease name or research topic; output is a ",
+    "evaluated_on": "2026-06-22",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Evidence Insight",
+    "execution_mode": "D",
+    "complexity": "Simple",
+    "n_inputs": 3
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated data detected"
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "No direct medical advice without disclaimer"
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "No methodological fallacies"
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Scripts parse without errors"
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 97,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "Workflow, examples, and resources documented"
+      },
+      "reliability": {
+        "score": 11,
+        "max": 12,
+        "note": "Error handling and recovery present"
+      },
+      "performance_context": {
+        "score": 8,
+        "max": 8,
+        "note": "Progressive disclosure with references"
+      },
+      "agent_usability": {
+        "score": 16,
+        "max": 16,
+        "note": "Clear triggers, output contract, error prevention"
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Input validation and description quality"
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "No credentials, no injection vectors"
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "Modular structure with scripts and references"
+      },
+      "agent_specific": {
+        "score": 20,
+        "max": 20,
+        "note": "Precise triggers, escape hatches, input validation"
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 83.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 12,
+      "total": 12
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Test case 1 for research-hotspot-analysis",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Standard execution for canonical input",
+        "basic": 33,
+        "specialized": 47,
+        "total": 80,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Output addresses the core research-hotspot-analysis task",
+            "result": "PASS",
+            "note": "Core objective met"
+          },
+          {
+            "text": "Output stays within declared skill scope",
+            "result": "PASS",
+            "note": "No scope violation detected"
+          },
+          {
+            "text": "Output format matches documented contract",
+            "result": "PASS",
+            "note": "Structured output as specified"
+          },
+          {
+            "text": "Skill correctly refuses out-of-scope requests",
+            "result": "PASS",
+            "note": "Input validation guides scope adherence"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Test case 2 for research-hotspot-analysis",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Standard execution for variant a input",
+        "basic": 34,
+        "specialized": 49,
+        "total": 83,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Output addresses the core research-hotspot-analysis task",
+            "result": "PASS",
+            "note": "Core objective met"
+          },
+          {
+            "text": "Output stays within declared skill scope",
+            "result": "PASS",
+            "note": "No scope violation detected"
+          },
+          {
+            "text": "Output format matches documented contract",
+            "result": "PASS",
+            "note": "Structured output as specified"
+          },
+          {
+            "text": "Skill correctly refuses out-of-scope requests",
+            "result": "PASS",
+            "note": "Input validation guides scope adherence"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Test case 3 for research-hotspot-analysis",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Standard execution for edge input",
+        "basic": 35,
+        "specialized": 51,
+        "total": 86,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Output addresses the core research-hotspot-analysis task",
+            "result": "PASS",
+            "note": "Core objective met"
+          },
+          {
+            "text": "Output stays within declared skill scope",
+            "result": "PASS",
+            "note": "No scope violation detected"
+          },
+          {
+            "text": "Output format matches documented contract",
+            "result": "PASS",
+            "note": "Structured output as specified"
+          },
+          {
+            "text": "Skill correctly refuses out-of-scope requests",
+            "result": "PASS",
+            "note": "Input validation guides scope adherence"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.8,
+    "dynamic_weighted": 49.8,
+    "score": 89,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Includes executable scripts for automation",
+    "Reference materials provided for domain guidance",
+    "Clear trigger conditions documented",
+    "Well-defined description for accurate skill triggering",
+    "Input validation section guards against scope drift"
+  ],
+  "recommendations": []
+}

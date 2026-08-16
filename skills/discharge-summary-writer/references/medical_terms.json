@@ -1,0 +1,127 @@
+{
+  "discharge_conditions": {
+    "improved": "improved",
+    "resolved": "resolved",
+    "stable": "condition stable",
+    "unchanged": "condition unchanged",
+    "deteriorated": "condition deteriorated",
+    "expired": "deceased",
+    "ama": "discharged against medical advice (Against Medical Advice)",
+    "transferred": "transferred"
+  },
+  "routes_of_administration": {
+    "po": "oral",
+    "iv": "intravenous injection",
+    "im": "intramuscular injection",
+    "sc": "subcutaneous injection",
+    "pr": "rectal administration",
+    "topical": "topical",
+    "inhale": "inhalation",
+    "sublingual": "sublingual"
+  },
+  "frequency": {
+    "qd": "once daily",
+    "bid": "twice daily",
+    "tid": "three times daily",
+    "qid": "four times daily",
+    "qhs": "at bedtime",
+    "q4h": "every 4 hours",
+    "q6h": "every 6 hours",
+    "q8h": "every 8 hours",
+    "q12h": "every 12 hours",
+    "prn": "as needed",
+    "ac": "before meals",
+    "pc": "after meals"
+  },
+  "common_sections": {
+    "hpi": "History of Present Illness",
+    "pmh": "Past Medical History",
+    "psh": "Past Surgical History",
+    "fh": "Family History",
+    "sh": "Social History",
+    "allergies": "Allergies",
+    "meds": "Current Medications",
+    "ros": "Review of Systems",
+    "pe": "Physical Examination",
+    "labs": "Laboratory Data",
+    "imaging": "Imaging Studies",
+    "assessment": "Assessment",
+    "plan": "Plan"
+  },
+  "vital_signs": {
+    "bp": "Blood Pressure",
+    "hr": "Heart Rate",
+    "rr": "Respiratory Rate",
+    "temp": "Temperature",
+    "spo2": "Oxygen Saturation",
+    "weight": "Weight",
+    "height": "Height",
+    "bmi": "Body Mass Index"
+  },
+  "common_discharge_diagnoses": {
+    "cardiovascular": [
+      "Coronary Artery Disease",
+      "Acute Myocardial Infarction",
+      "Heart Failure",
+      "Atrial Fibrillation",
+      "Hypertension"
+    ],
+    "respiratory": [
+      "Pneumonia",
+      "COPD Exacerbation",
+      "Asthma",
+      "Pulmonary Embolism"
+    ],
+    "gastrointestinal": [
+      "Acute Gastroenteritis",
+      "Peptic Ulcer Disease",
+      "Acute Pancreatitis",
+      "Acute Cholecystitis",
+      "Appendicitis"
+    ],
+    "neurological": [
+      "Ischemic Stroke",
+      "Hemorrhagic Stroke",
+      "Seizure Disorder",
+      "Meningitis"
+    ],
+    "infectious": [
+      "Sepsis",
+      "Urinary Tract Infection",
+      "Cellulitis",
+      "COVID-19"
+    ],
+    "surgical": [
+      "Post-operative Status",
+      "Fracture",
+      "Trauma"
+    ]
+  },
+  "warning_signs": {
+    "cardiac": [
+      "Chest pain",
+      "Severe shortness of breath",
+      "Palpitations",
+      "Fainting / syncope"
+    ],
+    "neurological": [
+      "Severe headache",
+      "Confusion",
+      "Weakness or numbness",
+      "Difficulty speaking"
+    ],
+    "surgical": [
+      "Fever > 38C",
+      "Wound redness or drainage",
+      "Increasing pain",
+      "Swelling"
+    ],
+    "general": [
+      "Severe abdominal pain",
+      "Vomiting blood",
+      "Blood in stool",
+      "Difficulty breathing",
+      "Uncontrolled bleeding"
+    ]
+  }
+}

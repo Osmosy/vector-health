@@ -1,0 +1,52 @@
+schema_version: 2
+name: meta-analysis
+layer: B
+owner_domain: meta_analysis_integrity
+maturity: official
+when_to_use:
+  - Running an end-to-end systematic review or meta-analysis (PROSPERO → search → screen → extract → synthesis → PRISMA)
+  - Diagnostic test accuracy meta-analysis (bivariate / HSROC) or intervention meta-analysis (random-effects)
+  - Screening reconciliation across two reviewers with Cohen's kappa and adjudication round
+  - Risk of bias batch (QUADAS-2 / ROBINS-I) tied to extraction CSV ID receipts
+  - Phase 6b post-analysis source-fidelity audit when CSV ↔ R output ↔ manuscript drift suspected
+when_NOT_to_use:
+  - Single-study analysis (use /analyze-stats)
+  - Topic discovery before a protocol exists (use /ma-scout)
+  - Reporting checklist generation only (use /check-reporting)
+  - Manuscript prose drafting after synthesis (use /write-paper)
+inputs:
+  - protocol/search_strategies.md
+  - screening/*.tsv
+  - extraction/*.csv
+outputs:
+  - 2_Screening/screening_consensus.json
+  - analysis/meta_analysis_outputs.json
+  - manuscript/manuscript.md
+deterministic_scripts:
+  - scripts/screening_reconcile.py
+  - scripts/extract_assist.py  # Phase 4 AI-assisted extraction suggestions (provenance + human gate); challenge card in scripts/extract_assist_challenge/
+  - scripts/check_exclusion_code_validity.py  # Phase 3f exclusion-code vs registered-eligibility gate; challenge card in scripts/check_exclusion_code_validity_challenge/
+side_effects:
+  - writes_project_artifacts
+downstream_consumers:
+  - write-paper
+  - self-review
+  - make-figures
+forbidden_actions:
+  - report_counts_without_id_receipts
+  - continue_after_p0_reconciliation_mismatch
+
+# v2.1 quality card
+purpose: "Run the SR/MA pipeline: PROSPERO registration, search, screening, extraction, risk of bias, synthesis (bivariate/HSROC or random-effects), and PRISMA reporting."
+safety_boundaries:
+  - "Study counts are never reported without ID-level receipts; halts on a P0 reconciliation mismatch."
+  - "Pool composition is locked to a single source of truth; downstream counts are re-derived, not copied."
+known_limitations:
+  - "Synthesis validity depends on correct extraction; the skill enforces process, not clinical correctness."
+  - "DTA pooling assumes adequate per-study 2x2 / threshold data."
+validation_commands:
+  - "python3 scripts/screening_reconcile.py"
+  - "python3 scripts/check_pool_consistency.py"
+  - "bash scripts/extract_assist_challenge/verify.sh  # deterministic, network-free"
+  - "bash scripts/check_exclusion_code_validity_challenge/verify.sh  # deterministic, network-free"
+evidence_surface: demo
