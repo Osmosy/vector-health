@@ -14,6 +14,9 @@
   8. Диаграмма: заголовок и подписи видов из спецификации присутствуют в HTML.
   9. Секреты: живые формы ключей в дереве (кроме тестовых фикстур) отсутствуют.
  10. Свой текст репозитория — без CJK (вендоренные навыки исключены: они на языке источника).
+ 11. Ограниченные лицензии: числа в шести документах совпадают с деревом, списки названы в NOTICE.
+ 12. Диаграмма: числа в спецификации совпадают с деревом (не только подписи в HTML).
+ 13. Единый источник чисел: stats.json воспроизводится генератором и сходится по суммам.
 
 Exit 0 — всё сходится; exit 1 — есть расхождения (печатаются с адресом проблемы).
 Любая проверка, которая не смогла выполниться, тоже даёт exit 1: «проверка не
@@ -226,6 +229,51 @@ def check_doc_counts(rep: Report, dirs: list[str]) -> None:
             rep.fail("числа", f"scripts/stats.json: total={stats.get('total')}, в дереве {total}")
         if stats.get("top_level") != total - stats.get("nested", 0):
             rep.fail("числа", "scripts/stats.json: top_level + nested != total")
+        # Суммы по источникам обязаны сходиться с итогами. Рукописный stats.json уже
+        # разошёлся так (у OpenClaw 779 при факте 777: сумма 1515 при 1513) — этого
+        # не видел ни один документ и ни одна проверка, пока аудитор не сравнил.
+        for key, expect in (("by_source_top", stats.get("top_level")),
+                            ("by_source_all", stats.get("total"))):
+            got = sum((stats.get(key) or {}).values())
+            if got != expect:
+                rep.fail("числа", f"scripts/stats.json: сумма {key} = {got}, "
+                                  f"а всего навыков {expect} — пересобери scripts/build_stats.py")
+        # состав scripts/ — тоже число в документах: было «9», а фактически 12
+        # (семь .py, установщик, четыре JSON-манифеста). Считается генератором.
+        sc = stats.get("scripts") or {}
+        if not sc:
+            rep.fail("числа", "stats.json: нет раздела scripts")
+        else:
+            real = {"py": 0, "sh": 0, "js": 0, "json": 0}
+            for dirpath, dirnames, filenames in os.walk(os.path.join(ROOT, "scripts")):
+                dirnames[:] = [d for d in dirnames if d != "__pycache__"]
+                for fn in filenames:
+                    if fn == "stats.json":
+                        continue
+                    for ext in (".py", ".sh", ".mjs", ".js", ".json"):
+                        if fn.endswith(ext):
+                            real["js" if ext in (".mjs", ".js") else ext[1:]] += 1
+                            break
+            for key, expect in real.items():
+                if sc.get(key) != expect:
+                    rep.fail("числа", f"stats.json: scripts.{key}={sc.get(key)}, "
+                                      f"в дереве {expect} — пересобери scripts/build_stats.py")
+            if not re.search(rf"(?<![\d.]){sc.get('total')}(?![\d.])",
+                             open(os.path.join(ROOT, "agent-description.md"),
+                                  encoding="utf-8").read()):
+                rep.fail("числа", f"agent-description.md не называет число файлов "
+                                  f"в scripts/ ({sc.get('total')})")
+        # stats.json обязан воспроизводиться из дерева: расхождение означает, что
+        # документы сверяются с устаревшим снимком
+        gen = os.path.join(ROOT, "scripts", "build_stats.py")
+        if os.path.isfile(gen):
+            proc = subprocess.run([sys.executable, "-B", gen, "--check"],
+                                  cwd=ROOT, capture_output=True, text=True)
+            if proc.returncode != 0:
+                rep.fail("числа", "scripts/stats.json не воспроизводится: "
+                                  f"{(proc.stdout or proc.stderr).strip()[:200]}")
+        else:
+            rep.fail("числа", "нет scripts/build_stats.py — stats.json нечем пересобрать")
         # OpenClaw: с учётом вложенных у него больше, чем в верхнеуровневом счёте
         row = next((l for l in readme.splitlines()
                     if "OpenClaw-Medical-Skills" in l and l.startswith("|")), "")
@@ -508,6 +556,120 @@ def check_clinical_claims(rep: Report) -> None:
     rep.note("клиника: оговорка на месте, годы испытаний либо подтверждены, либо помечены")
 
 
+def check_restricted_docs(rep: Report) -> None:
+    """Числа ограниченных лицензий в документах совпадают с деревом.
+
+    Проверка появилась после внешнего аудита: в шести документах стояло «8 навыков
+    Anthropic» при фактических 9 — офисных навыков девять, девятый `PPTX-Skill`
+    никто не заметил. Списки берутся из scripts/stats.json (генератор считает их из
+    дерева), поэтому ручная правка числа в документе роняет сборку, а не расходится
+    молча.
+    """
+    stats_path = os.path.join(ROOT, "scripts", "stats.json")
+    if not os.path.isfile(stats_path):
+        rep.fail("лицензии", "нет scripts/stats.json — числа ограничений неоткуда взять")
+        return
+    with open(stats_path, encoding="utf-8") as f:
+        stats = json.load(f)
+    restricted = stats.get("restricted") or {}
+    named = stats.get("restricted_skills") or {}
+    if not restricted:
+        rep.fail("лицензии", "stats.json не содержит раздела restricted")
+        return
+
+    # Число обязано стоять В ТОЙ ЖЕ СТРОКЕ, что и название вида ограничения.
+    # Искать число где угодно в документе недостаточно: мутация «заменить 9 на 8
+    # в строке про Anthropic» проходила, потому что девятка встречалась в других
+    # строках. Проверяем построчно, для таблиц — по строкам `| … |` и `<tr>`.
+    # Маркер — ярлык вида ограничения, как он пишется в таблицах. «некоммерческой
+    # лицензией» в обычном тексте (например, про веса модели RADAR) ограничением
+    # НАВЫКА не является, поэтому текст вне таблиц не учитывается вовсе.
+    KIND_MARKERS = {
+        "proprietary_hat": ("проприетарн", "proprietary"),
+        "anthropic": ("anthropic",),
+        "non_commercial": ("non-commercial",),
+    }
+    docs = ("README.md", "NOTICE.md", "AGENTS.md", "INSTALL.md",
+            "agent-description.md", os.path.join("docs", "index.html"))
+    for kind, count in restricted.items():
+        markers = KIND_MARKERS.get(kind, (kind.replace("_", " "),))
+        for doc in docs:
+            path = os.path.join(ROOT, doc)
+            if not os.path.isfile(path):
+                continue
+            # Проверяются ВСЕ строки про этот вид ограничения, а не «хотя бы одна
+            # верная»: иначе правка в таблице состава остаётся незамеченной, пока
+            # в другой строке (например, в журнале изменений) случайно стоит верное
+            # число. Исключение — журнал изменений: там числа зафиксированы на дату
+            # записи и по определению историчны.
+            rows = 0
+            for num, line in enumerate(open(path, encoding="utf-8"), 1):
+                stripped = line.strip()
+                # только табличные строки: markdown-таблица или html-строка
+                if not (stripped.startswith("|") or "<tr" in stripped):
+                    continue
+                low = line.lower()
+                if not any(m in low for m in markers):
+                    continue
+                if re.match(r"\|\s*\d{4}-\d{2}-\d{2}\s*\|", stripped):
+                    continue  # строка журнала изменений
+                rows += 1
+                plain = re.sub(r"[*_`]+", "", line)
+                plain = re.sub(r"</?[a-z][^>]*>", " ", plain)
+                if not re.search(rf"(?<![\d.]){count}(?![\d.])", plain):
+                    rep.fail("лицензии", f"{doc}:{num}: в строке про «{kind}» нет числа "
+                                         f"{count} — документ разошёлся с деревом")
+            if not rows:
+                # удаление строки целиком — тоже расхождение: документ обещает
+                # назвать ограничение, а назвать перестал
+                rep.fail("лицензии", f"{doc}: нет ни одной строки таблицы про «{kind}» — "
+                                     f"раздел ограничений из документа исчез")
+    notice_path = os.path.join(ROOT, "NOTICE.md")
+    notice = open(notice_path, encoding="utf-8").read() if os.path.isfile(notice_path) else ""
+    for kind, names in named.items():
+        if kind == "proprietary_hat":
+            continue  # 308 имён в NOTICE не перечисляются, там только число
+        # NOTICE называет офисные навыки перечнем (`xlsx`, `pdf`, … и варианты
+        # `-official`), а не поимённо каждую папку: `docx-official` покрыт записью
+        # «и их `-official` варианты». Поэтому принимаем либо имя навыка, либо
+        # указание на группу вариантов.
+        for name in names:
+            short = name.split("/")[-1]
+            if short in notice or "`-official`" in notice or "-official" in notice:
+                continue
+            rep.fail("лицензии", f"NOTICE не называет навык с ограничением "
+                                 f"«{kind}»: {name}")
+    rep.note("лицензии: числа в шести документах совпадают с деревом — "
+             f"проприетарных {restricted.get('proprietary_hat')}, "
+             f"Anthropic {restricted.get('anthropic')}, "
+             f"NC {restricted.get('non_commercial')}")
+
+
+def check_diagram_numbers(rep: Report) -> None:
+    """Числа в спецификации диаграммы совпадают с деревом.
+
+    Диаграмма — тоже документ: в ней жило «1540 описаний» при фактических 1541, и
+    увидеть это можно было только в живом артефакте. Проверяем, что итоговое число
+    названо, и что рядом со словами «навык»/«описание» не стоит чужое четырёхзначное.
+    """
+    spec_path = os.path.join(ROOT, "docs", "vector-health.architecture.json")
+    if not os.path.isfile(spec_path):
+        rep.fail("диаграмма", "нет спецификации docs/vector-health.architecture.json")
+        return
+    spec_text = open(spec_path, encoding="utf-8").read()
+    with open(os.path.join(ROOT, "scripts", "stats.json"), encoding="utf-8") as f:
+        stats = json.load(f)
+    total = stats["total"]
+    for m in re.finditer(r"(\d{3,4})\s*(описан|навык|навыков|skills?)", spec_text):
+        num = int(m.group(1))
+        if 1000 < num < 2000 and num not in (stats["total"], stats["top_level"]):
+            rep.fail("диаграмма", f"в спецификации «{num} {m.group(2)}», "
+                                  f"а в дереве {total} навыков")
+    if str(total) not in spec_text:
+        rep.fail("диаграмма", f"спецификация не называет итоговое число навыков ({total})")
+    rep.note(f"диаграмма: числа согласованы с деревом ({total})")
+
+
 def check_secrets(rep: Report) -> None:
     """9. Живых секретов в дереве нет."""
     hits = []
@@ -700,6 +862,8 @@ def main() -> int:
     check_diagram(rep)
     check_duplicates(rep)
     check_clinical_claims(rep)
+    check_restricted_docs(rep)
+    check_diagram_numbers(rep)
     check_secrets(rep)
     check_cjk(rep)
     check_language_layers(rep)

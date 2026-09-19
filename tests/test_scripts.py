@@ -392,6 +392,70 @@ check("CI ставит archify, а не пропускает проверку",
       "install-archify.sh" in wf and "проверка диаграммы пропущена" not in wf)
 check("CI проверяет воспроизводимость HTML", "check_diagram.py" in wf)
 
+print("\n=== 16. Единый источник чисел и ограниченные лицензии ===")
+# stats.json генерируется: рукописный разошёлся так, что его не поймала ни одна
+# проверка (у OpenClaw 779 при факте 777, сумма 1515 при 1513).
+stats2 = json.load(open(os.path.join(ROOT, "scripts", "stats.json"), encoding="utf-8"))
+check("stats.json: сумма by_source_top == top_level",
+      sum(stats2["by_source_top"].values()) == stats2["top_level"],
+      f"{sum(stats2['by_source_top'].values())} vs {stats2['top_level']}")
+check("stats.json: сумма by_source_all == total",
+      sum(stats2["by_source_all"].values()) == stats2["total"])
+check("stats.json: нет навыков без источника", stats2.get("unknown_source", 0) == 0,
+      str(stats2.get("unknown_source")))
+check("build_stats.py --check проходит (файл воспроизводим)",
+      run([sys.executable, "-B", "scripts/build_stats.py", "--check"]).returncode == 0)
+real_py = len([f for f in os.listdir(os.path.join(ROOT, "scripts")) if f.endswith(".py")])
+check("stats.json: число .py в scripts/ == факт",
+      stats2["scripts"]["py"] == real_py, f"{stats2['scripts']['py']} vs {real_py}")
+
+# ограниченные лицензии: три вида, три признака, числа из дерева
+restricted = stats2["restricted"]
+check("ограничения: три вида названы", set(restricted) == {"proprietary_hat", "anthropic", "non_commercial"},
+      str(restricted))
+# 9 офисных навыков Anthropic — девятый (PPTX-Skill) не замечали шесть документов
+check("ограничения: Anthropic == 9", restricted["anthropic"] == 9, str(restricted["anthropic"]))
+anth = stats2["restricted_skills"]["anthropic"]
+check("ограничения: PPTX-Skill в списке Anthropic", "PPTX-Skill" in anth, str(sorted(anth)))
+real_anth = [d for d in os.listdir(SKILLS)
+             if os.path.isfile(os.path.join(SKILLS, d, "LICENSE.txt"))
+             and "anthropic" in open(os.path.join(SKILLS, d, "LICENSE.txt"),
+                                     encoding="utf-8", errors="replace").read().lower()]
+check("ограничения: список Anthropic == дерево", sorted(real_anth) == sorted(anth),
+      f"{sorted(real_anth)} vs {sorted(anth)}")
+nc = stats2["restricted_skills"]["non_commercial"]
+check("ограничения: NC == 2 и это varCADD-пара",
+      len(nc) == 2 and all("cadd" in n.lower() for n in nc), str(nc))
+prop_list = stats2["restricted_skills"]["proprietary_hat"]
+check("ограничения: проприетарных 308", len(prop_list) == 308, str(len(prop_list)))
+
+# шесть документов обязаны называть числа в строке про ограничение
+for doc in ("README.md", "NOTICE.md", "AGENTS.md", "INSTALL.md", "agent-description.md",
+            os.path.join("docs", "index.html")):
+    text = open(os.path.join(ROOT, doc), encoding="utf-8").read()
+    plain = re.sub(r"</?[a-z][^>]*>", " ", re.sub(r"[*_`]+", "", text))
+    rows = [l for l in plain.splitlines()
+            if ("anthropic" in l.lower() and re.match(r"\s*(\||\S)", l))]
+    ok = any(re.search(r"(?<![\d.])9(?![\d.])", l) for l in rows)
+    check(f"{doc}: в строке про Anthropic стоит 9", ok)
+
+# диаграмма: числа согласованы с деревом
+spec2 = json.load(open(os.path.join(ROOT, "docs", "vector-health.architecture.json"),
+                       encoding="utf-8"))
+spec_txt = json.dumps(spec2, ensure_ascii=False)
+check("диаграмма: итоговое число навыков == факт",
+      str(stats2["total"]) in spec_txt, str(stats2["total"]))
+check("диаграмма: RADAR есть узлом, а не только в тексте",
+      any(c.get("id") == "radar" for c in spec2["components"]))
+check("диаграмма: подписи видов короче 48 символов (лимит схемы)",
+      all(len(v["label"]) <= 48 for v in spec2["meta"]["views"]),
+      str([len(v["label"]) for v in spec2["meta"]["views"]]))
+check("диаграмма: у связей нет свойства kind (схема его не знает)",
+      all("kind" not in c for c in spec2["connections"]))
+check("диаграмма: HTML содержит узел RADAR и число навыков",
+      "RADAR (Alibaba DAMO)" in open(os.path.join(ROOT, "docs",
+          "vector-health.architecture.html"), encoding="utf-8").read())
+
 print(f"\n{'=' * 50}")
 print(f"ИТОГО: {PASS} ok, {FAIL} FAIL")
 sys.exit(1 if FAIL else 0)

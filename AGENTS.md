@@ -18,12 +18,12 @@ MIT репозитория покрывает **собственный вкла�
 | Что | Навыков | Следствие |
 |---|---|---|
 | Проприетарная шапка в тексте навыка («proprietary and confidential… All Rights Reserved», © MD BABU MIA — из апстрима OpenClaw) | 308 | считать MIT нельзя |
-| Офисные навыки Anthropic (`xlsx`, `pdf`, `docx`, `pptx` и `-official`) | 8 | «© 2025 Anthropic, PBC. All rights reserved» |
+| Офисные навыки Anthropic (`xlsx`, `pdf`, `docx`, `pptx`, `PPTX-Skill` и их `-official` варианты) | 9 | «© 2025 Anthropic, PBC. All rights reserved» |
 | `Non-Commercial` | 2 | коммерческое использование запрещено |
 | Таксономия RADAR в `abdominal-ct-findings` | 1 | текст — Apache-2.0 (ок), но **веса модели — CC BY-NC-SA 4.0** и не берутся |
 
 Перед использованием конкретного навыка проверьте его поле `license` и первые строки
-`SKILL.md`. Числа сверяются с деревом: `python3 scripts/validate.py`.
+`SKILL.md`. Числа сверяются с деревом: `python3 scripts/validate.py` (20 проверок: числа, лицензии, ссылки, диаграмма).
 
 ## Базовые правила
 

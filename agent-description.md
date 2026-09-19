@@ -39,7 +39,7 @@ openmed, Aperivue medsci-skills) плюс три собственных. Дед�
 | Навыки верхнего уровня | 1513 каталогов |
 | Вложенные навыки | 28 (внутри каталогов-контейнеров апстримов) |
 | Собственные навыки | 3 (`dicom-vlm-analysis`, `atrial-fibrillation-treatment`, `abdominal-ct-findings`) |
-| Скрипты | 9 (`scripts/`: 6 .py + установщик + два JSON-манифеста) |
+| Скрипты | 12 (`scripts/`: 7 .py, 1 установщик, 4 JSON-манифеста) |
 | Тесты | 1 файл (`tests/test_scripts.py`, 89 проверок) |
 | Диаграмма | 1 живая (`docs/vector-health.architecture.html`) |
 
@@ -52,7 +52,7 @@ MIT репозитория покрывает **собственный вкла�
 | Что | Навыков | Следствие |
 |---|---|---|
 | Проприетарная шапка в тексте навыка («proprietary and confidential… All Rights Reserved», © MD BABU MIA — из апстрима OpenClaw) | 308 | считать MIT нельзя |
-| Офисные навыки Anthropic (`xlsx`, `pdf`, `docx`, `pptx` и `-official`) | 8 | «© 2025 Anthropic, PBC. All rights reserved» |
+| Офисные навыки Anthropic (`xlsx`, `pdf`, `docx`, `pptx`, `PPTX-Skill` и их `-official` варианты) | 9 | «© 2025 Anthropic, PBC. All rights reserved» |
 | `Non-Commercial` | 2 | коммерческое использование запрещено |
 | Таксономия RADAR в `abdominal-ct-findings` | 1 | текст — Apache-2.0 (ок), но **веса модели — CC BY-NC-SA 4.0** и не берутся |
 

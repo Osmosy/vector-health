@@ -57,7 +57,7 @@ Apache-2.0 покрывает её использование с сохране�
 | Что | Навыков | Лицензия | Следствие |
 |---|---|---|---|
 | Навыки с проприетарной шапкой в самом тексте | **308** (280 из OpenClaw + 28 вложенных) | «This code is proprietary and confidential… All Rights Reserved», © 2026 MD BABU MIA, PhD (шапка — из апстрима OpenClaw, не наша правка) | текст прямо запрещает копирование; MIT-статус этих файлов не подтверждён |
-| Офисные навыки Anthropic | 8 (`xlsx`, `pdf`, `docx`, `pptx` и `-official` варианты) | «© 2025 Anthropic, PBC. All rights reserved» + `LICENSE.txt` рядом, условия — по вашему соглашению с Anthropic | не MIT; использование регулируется договором с Anthropic |
+| Офисные навыки Anthropic | **9** (`xlsx`, `pdf`, `docx`, `pptx`, `PPTX-Skill` — плюс варианты `xlsx-official`, `pdf-anthropic`, `docx-official`, `pptx-official`) | «© 2025 Anthropic, PBC. All rights reserved» + `LICENSE.txt` рядом, условия — по вашему соглашению с Anthropic | не MIT; использование регулируется договором с Anthropic |
 | Non-Commercial | 2 (`varcadd-pathogenicity`, `variant-interpretation-acmg/varCADD`) | `Non-Commercial` | коммерческое использование запрещено |
 
 Это расхождение — **свойство апстримов, а не ошибка сборки**: проприетарная шапка
@@ -113,3 +113,5 @@ OpenClaw-Medical-Skills). Такие файлы синхронизация до�
 
 Библиотека — агрегация. Если вы автор навыка и хотите изменить атрибуцию или
 удалить его — создайте issue/PR.
+
+Откуда эти ограничения: проприетарные шапки — все 308 из OpenClaw; офисные навыки Anthropic — 8 из OpenClaw и 1 из AIPOCH (`PPTX-Skill` — тот самый девятый, который не упоминался ни в одном документе, пока внешний аудит не сверил числа); Non-Commercial — 2 из OpenClaw. То есть митигация по проприетарным одна на источник, а не 308 отдельных историй. Числа считаются из дерева (`scripts/build_stats.py`), сверяются валидатором.
