@@ -306,6 +306,40 @@ try:
 finally:
     shutil.rmtree(tmp5, ignore_errors=True)
 
+print("\n=== 14. Аудит: короткие документы, дубли, клинический навык ===")
+# Пункты внешнего аудита, которые обязаны не вернуться.
+stats = json.load(open(os.path.join(ROOT, "scripts", "stats.json"), encoding="utf-8"))
+real_total = len([1 for root, dirs, files in os.walk(SKILLS)
+                  if "SKILL.md" in files and not root.endswith("__pycache__")])
+check("stats.json total = факт дерева", stats["total"] == real_total,
+      f"{stats['total']} vs {real_total}")
+check("stats.json: top_level + nested = total",
+      stats["top_level"] + stats["nested"] == stats["total"])
+check("stats.json знает про вложенные у OpenClaw",
+      stats["by_source_all"].get("OpenClaw", 0) > stats["by_source_top"].get("OpenClaw", 0),
+      str(stats["by_source_all"]))
+check("в stats.json есть разбивка ограниченных по источникам",
+      "restricted_by_source" in stats)
+
+dups = json.load(open(os.path.join(ROOT, "scripts", "name-duplicates.json"), encoding="utf-8"))
+check("дубли идентичных навыков учтены списком", dups["count"] == len(dups["duplicates"]))
+check("каждый дубль — это пара одинаковых SKILL.md",
+      all(len(d["files"]) == 2 for d in dups["duplicates"]))
+
+af = open(os.path.join(SKILLS, "atrial-fibrillation-treatment", "SKILL.md"), encoding="utf-8").read()
+check("клинический навык несёт оговорку в начале",
+      "не для самолечения" in af[:3000])
+check("в References нет неподтверждённых годов",
+      not re.search(r"\*\*(?:ADVENT|CASTLE-AF|EARLY-AF)\*\*\s*—\s*(?:NEJM|JACC|Nature)\s*\d{4}", af))
+check("EAST-AFNET 4 помечен как подтверждённый (2020, PMID)",
+      "32865375" in af and "**2020**" in af or "NEJM **2020**" in af)
+
+# каждый короткий документ называет ограничения и ссылается на NOTICE
+for doc in ("AGENTS.md", "INSTALL.md", "agent-description.md"):
+    body = open(os.path.join(ROOT, doc), encoding="utf-8").read()
+    check(f"{doc}: ссылается на NOTICE и называет ограничение",
+          "NOTICE.md" in body and "308" in body)
+
 print(f"\n{'=' * 50}")
 print(f"ИТОГО: {PASS} ok, {FAIL} FAIL")
 sys.exit(1 if FAIL else 0)

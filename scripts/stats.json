@@ -1,0 +1,34 @@
+{
+ "generated_from": "дерево skills/ + scripts/upstream-origin.json + scripts/restricted-licenses.json",
+ "total": 1541,
+ "top_level": 1513,
+ "nested": 28,
+ "by_source_top": {
+  "aipoch": 600,
+  "OpenClaw": 779,
+  "own": 3,
+  "Aperivue": 59,
+  "openmed": 74
+ },
+ "by_source_all": {
+  "aipoch": 600,
+  "OpenClaw": 805,
+  "Aperivue": 59,
+  "openmed": 74,
+  "own": 3
+ },
+ "own": [
+  "abdominal-ct-findings",
+  "atrial-fibrillation-treatment",
+  "dicom-vlm-analysis"
+ ],
+ "restricted": {
+  "proprietary_hat": 308,
+  "anthropic": 8,
+  "non_commercial": 2
+ },
+ "scripts": 5,
+ "restricted_by_source": {
+  "OpenClaw": 308
+ }
+}

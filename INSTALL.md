@@ -29,8 +29,15 @@ Vector Health — **библиотека медицинских и биомед�
 - **Для синхронизации с апстримами** — `gh` CLI (авторизованный) либо
   `GITHUB_TOKEN` в окружении: без токена GitHub отдаёт мало анонимных запросов
   и скрипт упадёт с 403.
-- **Для диаграммы** — Node 18+ и `archify` (необязательно: проверка диаграммы
-  в CI пропускается, если инструмента нет).
+- **Для диаграммы** — Node 18+ и `archify` (необязательно: в CI проверка
+  диаграммы выполняется, если инструмент установлен, иначе шаг сообщает о пропуске).
+- **Для навыка `dicom-vlm-analysis`** — `pydicom` (рендер с window/level, чистый
+  Python) и локальная [Ollama](https://ollama.com) с моделью `medgemma:4b`. Без
+  Ollama навык бесполезен: он описывает снимок локальной моделью, а не облачной.
+  Веса модели скачиваются отдельно, в репозиторий не входят.
+- **Для навыка `abdominal-ct-findings`** — ничего: это таблицы и JSON.
+  Модель RADAR, из которой взята таксономия, не требуется и не поддерживается
+  на этом железе (её веса к тому же под некоммерческой лицензией).
 
 ## Быстрый старт
 
@@ -47,7 +54,7 @@ python3 -c "
 import json
 d = json.load(open('skills-index.json'))
 for s in d['skills']:
-    if 'dicom' in s['name'] or 'meta-analysis' in s['name']:
+    if 'dicom' in s['name'] or 'abdominal' in s['name']:
         print(s['path'], '—', s['description'][:90])
 "
 
@@ -85,8 +92,8 @@ python3 scripts/sync_upstreams.py --dry-run   # что изменилось в �
 | Задача | Чем |
 |---|---|
 | «Есть ли навык под DICOM/радиомику?» | `skills-index.json` или `ls skills \| grep` |
-| «Как читать МРТ локальной моделью?» | `skills/dicom-vlm-analysis/SKILL.md` |
-| «Мета-анализ: как считать?» | `skills/meta-analysis/SKILL.md` + `references/` |
+| «Как читать КТ/МРТ локальной моделью?» | `skills/dicom-vlm-analysis/SKILL.md` (нужны `pydicom`, локальная Ollama и модель `medgemma:4b` — см. раздел ниже) |
+| «Мета-анализ: как считать?» | `skills/meta-analysis/SKILL.md` + `references/` (часть скриптов апстрим не опубликовал — см. `docs/broken-refs.md`) |
 | «Что нового в апстримах?» | `python3 scripts/sync_upstreams.py --dry-run` |
 | «Почему ссылка в навыке битая?» | `docs/broken-refs.md` (инвентарь с причиной) |
 | «Откуда этот навык пришёл?» | `scripts/upstream-origin.json`, `NOTICE.md` |
@@ -115,6 +122,23 @@ python3 tests/test_scripts.py
 ```
 
 ## Ограничения
+
+### Лицензии вендоренных навыков
+
+MIT репозитория покрывает **собственный вклад**. У части вендоренных навыков лицензия
+ограничивает использование, и это надо знать ДО работы с ними (полная таблица и
+разбор — `NOTICE.md`):
+
+| Что | Навыков | Следствие |
+|---|---|---|
+| Проприетарная шапка в тексте навыка («proprietary and confidential… All Rights Reserved», © MD BABU MIA — из апстрима OpenClaw) | 308 | считать MIT нельзя |
+| Офисные навыки Anthropic (`xlsx`, `pdf`, `docx`, `pptx` и `-official`) | 8 | «© 2025 Anthropic, PBC. All rights reserved» |
+| `Non-Commercial` | 2 | коммерческое использование запрещено |
+| Таксономия RADAR в `abdominal-ct-findings` | 1 | текст — Apache-2.0 (ок), но **веса модели — CC BY-NC-SA 4.0** и не берутся |
+
+Перед использованием конкретного навыка проверьте его поле `license` и первые строки
+`SKILL.md`. Числа сверяются с деревом: `python3 scripts/validate.py`.
+
 
 - **Библиотека — не медицинское изделие.** Навыки описывают методики; ни один
   вывод не является диагнозом, назначением или заключением. Ответственность за

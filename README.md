@@ -6,13 +6,13 @@
 
 [![Architecture: live](https://img.shields.io/badge/Architecture-live_diagram-4f8ff7.svg)](https://osmosy.github.io/vector-health/docs/vector-health.architecture.html)
 
-**Библиотека медицинских и биомедицинских навыков для AI-агентов — 1541 навык из четырёх открытых коллекций плюс три собственных**
+**Библиотека медицинских и биомедицинских навыков для AI-агентов — 1541 навык: четыре открытые коллекции + три собственных навыка (один из них несёт таксономию RADAR под Apache-2.0)**
 
 [![Hermes Agent](https://img.shields.io/badge/Hermes-Agent-blue.svg)](https://github.com/NousResearch/hermes-agent)
 [![Ecosystem: Vector](https://img.shields.io/badge/Ecosystem-Vector-blue.svg)](https://osmosy.github.io/)
 [![Skills: 1541](https://img.shields.io/badge/Skills-1541-green.svg)](#состав)
-[![Sources: 4](https://img.shields.io/badge/Upstream_collections-4-blueviolet.svg)](NOTICE.md)
-[![Own skills: 2](https://img.shields.io/badge/Own_skills-2-orange.svg)](#собственные-навыки)
+[![Sources: 5](https://img.shields.io/badge/Upstream_sources-5-blueviolet.svg)](NOTICE.md)
+[![Own skills: 3](https://img.shields.io/badge/Own_skills-3-orange.svg)](#собственные-навыки)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 **Документация:** [Установка](INSTALL.md) · [Архитектура (live)](https://osmosy.github.io/vector-health/docs/vector-health.architecture.html) · [Источники и лицензии](NOTICE.md) · [Ограниченные лицензии](NOTICE.md#ограниченные-лицензии-внутри-библиотеки--читать-до-использования) · [Битые ссылки](docs/broken-refs.md) · [Для агентов](AGENTS.md)
@@ -31,13 +31,14 @@
 
 ## Состав
 
-| Источник | Навыков | Фокус | Лицензия |
-|---|---|---|---|
-| [OpenClaw-Medical-Skills](https://github.com/FreedomIntelligence/OpenClaw-Medical-Skills) | 777 | биоинформатика, геномика, клинические БД, drug discovery | MIT (заявлена в README, файла нет) |
-| [medical-research-skills](https://github.com/aipoch/medical-research-skills) (AIPOCH) | 600 | evidence, дизайн исследования, анализ, письмо, аудит навыков | MIT |
-| [openmed](https://github.com/maziyarpanahi/openmed) | 74 | клинический NLP, FHIR, деидентификация, HIPAA, ICD-10 | Apache-2.0 |
-| [medsci-skills](https://github.com/Aperivue/medsci-skills) (Aperivue) | 59 | протоколы, статистика, мета-анализ, гранты, imaging | MIT |
-| собственные | 3 | DICOM → локальная vision-модель; тактика при фибрилляции предсердий; таксономия находок КТ брюшной полости | MIT |
+| Источник | Верхних | Вложенных | Итого | Фокус | Лицензия |
+|---|---|---|---|---|---|
+| [OpenClaw-Medical-Skills](https://github.com/FreedomIntelligence/OpenClaw-Medical-Skills) | 777 | 28 | **805** | биоинформатика, геномика, клинические БД, drug discovery | MIT (заявлена в README, файла нет); внутри 308 навыков — проприетарная шапка |
+| [medical-research-skills](https://github.com/aipoch/medical-research-skills) (AIPOCH) | 600 | — | **600** | evidence, дизайн исследования, анализ, письмо, аудит навыков | MIT |
+| [openmed](https://github.com/maziyarpanahi/openmed) | 74 | — | **74** | клинический NLP, FHIR, деидентификация, HIPAA, ICD-10 | Apache-2.0 |
+| [medsci-skills](https://github.com/Aperivue/medsci-skills) (Aperivue) | 59 | — | **59** | протоколы, статистика, мета-анализ, гранты, imaging | MIT |
+| собственные | 3 | — | **3** | DICOM → локальная vision-модель; тактика при ФП; таксономия находок КТ брюшной полости (RADAR, Apache-2.0) | MIT (текст таксономии — Apache-2.0) |
+| **Итого** | **1513** | **28** | **1541** | | |
 
 **1541 навык** — 1513 каталогов верхнего уровня и 28 вложенных (апстримы держат
 часть навыков внутри каталогов-контейнеров, например
@@ -58,7 +59,7 @@ AIPOCH    600     ├─→ sync_upstreams.py ─→ skills/ (1541)  ─→ аг
 openmed    74     │   (идемпотентно:          │
 Aperivue   59     │    повторный запуск = 0)   ├─→ build_index.py ─→ skills-index.json
                   │                           │                      (поиск без загрузки всего)
-собственные 2 ────┘                           └─→ validate.py ─→ CI: числа, лицензии, ссылки
+собственные 3 ────┘                           └─→ validate.py ─→ CI: числа, лицензии, ссылки
 ```
 
 Порядок работы с библиотекой:
@@ -116,6 +117,8 @@ vector-health/
 │   └── <имя>/SKILL.md         # + references/, scripts/, assets/ (если есть)
 ├── skills-index.json          # каталог для поиска: имя, путь, описание
 ├── scripts/
+│   ├── refs.py                # разбор ссылок на файлы (общий для трёх скриптов)
+│   ├── stats.json             # счётчики из дерева: единый источник чисел для документов
 │   ├── sync_upstreams.py      # синхронизация с четырьмя апстримами (идемпотентна)
 │   ├── build_index.py         # сборка каталога (рекурсивно, с вложенными)
 │   ├── validate.py            # валидатор репозитория: 15 проверок (спина CI)

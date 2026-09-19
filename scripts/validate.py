@@ -23,6 +23,7 @@ import csv
 import io
 import json
 import os
+import pathlib
 import re
 import subprocess
 import sys
@@ -41,6 +42,10 @@ SOURCES = {
     "aipoch": ("aipoch/medical-research-skills", "aipoch-medical-research-skills-MIT.txt"),
     "openmed": ("maziyarpanahi/openmed", "maziyarpanahi-openmed-APACHE-2.0.txt"),
     "Aperivue": ("Aperivue/medsci-skills", "aperivue-medsci-skills-MIT.txt"),
+    # RADAR — не коллекция навыков, а источник таксономии в собственном навыке
+    # abdominal-ct-findings. Лицензия только на код (Apache-2.0); веса модели
+    # распространяются под CC BY-NC-SA 4.0 и в репозиторий не берутся.
+    "radar": ("alibaba-damo-academy/damo-radar", "alibaba-damo-academy-damo-radar-APACHE-2.0.txt"),
 }
 THIRD_PARTY = os.path.join(ROOT, "THIRD_PARTY_LICENSES")
 OWN_SKILLS = {"dicom-vlm-analysis", "atrial-fibrillation-treatment", "abdominal-ct-findings"}
@@ -211,6 +216,24 @@ def check_doc_counts(rep: Report, dirs: list[str]) -> None:
         rep.fail("числа", "README: нет утверждения о числе навыков (**N навыков**)")
     elif int(m.group(1)) != total:
         rep.fail("числа", f"README: заявлено {m.group(1)} навыков, в дереве {total}")
+    # единый источник чисел: если stats.json разошёлся с деревом, документы
+    # сверяются не с фактом, а с устаревшим снимком
+    stats_path = os.path.join(ROOT, "scripts", "stats.json")
+    if os.path.isfile(stats_path):
+        with open(stats_path, encoding="utf-8") as f:
+            stats = json.load(f)
+        if stats.get("total") != total:
+            rep.fail("числа", f"scripts/stats.json: total={stats.get('total')}, в дереве {total}")
+        if stats.get("top_level") != total - stats.get("nested", 0):
+            rep.fail("числа", "scripts/stats.json: top_level + nested != total")
+        # OpenClaw: с учётом вложенных у него больше, чем в верхнеуровневом счёте
+        row = next((l for l in readme.splitlines()
+                    if "OpenClaw-Medical-Skills" in l and l.startswith("|")), "")
+        if row and str(stats["by_source_all"].get("OpenClaw")) not in row:
+            rep.fail("числа", f"README: у OpenClaw не показано итоговое число "
+                              f"с вложенными ({stats['by_source_all'].get('OpenClaw')})")
+    else:
+        rep.fail("числа", "нет scripts/stats.json — единого источника чисел")
     # Бейдж несёт число ДВАЖДЫ: в ссылке (badge/Skills-1540) и в тексте
     # (Skills-1540-green). Проверяем оба вхождения — расхождение между ними
     # и есть та ошибка, которую не видно глазами.
@@ -259,6 +282,39 @@ def check_licenses(rep: Report) -> None:
     if "OpenClaw" not in notice or "LICENSE" not in notice:
         rep.fail("лицензии", "NOTICE не содержит оговорки про отсутствие файла LICENSE у OpenClaw")
     rep.note(f"лицензии: {len(files)} файлов, NOTICE называет {len(SOURCES)} источников")
+
+
+def check_short_docs(rep: Report) -> None:
+    """15. Короткие документы не противоречат каноническому разделу.
+
+    Ловушка, которую нашёл внешний аудит: ограничения лицензий были описаны
+    только в README и NOTICE, а AGENTS.md и INSTALL.md говорили просто
+    «MIT и Apache-2.0». Агент, читающий AGENTS.md по инструкции, получал
+    неверную картину — и не знал, что 308 навыков нельзя считать свободными.
+
+    Проверяются два свойства каждого короткого документа: (а) он ссылается на
+    канонический NOTICE, (б) он называет ключевые ограничения или отправляет
+    за ними туда. Плюс собственные навыки перечислены полностью — пропуск
+    третьего был ровно таким же дефектом.
+    """
+    with open(os.path.join(ROOT, "scripts", "stats.json"), encoding="utf-8") as f:
+        stats = json.load(f)
+    own = set(stats["own"])
+    for doc in ("AGENTS.md", "INSTALL.md", "agent-description.md"):
+        path = os.path.join(ROOT, doc)
+        if not os.path.isfile(path):
+            rep.fail("документы", f"нет {doc}")
+            continue
+        body = open(path, encoding="utf-8").read()
+        if "NOTICE.md" not in body:
+            rep.fail("документы", f"{doc}: нет ссылки на NOTICE.md (канонический раздел лицензий)")
+        if "308" not in body:
+            rep.fail("документы", f"{doc}: не названо ограничение (308 проприетарных навыков)")
+        missing = [n for n in own if n not in body]
+        if missing:
+            rep.fail("документы", f"{doc}: не упомянуты собственные навыки {missing}")
+    rep.note(f"документы: AGENTS/INSTALL/agent-description называют ограничения, "
+             f"ссылаются на NOTICE и перечисляют {len(own)} собственных навыка")
 
 
 def check_links(rep: Report) -> None:
@@ -378,6 +434,78 @@ def check_taxonomy_completeness(rep: Report) -> None:
     except Exception as e:  # noqa: BLE001 — без сети проверку не выполняем
         rep.note(f"таксономия: сверка с апстримом пропущена (нет сети: {type(e).__name__}) — "
                  f"локально проверено {len(cols)} колонок, {tax.get('findings_total')} находок")
+
+
+def check_duplicates(rep: Report) -> None:
+    """16. Дубли по содержимому — учтённый список, а не находка.
+
+    Апстримы держат один навык в двух местах: «плоская» копия в корне коллекции
+    плюс версия внутри каталога-контейнера (spatial-agent и
+    spatial-transcriptomics-analysis/SpatialAgent — байт-в-байт одно и то же).
+    Удалять одну копию нельзя: сломается ссылка из другого навыка, а
+    синхронизация вернёт файл при следующем прогоне как «удалённый апстримом».
+
+    Проверка нужна затем, чтобы НОВЫЙ дубль не появился незаметно: он означает
+    либо ошибку сборки, либо переименование в апстриме.
+    """
+    import hashlib
+    listed_path = os.path.join(ROOT, "scripts", "name-duplicates.json")
+    if not os.path.isfile(listed_path):
+        rep.fail("дубли", "нет scripts/name-duplicates.json — списка идентичных навыков")
+        return
+    with open(listed_path, encoding="utf-8") as f:
+        listed = json.load(f)
+    known = {tuple(sorted(d["files"])) for d in listed.get("duplicates", [])}
+
+    def sha(path: str) -> str:
+        with open(path, "rb") as fh:
+            return hashlib.sha256(fh.read()).hexdigest()
+
+    seen: dict[str, list[str]] = {}
+    for f in sorted(pathlib.Path(SKILLS).rglob("SKILL.md")):
+        seen.setdefault(sha(str(f)), []).append(str(f.relative_to(SKILLS)).replace(os.sep, "/"))
+    actual = {tuple(sorted(v)) for v in seen.values() if len(v) > 1}
+    new = sorted(actual - known)
+    gone = sorted(known - actual)
+    if new:
+        rep.fail("дубли", f"новые идентичные навыки: {[n[:2] for n in new[:3]]} — "
+                          f"обнови scripts/name-duplicates.json или разберись с причиной")
+    if gone:
+        rep.fail("дубли", f"идентичность исчезла: {[g[:2] for g in gone[:3]]} — обнови список")
+    rep.note(f"дубли: {len(actual)} пар идентичных навыков, все учтены в name-duplicates.json")
+
+
+def check_clinical_claims(rep: Report) -> None:
+    """17. Клинический навык обязан нести оговорку и не выдавать неподтверждённое.
+
+    `atrial-fibrillation-treatment` — тактика лечения, а не справочник: он читается
+    как рекомендация. Два обязательных свойства: (а) оговорка «для специалиста, не
+    для самолечения» стоит в начале, а не в конце; (б) годы публикаций испытаний
+    не выдуманы — либо подтверждены (сверено с первоисточником), либо помечены
+    «к сверке». Непроверяемый год в клиническом тексте выглядит как доказательство,
+    которого автор не проверял.
+
+    Проверка нужна потому, что этот навык — единственный в библиотеке, который
+    предписывает действия, и ошибка в нём дороже всех остальных.
+    """
+    path = os.path.join(SKILLS, "atrial-fibrillation-treatment", "SKILL.md")
+    if not os.path.isfile(path):
+        rep.fail("клиника", "нет skills/atrial-fibrillation-treatment/SKILL.md")
+        return
+    body = open(path, encoding="utf-8").read()
+    head = body[:3000]
+    for needle in ("не для самолечения", "не заменяет клиническое решение"):
+        if needle not in head:
+            rep.fail("клиника", f"оговорка «{needle}» не найдена в начале навыка")
+    if "## References" not in body:
+        rep.fail("клиника", "нет раздела References со ссылками на рекомендации")
+    # раздел References не должен содержать годов, не помеченных как подтверждённые
+    refs = body.split("## References", 1)[1]
+    unconfirmed = re.findall(r"\*\*(EAST-AFNET 4|EARLY-AF|STOP-AF First|CASTLE-AF|CASTLE-HTx|ADVENT|AFFIRM)\*\*\s*—\s*(?:NEJM|JACC|Nature)\s*\d{4}", refs)
+    if unconfirmed:
+        rep.fail("клиника", f"неподтверждённые годы в References: {unconfirmed[:3]} — "
+                            f"сверь с первоисточником или пометь «к сверке»")
+    rep.note("клиника: оговорка на месте, годы испытаний либо подтверждены, либо помечены")
 
 
 def check_secrets(rep: Report) -> None:
@@ -566,9 +694,12 @@ def main() -> int:
     check_licenses(rep)
     check_restricted(rep)
     check_links(rep)
+    check_short_docs(rep)
     check_assets(rep)
     check_skill_refs(rep)
     check_diagram(rep)
+    check_duplicates(rep)
+    check_clinical_claims(rep)
     check_secrets(rep)
     check_cjk(rep)
     check_language_layers(rep)

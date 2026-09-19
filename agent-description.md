@@ -12,7 +12,8 @@ openmed, Aperivue medsci-skills) плюс три собственных. Дед�
 
 - Хаб экосистемы: https://github.com/Osmosy/vector-work
 - Юридический хаб: https://github.com/Osmosy/vector-legal
-- Кинематографичные приёмы: https://github.com/Osmosy/vector-shotcraft
+- Маркетинговое агентство: https://github.com/Osmosy/vector-marketing
+- Приёмы для продуктовых роликов: https://github.com/Osmosy/vector-shotcraft
 - Прогноз спроса: https://github.com/Osmosy/vector-prediction
 
 ## Для агентов
@@ -41,6 +42,22 @@ openmed, Aperivue medsci-skills) плюс три собственных. Дед�
 | Скрипты | 6 (`scripts/`) |
 | Тесты | 1 файл (`tests/test_scripts.py`, 57 проверок) |
 | Диаграмма | 1 живая (`docs/vector-health.architecture.html`) |
+
+## Ограничения лицензий — обязательно к прочтению
+
+MIT репозитория покрывает **собственный вклад**. У части вендоренных навыков лицензия
+ограничивает использование, и это надо знать ДО работы с ними (полная таблица и
+разбор — `NOTICE.md`):
+
+| Что | Навыков | Следствие |
+|---|---|---|
+| Проприетарная шапка в тексте навыка («proprietary and confidential… All Rights Reserved», © MD BABU MIA — из апстрима OpenClaw) | 308 | считать MIT нельзя |
+| Офисные навыки Anthropic (`xlsx`, `pdf`, `docx`, `pptx` и `-official`) | 8 | «© 2025 Anthropic, PBC. All rights reserved» |
+| `Non-Commercial` | 2 | коммерческое использование запрещено |
+| Таксономия RADAR в `abdominal-ct-findings` | 1 | текст — Apache-2.0 (ок), но **веса модели — CC BY-NC-SA 4.0** и не берутся |
+
+Перед использованием конкретного навыка проверьте его поле `license` и первые строки
+`SKILL.md`. Числа сверяются с деревом: `python3 scripts/validate.py`.
 
 ## Источник и лицензии
 

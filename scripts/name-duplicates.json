@@ -1,0 +1,34 @@
+{
+ "note": "Идентичные по содержимому SKILL.md. Это НЕ случайная ошибка дедупликации: апстримы сами держат один навык в двух местах — обычно «плоская» копия в корне коллекции плюс версия внутри каталога-контейнера. Обе копии оставлены сознательно: удаление одной сломало бы ссылку из другого навыка или синхронизацию (файл вернётся при следующем прогоне как «удалённый апстримом»). Различающиеся пары (напр. cover-letter-drafter в двух категориях AIPOCH с разным текстом) сюда не попадают — они не идентичны.",
+ "count": 4,
+ "duplicates": [
+  {
+   "files": [
+    "antibody-design-agent/MAGE/SKILL.md",
+    "mage-antibody-generator/SKILL.md"
+   ],
+   "sha256": "32d21aac2aaf04a16383c2ede0b971b877736c651e2184c9eb1ec5fd05748f1f"
+  },
+  {
+   "files": [
+    "spatial-agent/SKILL.md",
+    "spatial-transcriptomics-analysis/SpatialAgent/SKILL.md"
+   ],
+   "sha256": "191c44537a2d9584120d72f74bc875b863518af7d7dcb3832ebff1f060b8826a"
+  },
+  {
+   "files": [
+    "spatial-transcriptomics-agent/SKILL.md",
+    "spatial-transcriptomics-analysis/STAgent/SKILL.md"
+   ],
+   "sha256": "fc8649248886a5026d5efeb45dd8e6e6a63a583470c9995aa6af4d097f91c69d"
+  },
+  {
+   "files": [
+    "varcadd-pathogenicity/SKILL.md",
+    "variant-interpretation-acmg/varCADD/SKILL.md"
+   ],
+   "sha256": "97cb5a3af11dd565b741d245f8bd0735a5c4152117248d97de5e804d67259c5a"
+  }
+ ]
+}
