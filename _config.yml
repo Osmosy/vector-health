@@ -22,7 +22,6 @@ exclude:
   - scripts/
   - tests/
   - THIRD_PARTY_LICENSES/
-  - assets/
   - .github/
   - LICENSE
   - AGENTS.md

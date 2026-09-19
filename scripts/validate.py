@@ -397,6 +397,43 @@ def check_restricted(rep: Report) -> None:
     rep.note(f"лицензии: ограниченных навыков {len(actual)} (в списке {len(recorded)}), NOTICE их называет")
 
 
+def check_assets(rep: Report) -> None:
+    """12. Изображения в документации и на сайте резолвятся.
+
+    Ловушка, на которую легко наступить при настройке Pages: файл ассета
+    исключён из сборки сайта (`exclude:` в `_config.yml`), и картинка на
+    опубликованной странице отдаёт 404, хотя в репозитории лежит. Локально всё
+    выглядит целым, поэтому проверка нужна на уровне связи «документ ссылается
+    на файл» и «файл не исключён из сайта».
+    """
+    img_re = re.compile(r'<img[^>]+src="([^"]+)"')
+    cfg_path = os.path.join(ROOT, "_config.yml")
+    excluded = []
+    if os.path.isfile(cfg_path):
+        text = open(cfg_path, encoding="utf-8").read()
+        block = re.search(r"^exclude:\n((?:[ \t]+-.*\n)+)", text, re.MULTILINE)
+        if block:
+            excluded = [l.strip().lstrip("- ").rstrip("/") for l in block.group(1).splitlines()]
+    for doc in DOCS:
+        path = os.path.join(ROOT, doc)
+        if not os.path.isfile(path):
+            continue
+        body = open(path, encoding="utf-8").read()
+        for src in img_re.findall(body):
+            if src.startswith(("http://", "https://", "data:")):
+                continue
+            local = os.path.join(ROOT, src)
+            if not os.path.isfile(local):
+                rep.fail("ассеты", f"{doc}: изображение {src} не найдено в репозитории")
+                continue
+            top = src.split("/")[0]
+            if any(e == top or e == src for e in excluded):
+                rep.fail("ассеты", f"{doc}: {src} есть в репозитории, но исключён из сайта "
+                                    f"(_config.yml exclude: {top}) — на Pages будет 404")
+    rep.note(f"ассеты: изображения в документах существуют и не исключены из сайта "
+             f"(исключено {len(excluded)} записей)")
+
+
 def main() -> int:
     rep = Report()
     dirs = check_skills(rep)
@@ -406,6 +443,7 @@ def main() -> int:
     check_licenses(rep)
     check_restricted(rep)
     check_links(rep)
+    check_assets(rep)
     check_skill_refs(rep)
     check_diagram(rep)
     check_secrets(rep)

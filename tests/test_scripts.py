@@ -185,6 +185,23 @@ check("повторный запуск сравнивает локальное �
 check("файлы-ссылки из форков тянутся (шаг 4)",
       "fork_files" in src and "all_heads" in src)
 
+print("\n=== 11. Ассеты: файл из репозитория не исключён из сайта ===")
+# Валидатор ловит ловушку Pages: ассет есть в репозитории, но исключён из сборки
+# сайта — локально всё цело, а на опубликованной странице картинка 404.
+tmp3 = tempfile.mkdtemp()
+try:
+    shutil.copytree(ROOT, tmp3, ignore=shutil.ignore_patterns(".git", "__pycache__"), dirs_exist_ok=True)
+    cfg = os.path.join(tmp3, "_config.yml")
+    t = open(cfg, encoding="utf-8").read()
+    open(cfg, "w", encoding="utf-8").write(t.replace("  - THIRD_PARTY_LICENSES/\n",
+                                                     "  - THIRD_PARTY_LICENSES/\n  - assets/\n"))
+    r5 = run([sys.executable, "scripts/validate.py"], cwd=tmp3)
+    check("ассет, исключённый из сайта, роняет валидатор", r5.returncode == 1, f"exit={r5.returncode}")
+    check("в сообщении названы и файл, и причина", "vector-logo.png" in r5.stdout and "404" in r5.stdout,
+          r5.stdout[-300:])
+finally:
+    shutil.rmtree(tmp3, ignore_errors=True)
+
 print(f"\n{'=' * 50}")
 print(f"ИТОГО: {PASS} ok, {FAIL} FAIL")
 sys.exit(1 if FAIL else 0)
