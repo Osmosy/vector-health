@@ -1,6 +1,14 @@
-# GitHub Pages (legacy/Jekyll). Нужен ровно для одного: шапка README — это
-# <div align="center"> с markdown внутри. Без parse_block_html kramdown
-# показывает такой блок сырым текстом (бейджи и заголовок видны как код).
+# GitHub Pages (legacy/Jekyll). Нужен ровно для двух вещей: шапка README — это
+# <div align="center"> с markdown внутри (без parse_block_html kramdown
+# показывает её сырым текстом, бейджи и заголовок видны как код), и страница
+# сайта docs/index.html.
+#
+# ВАЖНО. Библиотека — 9887 файлов, и Jekyll обрабатывает их ВСЕ: 40 навыков
+# содержат Liquid-подобные шаблоны ({{ ... }} в промптах и шаблонах политик),
+# на которых сборка страницы падала («Page build failed») — сайт отдавал 404.
+# Поэтому вендоренные навыки, скрипты и тесты исключены из обработки: сайту они
+# не нужны, а их содержимое — чужие тексты, которые нельзя править под Jekyll.
+# Сайт собирается из README.md, docs/ и корневых документов.
 title: Vector Health
 description: Библиотека медицинских и биомедицинских навыков для AI-агентов — 1540 навыков из четырёх открытых коллекций плюс собственные
 
@@ -8,3 +16,26 @@ markdown: kramdown
 kramdown:
   input: GFM
   parse_block_html: true
+
+exclude:
+  - skills/
+  - scripts/
+  - tests/
+  - THIRD_PARTY_LICENSES/
+  - assets/
+  - .github/
+  - LICENSE
+  - AGENTS.md
+  - INSTALL.md
+  - NOTICE.md
+  - agent-description.md
+  - skills-index.json
+  - .gitignore
+
+# Копировать в сайт без обработки Liquid: текст навыков и диаграмма содержат
+# {{ }} и {% %}, которые Jekyll принял бы за свои теги.
+keep_files:
+  - docs
+
+include:
+  - docs
