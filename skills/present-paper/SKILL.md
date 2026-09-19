@@ -74,6 +74,8 @@ animation discipline) plus the G1–G10 self-check the Phase 3.5 critic scores a
 | `references/medical_presentation_templates.md` | the venue is one of the five medical ones — then read **that section only** | ~3,700 tokens, of which you use a fifth |
 | `references/slide_visual_styles/CATALOG.md` → one style file | Q2 has chosen a style | ~2,300 tokens per style |
 | `references/slide_design_principles.md` | you are stuck on *why* a slide is not landing — Reynolds / Duarte / Knaflic / Tufte, the theory under the rules in **C** | ~2,600 tokens of theory you mostly already applied |
+| `references/generated_illustrations.md` | you are about to generate any image for a slide, or a text-only slide keeps failing the critic | ~1,300 tokens; the first rule (never generate a medical image) is not optional |
+| `references/spoken_notes_and_bilingual.md` | you are drafting speaker notes, or the deck is not monolingual | ~1,700 tokens; both halves are about delivery, not design |
 
 These mirror the entry-point pattern used in
 `make-figures/references/design_principles.md` (Step 1 "Specify"). Both skills share
@@ -260,6 +262,11 @@ Draft a complete speaker script with these requirements:
 4. **Timing markers**: Note approximate time per slide
 5. **Transition phrases**: Connect each slide to the narrative arc
 
+Those five govern *what the notes contain*. How the sentences are built — which is a separate and
+more common failure, because notes are spoken and not read — is in
+`references/spoken_notes_and_bilingual.md`, together with the language split for a deck that is not
+monolingual. Read it before drafting if either applies.
+
 ### Structure
 
 ```text
@@ -311,8 +318,15 @@ canonical template libraries:
   Use for **academic lecture multi-paper survey** (template #5). Functions:
   `new_presentation`, `add_title_slide`, `add_toc_slide`, `add_section_divider`,
   `add_transition_slide`, `add_content_slide`, `add_glossary_slide`,
-  `add_closing_slide`, plus `fix_app_xml()` helper. Style spec:
+  `add_closing_slide`, plus `apply_fonts(prs, en=..., ko=...)` and `fix_app_xml()` helpers. Style spec:
   `references/slide_visual_styles/nature_lancet.md`.
+
+The Nature/Lancet defaults use 20 pt body text, subtitles and glossary entries.
+They suit the `conference_oral`, `critique`, `case_anchored`, `didactic` and
+`defence` budget profiles with concise content. `keynote`, `lay_talk` and
+`decision_brief` require larger type and layout adaptation; selecting a profile
+in the checker does not restyle the deck. Outline/glossary capacity bounds do not
+guarantee readable density or text fit. Render the actual content and inspect it.
 
 For lecture decks pulling figures from PDFs (rather than from `/make-figures`
 output), use `${CLAUDE_SKILL_DIR}/scripts/extract_pdf_figures.py` — pdftoppm + PIL
@@ -546,6 +560,10 @@ When the deck pulls figures from `analysis/figures/` produced by `/make-figures`
   the bullet above it is edited. Nothing catches that: text search sees the slide and not the image,
   so the only thing that finds it is a person looking at the render. Numbers and conclusions live in
   the slide's own text where they can be read, grepped, and corrected.
+- **Generating an illustration instead of sourcing one**: allowed for concepts and scenes, never
+  for anything that could be mistaken for a measurement — no generated CT, MRI, histology, or
+  radiograph, not even "as an illustration". Read `references/generated_illustrations.md` before
+  the first prompt; it also covers palette, text-in-image, provenance, and disclosure.
 
 ### Diagrams and plots are drawn as CODE, then inserted (not out of autoshapes)
 
@@ -640,6 +658,11 @@ with a count per font so a 1,000-run body face reads differently from a stray mo
 code lines. It is a blocklist, not an allowlist: a hospital's licensed brand face is not this
 check's business. It exempts fonts the deck **embeds**, and it treats a theme-level default as
 inert until the deck actually contains text of the script that slot serves.
+A pass does not verify font installation or renderer substitution. For the
+Nature/Lancet builder, call `apply_fonts` after adding slides and before saving to
+select installed Latin and East Asian faces without changing text or formatting.
+It does not embed fonts or modify fonts inside images, tables or charts. Verify
+the actual exported PDF's fonts as well as its visible layout.
 
 Two ways to be safe, and both have a cost worth knowing:
 
@@ -843,6 +866,11 @@ on everything else as unread, not as passed.
 `python-pptx` will write more text than a box can show and say nothing about it. PowerPoint reveals
 it on the screen, which is where the audience is.
 
+The measured-overflow check uses `pdftotext -bbox-layout` line rectangles. It
+checks bottom edges against the slide and filled blocks; it does not certify all
+intersections, top/right clipping, or text omitted entirely from the PDF export.
+Inspect the render against the slide source, including long captions and titles.
+
 The tempting check is arithmetic — font size × line spacing × lines — and it fails in **both**
 directions. A line-height constant of 1.42 under-estimated CJK line pitch and let a body block cross
 into the footer; measuring the render gave 1.60; raising the constant to 1.62 then refused about 290
@@ -1019,8 +1047,6 @@ This skill composes with adjacent skills and global rules:
 
 - **Never fabricate references.** All citations must be verified via `/search-lit` with confirmed DOI or PMID. Mark unverified references as `[UNVERIFIED - NEEDS MANUAL CHECK]`.
 - **Never invent clinical definitions, diagnostic criteria, or guideline recommendations.** If uncertain, flag with `[VERIFY]` and ask the user.
-- **Never fabricate numerical results** — compliance percentages, scores, effect sizes, or sample sizes must come from actual data or analysis output.
-- If a reporting guideline item, journal policy, or clinical standard is uncertain, state the uncertainty rather than guessing.
 
 ## Global-rule references
 

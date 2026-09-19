@@ -7,9 +7,9 @@ a-priori effect-size assumptions behind them are *computed*, not extracted, so t
 CSV row or source-paper Table to trace to. They routinely escape both the internal-consistency
 check and the source-fidelity audit above.
 
-**Precedent failure pattern:**
-> A pilot study reported a minimum detectable effect of d = 1.67. No standard two-sample method
-> reproduces it (the correct value at the stated n, alpha, and power was about 1.24). It survived
+**The failure pattern:**
+> A pilot study reported a minimum detectable effect that no standard two-sample method
+> reproduces at the stated n, alpha, and power. It survived
 > several review rounds because no committed script computed it — the value had been hand-entered —
 > and one reviewer even cited the figure approvingly. In the same manuscript, a set of future-trial
 > sample sizes was numerically correct but had been produced with an exact noncentral-t tool, while
@@ -30,7 +30,7 @@ check and the source-fidelity audit above.
 
 3. **Recompute independently** with a standard tool, then classify:
    - **Not reproducible by any standard method** → likely a calculation error (Major; P0 if it
-     is a headline claim). This is the d = 1.67-vs-1.24 case above.
+     is a headline claim). This is the minimum-detectable-effect case above.
    - **Reproducible only by a method the committed script does not implement** (e.g. the
      manuscript value is noncentral-t but the script is a normal approximation) → provenance /
      method drift. The number may be correct, but update the committed code so it reproduces the

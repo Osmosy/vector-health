@@ -23,16 +23,14 @@ Canonical per-journal reviewer formatting profiles. Consumed by both the OSS `pe
 
 These profiles are trusted precisely because they are specific: a reviewer reads the recommendation
 options here and picks one without opening the portal first. That is what makes a wrong entry
-expensive, and it has now happened twice on two different journals.
+expensive, and two entries in this directory were wrong.
 
 - A profile listed **"Accept with Minor Revision"** as a recommendation option. The live form does
   not have that label, and its minor-revision tier is **two** options — final approval *by Editor*
-  versus *by this reviewer*, a real decision about whether the paper returns to the reviewer. The
-  reviewer was told to pick the non-existent option and had to report back from the portal. Filed,
-  then observed a second time two weeks later, still uncorrected.
+  versus *by this reviewer*, a real decision about whether the paper returns to the reviewer.
 - Another profile listed **ORCID Reviewer Credit** under *Confirmed Form Fields*. It is not a
-  scorecard field at all — zero occurrences in either round's confirmation PDF; it is an
-  account-level setting. It reached a submission checklist as a field to answer.
+  scorecard field at all — zero occurrences on the form; it is an
+  account-level setting.
 
 Both entries came from the same place: **a review invitation, or the author guidelines.** An
 invitation advertises the review. The form is what you fill in. They are not the same document, and
@@ -43,16 +41,21 @@ nothing in this directory used to say so.
 1. **Source of truth is a completed form or its confirmation PDF** — never the invitation, never the
    author guidelines. Guidelines describe the journal's policy; the form is the journal's software.
 2. **Every form-field list carries an evidence pointer**, or it may not be called *confirmed*:
-   `Verified against {R1/R2/…} confirmation PDF, {YYYY-MM-DD}`. **Date and round only — never the
-   manuscript ID** (Design Principle 3: the set of manuscripts a reviewer has handled can identify
-   the reviewer).
+   `Verified against a completed review form, {YYYY-MM}`. **Evidence class and month only.**
+   Never the manuscript ID, and — added 2026-08-17 — never the round, the count, or the day.
+   Design Principle 3 says the set of manuscripts a reviewer has handled can identify the
+   reviewer; so does the set of *reviews*. A round number and a day-precision date say how many
+   reviews were done and when, which is a reviewing timeline, and correlating five profiles
+   rebuilds it. Worse, a day-precision date is a join key: an ID scrubbed from this file survives
+   in already-published package versions, and a shared date links the two back together. The month
+   carries the staleness signal a date exists for; nothing else here needs to.
 3. **A confirmation PDF cannot verify a dropdown.** It carries no form widgets, so the *contents* of
    a recommendation or rating menu are not recoverable from it. Verifying an option list means
    rendering the live page as an image. Until that is done, mark the list partially verified and
    **leave the unread labels blank rather than filling them in** — a plausible guess in a confident
    file is worse than an admitted gap.
-4. **When a profile is wrong, correct the profile.** Reading it and working around it in one session
-   leaves the next reader to hit the same wall.
+4. **When a profile is wrong, correct the profile.** Reading it, working around the error and
+   moving on leaves the next reader to hit the same wall.
 
 ## Adding a New Journal
 

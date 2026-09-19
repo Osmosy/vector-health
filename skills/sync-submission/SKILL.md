@@ -25,8 +25,8 @@ and records whether it is current, stale, or frozen.
 2. Journal short name, e.g. `chest`, `ryai`, `academic_radiology`.
 3. Optional mode:
    - `audit`: compare existing submission against canonical source.
-   - `build`: copy canonical source into `submission/{journal}/manuscript/` and write metadata.
-   - `freeze`: mark a package as submitted/frozen.
+   - `build`: copy canonical source and optional declared final artifacts, preserving file bytes, and write metadata.
+   - `freeze`: freeze the chosen byte snapshot with its available check context (not submission approval).
 
 ## Deterministic Script
 
@@ -57,6 +57,14 @@ The registry is a project-local YAML mapping author identifiers (full names, nat
 | Pre-flight gate | `qc/preflight_gate_report.json` | Aggregated halt-on-failure manifest (see "Pre-flight gate" below) |
 | Supplement structure | `qc/supplement_structure.json` | Gate 14: index↔file 1:1, sub-section gaps, callout coverage |
 
+For a complete bundle, use `build --bundle-spec bundle.json` after running the
+existing renderers. The declaration adds final Word/PDF, supplement, cover-letter,
+table/figure and notice files with pinned render-input hashes and reuse-rights
+records. Copies preserve file bytes; content and visual fidelity remain
+`not_assessed` until separately reviewed. Build refuses edited or frozen outputs
+and destructive path collisions. See [bundle workflow](references/bundle_workflow.md)
+for the schema, a runnable synthetic example and the limits of each recorded check.
+
 ## Pre-flight gate (single command — last step before freeze)
 
 Run this once, right before `freeze`/submission. It orchestrates the existing
@@ -65,6 +73,14 @@ writes a single aggregated manifest (`qc/preflight_gate_report.json`), and exits
 **non-zero** so a build wrapper or CI step can stop the freeze. It shells out to
 the per-check scripts and reimplements none of them — the halt decision is driven
 by each sub-check's normalized exit code.
+
+The report distinguishes executed, skipped and errored checks. Its legacy
+`submission_safe` field means no configured blocker/error, not submission
+approval; `readiness` remains `not_assessed`. The optional bundle hash binding
+identifies the package present during the run, not per-file visual inspection or
+all external check inputs. Run `audit` again after preflight to expose current,
+stale or unbound evidence. Freeze records a byte snapshot and its available check
+context; it does not run preflight or approve source fidelity or reuse permissions.
 
 ```bash
 python "${CLAUDE_SKILL_DIR}/scripts/preflight_gate.py" --project-root . --journal chest
@@ -261,18 +277,18 @@ Body words are matched with a 5% tolerance ("approximately N words"
 phrasing). Abstract words tolerate ±5. Reference / table / figure counts
 require exact match.
 
-Output `qc/cover_letter_drift.json`:
+Example `qc/cover_letter_drift.json` (synthetic values):
 
 ```json
 {
   "submission_safe": false,
-  "truth": {"body_words": 3036, "abstract_words": 319, "references": 12,
+  "truth": {"body_words": 2400, "abstract_words": 210, "references": 10,
             "tables": 3, "figures": 4},
-  "claims": {"body_words": 3790, "abstract_words": 250, "references": 12},
+  "claims": {"body_words": 2800, "abstract_words": 250, "references": 10},
   "drifts": [
-    {"field": "body_words", "truth": 3036, "cover_letter_claim": 3790,
+    {"field": "body_words", "truth": 2400, "cover_letter_claim": 2800,
      "severity": "MAJOR",
-     "note": "|claim - truth| = 754 > tolerance 151"}
+     "note": "|claim - truth| = 400 > tolerance 120"}
   ]
 }
 ```

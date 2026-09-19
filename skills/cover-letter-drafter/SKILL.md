@@ -1,105 +1,224 @@
 ---
 name: cover-letter-drafter
-description: Drafts journal-ready cover letters for manuscript submission. Use when preparing a submission package, communicating the manuscript's contributions and journal fit to editors, or tailoring the novelty framing for a specific journal's scope. Also triggers on "write a cover letter for my paper", "draft a submission cover letter", "help me write to the editor", or "cover letter for [journal name]".
+description: Generates professional cover letters for journal submissions and job.
 license: MIT
 author: AIPOCH
 ---
 > **Source**: [https://github.com/aipoch/medical-research-skills](https://github.com/aipoch/medical-research-skills)
 
-# Cover Letter Generator
+# Cover Letter Drafter
 
-You are a biomedical writing specialist for journal cover letters. Your output is a complete, editor-facing letter that frames the manuscript's importance, novelty, and journal fit concisely and professionally.
+Creates tailored cover letters for academic and medical positions.
 
 ## When to Use
 
-- Drafting the cover letter for initial manuscript submission to a specific journal
-- Tailoring the novelty and contribution framing to match a journal's scope and readership
-- Organizing required submission statements (originality, authorship approval, conflicts of interest, suggested reviewers)
-- Revising a cover letter after rejection for resubmission to a different journal
-- Ensuring the cover letter complements rather than repeats the abstract
+- Use this skill when the task needs Generates professional cover letters for journal submissions and job.
+- Use this skill for academic writing tasks that require explicit assumptions, bounded scope, and a reproducible output format.
+- Use this skill when you need a documented fallback path for missing inputs, execution errors, or partial evidence.
+
+## Key Features
+
+See `## Features` above for related details.
+
+- Scope-focused workflow aligned to: Generates professional cover letters for journal submissions and job.
+- Packaged executable path(s): `scripts/main.py`.
+- Reference material available in `references/` for task-specific guidance.
+- Structured execution path designed to keep outputs consistent and reviewable.
+
+## Dependencies
+
+See `## Prerequisites` above for related details.
+
+- `Python`: `3.10+`. Repository baseline for current packaged skills.
+- `Third-party packages`: `not explicitly version-pinned in this skill package`. Add pinned versions if this skill needs stricter environment control.
+
+## Example Usage
+
+See `## Usage` above for related details.
+
+```bash
+cd "20260318/scientific-skills/Academic Writing/cover-letter-drafter"
+python -m py_compile scripts/main.py
+python scripts/main.py --help
+```
+
+Example run plan:
+1. Confirm the user input, output path, and any required config values.
+2. Edit the in-file `CONFIG` block or documented parameters if the script uses fixed settings.
+3. Run `python scripts/main.py` with the validated inputs.
+4. Review the generated output and return the final artifact with any assumptions called out.
+
+## Implementation Details
+
+See `## Workflow` above for related details.
+
+- Execution model: validate the request, choose the packaged workflow, and produce a bounded deliverable.
+- Input controls: confirm the source files, scope limits, output format, and acceptance criteria before running any script.
+- Primary implementation surface: `scripts/main.py`.
+- Reference guidance: `references/` contains supporting rules, prompts, or checklists.
+- Parameters to clarify first: input path, output path, scope filters, thresholds, and any domain-specific constraints.
+- Output discipline: keep results reproducible, identify assumptions explicitly, and avoid undocumented side effects.
+
+## Quick Check
+
+Use this command to verify that the packaged script entry point can be parsed before deeper execution.
+
+```bash
+python -m py_compile scripts/main.py
+```
+
+## Audit-Ready Commands
+
+Use these concrete commands for validation. They are intentionally self-contained and avoid placeholder paths.
+
+```bash
+python -m py_compile scripts/main.py
+python scripts/main.py --help
+```
+
+## Workflow
+
+1. Confirm the user objective, required inputs, and non-negotiable constraints before doing detailed work.
+2. Validate that the request matches the documented scope and stop early if the task would require unsupported assumptions.
+3. Use the packaged script path or the documented reasoning path with only the inputs that are actually available.
+4. Return a structured result that separates assumptions, deliverables, risks, and unresolved items.
+5. If execution fails or inputs are incomplete, switch to the fallback path and state exactly what blocked full completion.
+
+## Features
+
+- Journal submission cover letters
+- Job application cover letters
+- Fellowship application letters
+- Customizable templates
+
+## Parameters
+
+| Parameter | Type | Default | Required | Description |
+|-----------|------|---------|----------|-------------|
+| `--purpose` | string | job | No | Cover letter type (journal, job, fellowship) |
+| `--recipient`, `-r` | string | - | Yes | Target journal or institution |
+| `--key-points`, `-k` | string | - | Yes | Comma-separated key points to highlight |
+| `--title` | string | - | No | Manuscript title (for journal submissions) |
+| `--significance` | string | - | No | Significance statement (for journal submissions) |
+| `--author`, `--applicant`, `-a` | string | Applicant | No | Author or applicant name |
+| `--position` | string | - | No | Position title (for job applications) |
+| `--fellowship` | string | - | No | Fellowship name (for fellowship applications) |
+| `--output`, `-o` | string | - | No | Output JSON file path |
+
+## Usage
+
+```text
+
+# Journal submission cover letter
+python scripts/main.py --purpose journal --recipient "Nature Medicine" \
+  --key-points "Novel findings,Clinical relevance" \
+  --title "Study X" --significance "major advance" --author "Dr. Smith"
+
+# Job application cover letter
+python scripts/main.py --purpose job --recipient "Harvard Medical School" \
+  --key-points "10 years experience,Published 20 papers" \
+  --position "Assistant Professor" --applicant "Dr. Jones"
+
+# Fellowship application
+python scripts/main.py --purpose fellowship --recipient "NIH" \
+  --key-points "Research excellence,Leadership skills" \
+  --fellowship "K99" --applicant "Dr. Lee"
+```
+
+## Output Format
+
+```json
+{
+  "cover_letter": "string",
+  "subject_line": "string",
+  "word_count": "int"
+}
+```
+
+## Risk Assessment
+
+| Risk Indicator | Assessment | Level |
+|----------------|------------|-------|
+| Code Execution | Python/R scripts executed locally | Medium |
+| Network Access | No external API calls | Low |
+| File System Access | Read input files, write output files | Medium |
+| Instruction Tampering | Standard prompt guidelines | Low |
+| Data Exposure | Output files saved to workspace | Low |
+
+## Security Checklist
+
+- [ ] No hardcoded credentials or API keys
+- [ ] No unauthorized file system access (../)
+- [ ] Output does not expose sensitive information
+- [ ] Prompt injection protections in place
+- [ ] Input file paths validated (no ../ traversal)
+- [ ] Output directory restricted to workspace
+- [ ] Script execution in sandboxed environment
+- [ ] Error messages sanitized (no stack traces exposed)
+- [ ] Dependencies audited
+
+## Prerequisites
+
+No additional Python packages required.
+
+## Evaluation Criteria
+
+### Success Metrics
+- [ ] Successfully executes main functionality
+- [ ] Output meets quality standards
+- [ ] Handles edge cases gracefully
+- [ ] Performance is acceptable
+
+### Test Cases
+1. **Basic Functionality**: Standard input → Expected output
+2. **Edge Case**: Invalid input → Graceful error handling
+3. **Performance**: Large dataset → Acceptable processing time
+
+## Lifecycle Status
+
+- **Current Stage**: Draft
+- **Next Review Date**: 2026-03-06
+- **Known Issues**: None
+- **Planned Improvements**: 
+  - Performance optimization
+  - Additional feature support
+
+## Output Requirements
+
+Every final response should make these items explicit when they are relevant:
+
+- Objective or requested deliverable
+- Inputs used and assumptions introduced
+- Workflow or decision path
+- Core result, recommendation, or artifact
+- Constraints, risks, caveats, or validation needs
+- Unresolved items and next-step checks
+
+## Error Handling
+
+- If required inputs are missing, state exactly which fields are missing and request only the minimum additional information.
+- If the task goes outside the documented scope, stop instead of guessing or silently widening the assignment.
+- If `scripts/main.py` fails, report the failure point, summarize what still can be completed safely, and provide a manual fallback.
+- Do not fabricate files, citations, data, search results, or execution outcomes.
 
 ## Input Validation
 
-This skill accepts:
-- Manuscript title, author list, corresponding author contact details
-- Brief description of the study and its key contributions
-- Target journal name and optional scope notes
-- Optionally: suggested reviewers, conflicts of interest, required declarations
+This skill accepts requests that match the documented purpose of `cover-letter-drafter` and include enough context to complete the workflow safely.
 
-Out-of-scope:
-- Writing the manuscript abstract or main text
-- Predicting editorial acceptance likelihood
-- Providing legal or compliance advice about disclosure obligations
+Do not continue the workflow when the request is out of scope, missing a critical input, or would require unsupported assumptions. Instead respond:
 
-> "Cover Letter Generator drafts the editor-facing cover letter. Provide manuscript details and target journal, and I will write the letter."
+> `cover-letter-drafter` only handles its documented workflow. Please provide the missing required inputs or switch to a more suitable skill.
 
-## Core Workflow
+## Response Template
 
-### Step 1 — Collect Required Inputs
+Use the following fixed structure for non-trivial requests:
 
-**Mandatory:**
-- Manuscript title
-- Author list and corresponding author (name, email, affiliation)
-- Target journal name
-- 3–5 key contributions or innovations (what is new about this work)
-- One-sentence description of the main finding or result
+1. Objective
+2. Inputs Received
+3. Assumptions
+4. Workflow
+5. Deliverable
+6. Risks and Limits
+7. Next Checks
 
-**Optional (but improves quality):**
-- Journal scope/focus notes or readership description
-- Methods summary (1–2 sentences)
-- Suggested reviewers (name + institution + rationale for why they are appropriate)
-- Conflicts of interest statement
-- Any journal-specific required declarations (data availability, ethics, preprint status)
-
-If the manuscript title and target journal are not provided, ask for them before drafting.
-
-### Step 2 — Draft the Cover Letter
-
-Structure the letter in 5 paragraphs:
-
-**P1 — Submission request + title + journal fit**
-> "We submit our manuscript entitled '[Title]' for consideration in [Journal]. [1–2 sentences on why the manuscript fits the journal's scope and readership.]"
-
-**P2 — Core novelty and what is new vs prior work**
-> "[State the central scientific question or gap.] Our study [describe the key innovation — new method, new population, new finding, new evidence level]. Unlike previous work that [brief contrast with prior art], we [what you did differently or additionally]."
-
-**P3 — Methods and key quantitative results**
-> "[1–2 sentences summarizing the approach.] Our main finding: [key result with a quantitative anchor if available]. [Optional: secondary finding.]"
-
-**P4 — Impact and relevance to readership**
-> "[Why these findings matter to the journal's audience.] [Impact on clinical practice / research direction / field understanding.] [Data/code availability if relevant.]"
-
-**P5 — Declarations + closing**
-> "We confirm this manuscript is original, has not been published previously, and is not under consideration elsewhere. All authors have approved the manuscript. [Add journal-specific statements: ethics, data availability, conflicts of interest.] [Suggested reviewers if applicable.] Thank you for your consideration."
-
-### Step 3 — Calibrate Tone and Length
-
-- **Length**: 300–450 words for most journals; <300 for brief communications or short reports
-- **Tone**: professional, concise, editor-facing (not enthusiastic marketing language)
-- **Avoid**: starting with "We are pleased to submit..."; starting every sentence with "Our"; superlatives like "groundbreaking", "unprecedented"
-- **Use**: direct statements about the finding; clear statement of journal fit; specific contribution language
-
-### Step 4 — Final Check
-
-Before delivering, verify:
-- [ ] Manuscript title matches exactly (capitalization, punctuation)
-- [ ] Corresponding author details are complete (name, affiliation, email)
-- [ ] Journal name is stated correctly
-- [ ] At least one explicit statement on journal-scope fit
-- [ ] Core novelty stated in ≤3 sentences
-- [ ] Declarations block present (originality, author approval, COI if any)
-- [ ] No abstract simply copy-pasted into the letter
-- [ ] Tone is professional throughout
-
-## Hard Rules
-
-- Never fabricate journal acceptance rates, editorial preferences, or peer-reviewer affiliations
-- Never write statements asserting acceptance likelihood ("this paper will be of great interest to your reviewers")
-- Do not invent contributions or results not provided by the user
-- Do not copy-paste the abstract as the cover letter — the letter must add framing context
-- If the user has not specified a conflict of interest, use `[Author to confirm: no conflicts of interest / state conflicts]` rather than inserting "none" by default
-
-## References
-
-→ Cover letter template: [assets/cover_letter_template.md](assets/cover_letter_template.md)
-→ Checklist and output formats: [references/guide.md](references/guide.md)
+If the request is simple, you may compress the structure, but still keep assumptions and limits explicit when they affect correctness.
