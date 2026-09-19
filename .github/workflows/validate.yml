@@ -27,3 +27,6 @@ jobs:
 
       - name: Проверить, что README не расходится с деревом
         run: python scripts/validate_readme.py
+
+      - name: Ссылки внутри навыков — у собственных навыков битых быть не должно
+        run: python scripts/broken_refs.py --strict-own

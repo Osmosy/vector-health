@@ -62,7 +62,12 @@ SOURCES = {
 EXCLUDE_PARTS = ("/evals/", "/eval/", "/fixtures/", "/repo/", "/node_modules/", "/.git/",
                  "/tests/", "/test_data/", "/.github/", "/docs/", "/challenges/",
                  "/lint_challenge/", "/analysis_run_challenge/", "/_challenge/")
-EXCLUDE_SUFFIX = (".npy", ".xlsx", ".parquet", ".h5ad", ".rds", ".bam", ".gz", ".zip", ".whl")
+EXCLUDE_SUFFIX = (".npy", ".xlsx", ".parquet", ".h5ad", ".rds", ".bam", ".zip", ".whl")
+# Тяжёлые архивы: файл есть в апстриме и на него ссылается SKILL.md, но это
+# демо-данные на мегабайты (выгрузки 23andMe по 4.9 МБ), а не материал навыка.
+# Держать их в библиотеке навыков — удвоить репозиторий ради одного примера.
+HEAVY_SUFFIX = (".gz", ".tgz", ".bz2", ".xz", ".tar", ".7z")
+HEAVY_MAX = 1_500_000  # байт: крупнее — демо-датасет, а не материал навыка
 # Служебные артефакты апстримов: отчёты прогонов, аудиты, changelog'и. При сборке
 # они не вендорились; тянуть их обратно — удвоить библиотеку мусором.
 EXCLUDE_MARKERS = ("_audit_result", "audit_result", "eval_report", "POLISH_CHANGELOG",
@@ -75,6 +80,8 @@ REF_RE = re.compile(r"(?:references|scripts|templates|assets|prompts|data)/[A-Za
 AUX_PREFIXES = ("references/", "scripts/", "templates/", "assets/", "prompts/", "data/",
                 "requirements.txt", "skill.yml", "LICENSE")
 MAX_FILE = 5 * 1024 * 1024
+
+_HEADS_CACHE: tuple[dict[str, dict[str, str]], dict[str, int]] | None = None
 
 
 def token() -> str:
@@ -147,7 +154,14 @@ def blob_map(repo: str, ref: str) -> dict[str, str]:
     tree = api(f"https://api.github.com/repos/{repo}/git/trees/{ref}?recursive=1")
     if tree.get("truncated"):
         print(f"  ! дерево {repo}@{ref[:7]} усечено API — часть файлов не увидим", file=sys.stderr)
-    return {x["path"]: x["sha"] for x in tree["tree"] if x.get("type") == "blob"}
+    return {x["path"]: x["sha"] for x in tree.get("tree", []) if x.get("type") == "blob"}
+
+
+def blob_sizes(repo: str, ref: str) -> dict[str, int]:
+    """Путь → размер в байтах. Размер нужен, чтобы не тянуть мегабайтные
+    демо-датасеты, на которые ссылается SKILL.md (выгрузки 23andMe по 4.9 МБ)."""
+    tree = api(f"https://api.github.com/repos/{repo}/git/trees/{ref}?recursive=1")
+    return {x["path"]: x.get("size", 0) for x in tree.get("tree", []) if x.get("type") == "blob"}
 
 
 def head_of(repo: str) -> str:
@@ -251,6 +265,63 @@ def local_tree(name: str) -> dict[str, str]:
     return out
 
 
+def all_heads() -> tuple[dict[str, dict[str, str]], dict[str, int]]:
+    """Деревья всех источников: {источник: {путь: sha}} и {путь: размер}.
+
+    Нужно для случая «гибридного» навыка: SKILL.md из одного апстрима, а его
+    references/scripts — только в другом. Кэш на процесс: деревья по 20k путей
+    дёргать на каждый навык нельзя.
+    """
+    global _HEADS_CACHE
+    if _HEADS_CACHE is None:
+        trees: dict[str, dict[str, str]] = {}
+        sizes: dict[str, int] = {}
+        for label, cfg in SOURCES.items():
+            ref = head_of(cfg["repo"])
+            trees[label] = blob_map(cfg["repo"], ref)
+            sizes.update(blob_sizes(cfg["repo"], ref))
+        _HEADS_CACHE = (trees, sizes)
+    return _HEADS_CACHE
+
+
+def fork_files(name: str, trees: dict[str, dict[str, str]], sizes: dict[str, int],
+               origin: dict[str, str], label: str) -> list[tuple[str, str, str]]:
+    """Файлы навыка, на которые ссылается SKILL.md, но лежащие у ДРУГОГО источника.
+
+    Часть навыков — гибрид: SKILL.md пришёл из одного апстрима, а его references/
+    и scripts/ существуют только в другом (gwas-database, pathml, pydicom, shap,
+    hypothesis-generation: SKILL.md от aipoch, остальное — в форке OpenClaw,
+    который содержит более полную версию). Такие файлы не докачивались, и ссылки
+    в навыке оставались битыми, хотя файл доступен.
+
+    Возвращает [(rel, upstream_path, repo)] для файлов, отсутствующих локально.
+    """
+    out: list[tuple[str, str, str]] = []
+    skill_md = os.path.join(SKILLS, name, "SKILL.md")
+    if not os.path.isfile(skill_md):
+        return out
+    body = open(skill_md, encoding="utf-8", errors="replace").read()
+    for rel in sorted(set(re.findall(REF_RE, body))):
+        rel = os.path.normpath(rel)
+        if rel.startswith("..") or rel.startswith("/"):
+            continue
+        if os.path.exists(os.path.join(SKILLS, name, rel)):
+            continue
+        for tree_label, paths in trees.items():
+            if tree_label == label:
+                continue  # свой источник уже проверен шагом 2
+            for up, _sha in paths.items():
+                if up.endswith(f"/{name}/{rel}"):
+                    if is_excluded(up) or sizes.get(up, 0) > HEAVY_MAX:
+                        break
+                    out.append((rel, up, SOURCES[tree_label]["repo"]))
+                    break
+            else:
+                continue
+            break
+    return out
+
+
 def index_by_skill(head_paths: set[str], local_names: set[str]) -> dict[str, list[str]]:
     """Апстрим-пути, сгруппированные по имени навыка (известные локальные имена).
 
@@ -298,6 +369,7 @@ def plan(label: str, cfg: dict, origin: dict[str, str]) -> dict:
     repo, roots = cfg["repo"], cfg["roots"]
     head_ref = head_of(repo)
     head = blob_map(repo, head_ref)
+    sizes = blob_sizes(repo, head_ref)
 
     local_names = {n for n in os.listdir(SKILLS) if os.path.isdir(os.path.join(SKILLS, n))}
     up_skill_names = {n for n in (skill_dir_of(p) for p in head) if n}
@@ -320,7 +392,7 @@ def plan(label: str, cfg: dict, origin: dict[str, str]) -> dict:
         name = skill_dir_of(path)
         if not name or is_excluded(path) or name in known_anywhere:
             continue
-        create.append((name, "SKILL.md", path))
+        create.append((name, "SKILL.md", path, repo))
 
     # 2. Наши навыки этого источника: сверить каждый файл с апстримом.
     def is_ours(name: str) -> bool:
@@ -338,7 +410,7 @@ def plan(label: str, cfg: dict, origin: dict[str, str]) -> dict:
             if up is None or is_excluded(up):
                 continue
             if head[up] != sha:
-                update.append((name, rel, up))
+                update.append((name, rel, up, repo))
 
         # Файлы, на которые ССЫЛАЕТСЯ сам SKILL.md, но которых у нас нет.
         # Тянем не всё подряд: полный набор апстрима — это десятки тысяч
@@ -360,7 +432,11 @@ def plan(label: str, cfg: dict, origin: dict[str, str]) -> dict:
             up = upstream_of(name, rel, index, roots)
             if up is None or is_excluded(up):
                 continue
-            create.append((name, rel, up))
+            # Размер известен из дерева: не тянем мегабайтные датасеты, даже если
+            # на них ссылается SKILL.md — это демо-примеры, а не материал навыка.
+            if sizes.get(up, 0) > HEAVY_MAX:
+                continue
+            create.append((name, rel, up, repo))
 
     # 3. Файлы, удалённые апстримом у нашего источника (были на базе сборки — нет в HEAD).
     base_ref = assembled_ref(repo)
@@ -371,15 +447,35 @@ def plan(label: str, cfg: dict, origin: dict[str, str]) -> dict:
             if upstream_of(name, rel, index, roots) is None and \
                     upstream_of(name, rel, base_index, roots) is not None:
                 delete.append((name, rel))
+
+    # 4. Апстрим-форки: у ряда навыков SKILL.md пришёл из одного источника, а файлы,
+    #    на которые он ссылается, есть только в ДРУГОМ (напр. gwas-database,
+    #    pathml, pydicom: SKILL.md от aipoch, а references/ и scripts/ — только в
+    #    форке OpenClaw). Без этого шага ссылки в таких навыках остаются битыми,
+    #    хотя файл лежит в апстриме и стоит одну закачку.
+    #    Ссылка на файл чужого источника — это пробел библиотеки, а не подмена
+    #    содержимого: SKILL.md, владельческий файл, никогда не трогается.
+    other_trees, other_sizes = all_heads()
+    for name in owned:
+        for rel, up, up_repo in fork_files(name, other_trees, other_sizes, origin, label):
+            create.append((name, rel, up, up_repo))
     return {"repo": repo, "head": head_ref, "base": base_ref,
             "update": update, "create": create, "delete": delete}
 
 
 def apply(plan_data: dict) -> tuple[int, int]:
-    repo, ref = plan_data["repo"], plan_data["head"]
+    """Записать файлы плана. Для каждого — свой репозиторий и его HEAD: файл из
+    форка лежит в другом репозитории, и его нельзя тянуть по ref основного."""
     written = skipped = 0
-    for name, rel, up in plan_data["update"] + plan_data["create"]:
-        data = fetch_bytes(repo, up, ref)
+    refs: dict[str, str] = {}
+
+    def ref_for(repo: str) -> str:
+        if repo not in refs:
+            refs[repo] = head_of(repo)
+        return refs[repo]
+
+    for name, rel, up, repo in plan_data["update"] + plan_data["create"]:
+        data = fetch_bytes(repo, up, ref_for(repo))
         if data is None or len(data) > MAX_FILE:
             skipped += 1
             continue
@@ -417,10 +513,11 @@ def main() -> int:
         print(f"=== {label} ({p['repo']})  база {p['base'][:7]} → head {p['head'][:7]}")
         print(f"   обновить: {len(p['update'])} | добавить: {len(p['create'])} "
               f"| удалить: {len(p['delete'])}")
-        for name, rel, _up in p["update"][:10]:
+        for name, rel, _up, _r in p["update"][:10]:
             print(f"      обновить: {name}/{rel}")
-        for name, rel, _up in p["create"][:10]:
-            print(f"      добавить: {name}/{rel}")
+        for name, rel, _up, src in p["create"][:10]:
+            mark = "" if src == p["repo"] else f"  (+ {src})"
+            print(f"      добавить: {name}/{rel}{mark}")
         for name, rel in p["delete"][:5]:
             print(f"      удалить:  {name}/{rel}")
         for key in ("update", "create", "delete"):
