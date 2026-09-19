@@ -19,11 +19,15 @@ Exit 0 — всё сходится; exit 1 — есть расхождения (
 Любая проверка, которая не смогла выполниться, тоже даёт exit 1: «проверка не
 запустилась» не должно выглядеть как «проверка прошла».
 """
+import csv
+import io
 import json
 import os
 import re
 import subprocess
 import sys
+import urllib.error
+import urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKILLS = os.path.join(ROOT, "skills")
@@ -315,6 +319,67 @@ def check_diagram(rep: Report) -> None:
     rep.note(f"диаграмма: заголовок и {len((data.get('meta') or {}).get('views', []) or [])} подписей видов сверены с HTML")
 
 
+def check_taxonomy_completeness(rep: Report) -> None:
+    """14. Таксономия КТ: колонки сверяются с апстримом, классы MERLIN полны.
+
+    Два дефекта, которые в такой таблице не видны глазом: (а) колонки разошлись
+    с источником — тогда китайский ключ перестаёт находить класс в выводе модели;
+    (б) в разборе внешнего теста перечислены не все классы — тогда таблица
+    выглядит полной, а часть провалов просто не показана.
+
+    Сверка идёт с ЖИВЫМ апстримом, поэтому проверка пропускается без сети и
+    сообщает об этом (молчаливый пропуск выглядел бы как успех).
+    """
+    base = os.path.join(SKILLS, "abdominal-ct-findings", "references")
+    tax_path = os.path.join(base, "radar-taxonomy.json")
+    qm_path = os.path.join(base, "quality-metrics.md")
+    if not os.path.isfile(tax_path):
+        rep.fail("таксономия", "нет references/radar-taxonomy.json")
+        return
+    with open(tax_path, encoding="utf-8") as f:
+        tax = json.load(f)
+    cols = [x["csv_column_zh_en"] for x in tax["findings"]]
+    if len(set(cols)) != len(cols):
+        dups = [c for c in set(cols) if cols.count(c) > 1]
+        rep.fail("таксономия", f"колонки-дубликаты: {dups[:3]}")
+    if tax.get("outside_abdomen_total") != sum(1 for o in tax.get("organs", []) if o.get("outside_abdomen")):
+        rep.fail("таксономия", "outside_abdomen_total не совпадает с числом помеченных структур")
+
+    # живая сверка с апстримом (сеть не обязательна — тогда честно сообщаем)
+    try:
+        url = ("https://raw.githubusercontent.com/alibaba-damo-academy/damo-radar/"
+               "HEAD/results/RADAR_infer_results_demo.csv")
+        req = urllib.request.Request(url, headers={"User-Agent": "vector-health-validate"})
+        with urllib.request.urlopen(req, timeout=60) as r:
+            body = r.read().decode("utf-8-sig")
+        upstream = next(csv.reader(io.StringIO(body)))[1:]
+        if upstream != cols:
+            only_up = [c for c in upstream if c not in cols]
+            only_us = [c for c in cols if c not in upstream]
+            rep.fail("таксономия",
+                     f"колонки разошлись с апстримом: нет у нас {only_up[:3]}, лишние {only_us[:3]}")
+        else:
+            rep.note(f"таксономия: {len(cols)} колонок совпадают с апстримом побайтово и по порядку")
+        # классы в разборе внешнего теста
+        merlin_url = ("https://raw.githubusercontent.com/alibaba-damo-academy/"
+                      "damo-radar/HEAD/docs/INFERENCE.md")
+        req2 = urllib.request.Request(merlin_url, headers={"User-Agent": "vector-health-validate"})
+        with urllib.request.urlopen(req2, timeout=60) as r2:
+            doc = r2.read().decode("utf-8")
+        classes = re.findall(r"^([a-z_]+)\s+[01]\.\d+\s*$", doc, re.MULTILINE)
+        with open(qm_path, encoding="utf-8") as f:
+            qm = f.read()
+        missing = [c for c in classes if c not in qm]
+        if missing:
+            rep.fail("таксономия", f"в разборе внешнего теста нет классов: {missing[:5]} "
+                                   f"({len(classes) - len(missing)} из {len(classes)})")
+        else:
+            rep.note(f"таксономия: все {len(classes)} классов внешнего теста разобраны поимённо")
+    except Exception as e:  # noqa: BLE001 — без сети проверку не выполняем
+        rep.note(f"таксономия: сверка с апстримом пропущена (нет сети: {type(e).__name__}) — "
+                 f"локально проверено {len(cols)} колонок, {tax.get('findings_total')} находок")
+
+
 def check_secrets(rep: Report) -> None:
     """9. Живых секретов в дереве нет."""
     hits = []
@@ -377,6 +442,23 @@ def check_language_layers(rep: Report) -> None:
         rep.fail("языки", f"{len(empty)} находок без русского перевода")
     rep.note(f"языки: таксономия {data.get('findings_total')} находок × "
              f"{data.get('organs_total')} органов, CJK только в полях-источниках")
+
+    # Таблица в SKILL.md — это то, что читает человек; JSON — то, чем пользуется
+    # машина. Разойдясь, они дают два разных ответа на «какие находки бывают»,
+    # и заметить это глазами нельзя: обе выглядят правдоподобно.
+    skill_md = os.path.join(SKILLS, "abdominal-ct-findings", "SKILL.md")
+    if not os.path.isfile(skill_md):
+        rep.fail("языки", "нет SKILL.md у abdominal-ct-findings")
+        return
+    body = open(skill_md, encoding="utf-8").read()
+    missing = [f.get("finding_ru") for f in data.get("findings", [])
+               if f"| {f.get('finding_ru')} |" not in body]
+    if missing:
+        rep.fail("языки", f"{len(missing)} находок есть в JSON, но выпали из таблицы SKILL.md: "
+                          f"{missing[:5]}")
+    org_missing = [o.get("organ_ru") for o in data.get("organs", []) if o.get("organ_ru") not in body]
+    if org_missing:
+        rep.fail("языки", f"структуры есть в JSON, но не упомянуты в SKILL.md: {org_missing[:3]}")
 
 
 def check_cjk(rep: Report) -> None:
@@ -490,6 +572,7 @@ def main() -> int:
     check_secrets(rep)
     check_cjk(rep)
     check_language_layers(rep)
+    check_taxonomy_completeness(rep)
 
     for note in rep.notes:
         print(f"  · {note}")

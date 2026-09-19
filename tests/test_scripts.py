@@ -250,6 +250,51 @@ try:
 finally:
     shutil.rmtree(tmp4, ignore_errors=True)
 
+print("\n=== 13. Таксономия: колонки, органы, полнота разбора внешнего теста ===")
+# Локальная часть проверки (сеть не нужна): структура данных и соответствие
+# между таблицей в SKILL.md и JSON — расхождение означает, что таблица показывает
+# не то, что лежит в данных.
+tax2 = json.load(open(os.path.join(SKILLS, "abdominal-ct-findings", "references",
+                                   "radar-taxonomy.json"), encoding="utf-8"))
+cols_list = [f["csv_column_zh_en"] for f in tax2["findings"]]
+check("колонок столько же, сколько находок", len(cols_list) == tax2["findings_total"])
+check("колонки уникальны", len(set(cols_list)) == len(cols_list))
+check("каждая колонка начинается с китайского имени органа",
+      all(c.startswith(f["organ_zh"] + "_") for f, c in zip(tax2["findings"], cols_list)))
+check("внебрюшных структур помечено 5", tax2.get("outside_abdomen_total") == 5,
+      str(tax2.get("outside_abdomen_total")))
+outside = {o["organ_zh"] for o in tax2["organs"] if o.get("outside_abdomen")}
+check("внебрюшные — лёгкие, сердце, рёбра, пищевод, крестец",
+      outside == {"肺", "心脏", "肋骨", "食管", "骶骨"}, str(outside))
+
+skill_md = open(os.path.join(SKILLS, "abdominal-ct-findings", "SKILL.md"), encoding="utf-8").read()
+check("каждая находка из JSON есть в таблице SKILL.md",
+      all(f"| {f['finding_ru']} |" in skill_md for f in tax2["findings"]))
+check("в таблице структур есть колонка про брюшную полость",
+      "В брюшной полости" in skill_md)
+check("граница области объяснена в тексте",
+      "вне её" in skill_md or "внебрюшн" in skill_md)
+
+# мутация: рассинхронизировать таблицу и данные — таблица показывает не то, что в JSON
+# Копируем ЦЕЛИКОМ (вместе с docs/): если урезать копию, валидатор упадёт на
+# посторонних проверках и тест «пройдёт» по неверной причине — так и случилось
+# с первой версией этого теста.
+tmp5 = tempfile.mkdtemp()
+try:
+    shutil.copytree(ROOT, tmp5, ignore=shutil.ignore_patterns(".git", "__pycache__"),
+                    dirs_exist_ok=True)
+    sp = os.path.join(tmp5, "skills", "abdominal-ct-findings", "SKILL.md")
+    body = open(sp, encoding="utf-8").read()
+    mutated = body.replace("| Язва желудка |", "| Язва |")
+    check("мутация применена (иначе тест бесполезен)", mutated != body)
+    open(sp, "w", encoding="utf-8").write(mutated)
+    r7 = run([sys.executable, "scripts/validate.py"], cwd=tmp5)
+    check("выпавшая из таблицы находка роняет валидатор", r7.returncode == 1, f"exit={r7.returncode}")
+    check("упавшая проверка — именно про таблицу",
+          "[языки]" in r7.stdout and "Язва желудка" in r7.stdout, r7.stdout[-260:])
+finally:
+    shutil.rmtree(tmp5, ignore_errors=True)
+
 print(f"\n{'=' * 50}")
 print(f"ИТОГО: {PASS} ok, {FAIL} FAIL")
 sys.exit(1 if FAIL else 0)

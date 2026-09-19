@@ -2,7 +2,7 @@
  "source": "RADAR (Alibaba DAMO Academy), results/RADAR_infer_results_demo.csv",
  "source_url": "https://github.com/alibaba-damo-academy/damo-radar/blob/HEAD/results/RADAR_infer_results_demo.csv",
  "source_license": "Apache-2.0 (код репозитория; веса модели на HF — CC BY-NC-SA 4.0)",
- "note": "Поле `*_zh` — оригинал апстрима (не переводить, не переименовывать: это ключ к CSV). `finding_en` — английское название модели. `finding_ru` — перевод этого репозитория.",
+ "note": "Поле `*_zh` — оригинал апстрима (не переводить, не переименовывать: это ключ к CSV). `finding_en` — английское название модели. `finding_ru` — перевод этого репозитория. Поле `outside_abdomen` отмечает структуры вне брюшной полости (лёгкие, сердце, рёбра, пищевод, крестец): они входят в область исследования, но не в брюшную полость.",
  "modality": "КТ брюшной полости с контрастированием (contrast-enhanced abdominal CT)",
  "organs_total": 18,
  "findings_total": 146,
@@ -11,109 +11,127 @@
    "organ_zh": "主动脉",
    "organ_en": "Aorta",
    "organ_ru": "Аорта",
-   "findings_total": 4
+   "findings_total": 4,
+   "outside_abdomen": false
   },
   {
    "organ_zh": "十二指肠",
    "organ_en": "Duodenum",
    "organ_ru": "Двенадцатиперстная кишка",
-   "findings_total": 5
+   "findings_total": 5,
+   "outside_abdomen": false
   },
   {
    "organ_zh": "大肠",
    "organ_en": "Large bowel",
    "organ_ru": "Ободочная кишка",
-   "findings_total": 18
+   "findings_total": 18,
+   "outside_abdomen": false
   },
   {
    "organ_zh": "小肠",
    "organ_en": "Small bowel",
    "organ_ru": "Тонкая кишка",
-   "findings_total": 13
+   "findings_total": 13,
+   "outside_abdomen": false
   },
   {
    "organ_zh": "心脏",
    "organ_en": "Heart",
    "organ_ru": "Сердце",
-   "findings_total": 2
+   "findings_total": 2,
+   "outside_abdomen": true
   },
   {
    "organ_zh": "肋骨",
    "organ_en": "Rib",
    "organ_ru": "Рёбра",
-   "findings_total": 3
+   "findings_total": 3,
+   "outside_abdomen": true
   },
   {
    "organ_zh": "肝",
    "organ_en": "Liver",
    "organ_ru": "Печень",
-   "findings_total": 18
+   "findings_total": 18,
+   "outside_abdomen": false
   },
   {
    "organ_zh": "肺",
    "organ_en": "Lung",
    "organ_ru": "Лёгкие",
-   "findings_total": 10
+   "findings_total": 10,
+   "outside_abdomen": true
   },
   {
    "organ_zh": "肾",
    "organ_en": "Kidney",
    "organ_ru": "Почки",
-   "findings_total": 14
+   "findings_total": 14,
+   "outside_abdomen": false
   },
   {
    "organ_zh": "肾上腺",
    "organ_en": "Adrenal gland",
    "organ_ru": "Надпочечники",
-   "findings_total": 6
+   "findings_total": 6,
+   "outside_abdomen": false
   },
   {
    "organ_zh": "胃",
    "organ_en": "Stomach",
    "organ_ru": "Желудок",
-   "findings_total": 6
+   "findings_total": 6,
+   "outside_abdomen": false
   },
   {
    "organ_zh": "胆囊",
    "organ_en": "Gallbladder / extrahepatic bile ducts",
    "organ_ru": "Жёлчный пузырь и жёлчные протоки",
-   "findings_total": 14
+   "findings_total": 14,
+   "outside_abdomen": false
   },
   {
    "organ_zh": "胰腺",
    "organ_en": "Pancreas",
    "organ_ru": "Поджелудочная железа",
-   "findings_total": 10
+   "findings_total": 10,
+   "outside_abdomen": false
   },
   {
    "organ_zh": "脾",
    "organ_en": "Spleen",
    "organ_ru": "Селезёнка",
-   "findings_total": 8
+   "findings_total": 8,
+   "outside_abdomen": false
   },
   {
    "organ_zh": "膀胱",
    "organ_en": "Bladder",
    "organ_ru": "Мочевой пузырь",
-   "findings_total": 6
+   "findings_total": 6,
+   "outside_abdomen": false
   },
   {
    "organ_zh": "门静脉",
    "organ_en": "Portal vein",
    "organ_ru": "Воротная вена",
-   "findings_total": 3
+   "findings_total": 3,
+   "outside_abdomen": false
   },
   {
    "organ_zh": "食管",
    "organ_en": "Esophagus",
    "organ_ru": "Пищевод",
-   "findings_total": 5
+   "findings_total": 5,
+   "outside_abdomen": true
   },
   {
    "organ_zh": "骶骨",
    "organ_en": "Sacrum",
    "organ_ru": "Крестец",
-   "findings_total": 1
+   "findings_total": 1,
+   "outside_abdomen": true
   }
  ],
  "findings": [
@@ -1431,5 +1449,6 @@
    "finding_ru": "Остеит",
    "csv_column_zh_en": "骶骨_骨炎 (Sacrum_Osteitis)"
   }
- ]
+ ],
+ "outside_abdomen_total": 5
 }
