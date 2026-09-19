@@ -23,6 +23,7 @@
 import argparse
 import json
 import os
+import posixpath
 import re
 import subprocess
 import sys
@@ -37,7 +38,27 @@ REPORT = os.path.join(ROOT, "docs", "broken-refs.md")
 ORIGIN = os.path.join(ROOT, "scripts", "upstream-origin.json")
 
 # Собственные навыки: их качество — наша ответственность, унаследованное — нет.
-OWN_SKILLS = {"dicom-vlm-analysis", "atrial-fibrillation-treatment"}
+# Список берётся из scripts/stats.json, а не зашит здесь: в зашитом было ДВА имени
+# из трёх, и третий навык (abdominal-ct-findings) не проверялся на битые ссылки —
+# режим --strict-own молча считал его чужим. Один источник, как и везде.
+def own_skills() -> set[str]:
+    path = os.path.join(ROOT, "scripts", "stats.json")
+    if os.path.isfile(path):
+        try:
+            with open(path, encoding="utf-8") as f:
+                own = json.load(f).get("own") or []
+            if own:
+                return set(own)
+        except (OSError, json.JSONDecodeError):
+            pass
+    return {"dicom-vlm-analysis", "atrial-fibrillation-treatment"}
+
+
+OWN_SKILLS = own_skills()
+
+# Для категории «в корне источника»: путь файла в дереве апстрима —
+# чтобы отчёт давал не только диагноз, но и место, откуда файл брать.
+REPO_LEVEL_PATHS: dict[tuple[str, str], str] = {}
 
 SOURCES = {
     "OpenClaw": "FreedomIntelligence/OpenClaw-Medical-Skills",
@@ -127,9 +148,26 @@ def scan() -> list[tuple[str, str]]:
     return broken
 
 
+def upstream_dir_of(name: str, label: str, trees: dict[str, dict[str, int]]) -> str | None:
+    """Каталог навыка в дереве апстрима (`skills/<name>` или `scientific-skills/Data Analysis/<name>`).
+
+    Нужен, чтобы отличить битую ссылку от ЖИВОЙ В ИСХОДНОЙ РАСКЛАДКЕ: навык пишет
+    `../../scripts/x.py` — в репозитории-источнике это путь от каталога навыка на
+    два уровня вверх, и файл там есть. У нас навыки лежат плоско (все в `skills/`),
+    поэтому тот же `../../` выводит за пределы репозитория.
+    """
+    paths = trees.get(label) or {}
+    suffix = f"/{name}/SKILL.md"
+    for up in paths:
+        if up.endswith(suffix) or up == f"{name}/SKILL.md":
+            return posixpath.dirname(up)
+    return None
+
+
 def classify(broken, trees):
     buckets: dict[str, list[tuple[str, str, str]]] = {
-        "placeholder": [], "recoverable": [], "heavy": [], "inherited": []}
+        "placeholder": [], "recoverable": [], "heavy": [], "repo_level": [], "inherited": []}
+    origin = load_origin()
     for rel_skill, ref, _raw in broken:
         name = rel_skill.rsplit("/", 1)[-1]
         # «Пример пути в коде» — не ссылка на файл, а форма пути
@@ -149,11 +187,32 @@ def classify(broken, trees):
             if found:
                 break
         if not found:
+            # Вторая попытка: ссылка ведёт ВВЕРХ от каталога навыка к файлу в корне
+            # репозитория-источника (`scripts/`, `examples/`, `docs/`). Файл
+            # существует и доступен по blob SHA — это не дефект апстрима, а
+            # следствие того, что мы складываем навыки плоско. Отдельная категория:
+            # смешивать с «файла нет нигде» значит прятать восстановимые ссылки
+            # среди неисправимых и обещать читателю больше, чем есть.
+            label = origin.get(rel_skill) or origin.get(rel_skill.split("/")[0])
+            up_dir = upstream_dir_of(name, label, trees) if label else None
+            if up_dir and ref.startswith(("../", "./")):
+                cand = posixpath.normpath(posixpath.join(up_dir, ref))
+                size = (trees.get(label) or {}).get(cand)
+                if size is not None:
+                    found = (label, cand, size)
+        if not found:
             buckets["inherited"].append((rel_skill, ref, ""))
         elif found[1].endswith(HEAVY_SUFFIX) or found[2] > HEAVY_MAX:
             buckets["heavy"].append((rel_skill, ref, found[0]))
         else:
-            buckets["recoverable"].append((rel_skill, ref, found[0]))
+            # «в корне источника» = цель лежит вне каталога навыка
+            target_dir = posixpath.dirname(found[1])
+            skill_dir = upstream_dir_of(name, found[0], trees) or ""
+            if skill_dir and not target_dir.startswith(skill_dir):
+                buckets["repo_level"].append((rel_skill, ref, found[0]))
+                REPO_LEVEL_PATHS[(rel_skill, ref)] = found[1]
+            else:
+                buckets["recoverable"].append((rel_skill, ref, found[0]))
     return buckets
 
 
@@ -184,15 +243,35 @@ def write_report(buckets, total_ok: int, origin: dict[str, str]) -> None:
         f"| Пример пути в коде | {len(buckets['placeholder'])} | форма пути (`YYYY`, `xxx`, `<file>`), а не файл — требовать его нельзя |",
         f"| Восстановимо | {len(buckets['recoverable'])} | файл есть у источника — закрывается `scripts/sync_upstreams.py` |",
         f"| Тяжёлые данные | {len(buckets['heavy'])} | файл есть, но это демо-датасет на мегабайты — сознательно не тянем |",
+        f"| В корне источника | {len(buckets['repo_level'])} | файл ЕСТЬ в репозитории-источнике, но вне каталога навыка (`scripts/`, `examples/`, `docs/`) — ссылка писалась под их раскладку, где навыки лежат глубже |",
         f"| Унаследованное | {len(buckets['inherited'])} | файла нет ни у одного источника — дефект апстрима |",
         "",
     ]
     for key, title in (("placeholder", "Пример пути в коде (не ссылка)"),
                        ("recoverable", "Восстановимо"),
+                       ("repo_level", "Файл в корне репозитория-источника (вне каталога навыка)"),
                        ("heavy", "Тяжёлые данные (не тянем)"),
                        ("inherited", "Унаследованное (дефект источника)")):
         items = buckets[key]
         if not items:
+            continue
+        if key == "repo_level":
+            lines += [f"## {title}", "",
+                      "Файл существует в репозитории-источнике, но **вне каталога навыка** — "
+                      "в его корне (`scripts/`, `examples/`, `docs/`). Навык писал ссылку под "
+                      "исходную раскладку, где каталоги навыков лежат глубже; мы складываем "
+                      "навыки плоско, поэтому та же ссылка (`../../`) выводит за пределы "
+                      "репозитория. Ссылка не станет рабочей от простой закачки файла в "
+                      "навык: путь в тексте останется прежним. Брать файл — по URL ниже, "
+                      "требовать его внутри репозитория нельзя.", "",
+                      "| Навык | Ссылка в тексте | Файл в источнике | Взять |", "|---|---|---|---|"]
+            for rel_skill, ref, src in sorted(items):
+                full = ref
+                note = src or origin.get(rel_skill, "") or "—"
+                up = REPO_LEVEL_PATHS.get((rel_skill, ref), "")
+                url = (f"https://github.com/{SOURCES[note]}/blob/HEAD/{up}" if note in SOURCES and up else "—")
+                lines.append(f"| `{rel_skill}` | `{ref}` | `{up or '—'}` | {url} |")
+            lines.append("")
             continue
         lines += [f"## {title}", "",
                   "| Навык | Файл | Источник |", "|---|---|---|"]
@@ -227,13 +306,15 @@ def main() -> int:
     print(f"ссылок на файлы: {total_refs} | на месте: {total_ok} | битых: {len(broken)}")
     print(f"  примеры путей: {len(buckets['placeholder'])}"
           f" | восстановимо: {len(buckets['recoverable'])}"
+          f" | в корне источника: {len(buckets['repo_level'])}"
           f" | тяжёлые: {len(buckets['heavy'])}"
           f" | унаследовано: {len(buckets['inherited'])}")
     if not args.no_report:
         write_report(buckets, total_ok, load_origin())
         print(f"  отчёт: {os.path.relpath(REPORT, ROOT)}")
 
-    own_broken = [(s, r) for s, r, _ in buckets["recoverable"] + buckets["heavy"] + buckets["inherited"]
+    own_broken = [(s, r) for s, r, _ in buckets["recoverable"] + buckets["repo_level"]
+                  + buckets["heavy"] + buckets["inherited"]
                   if s in OWN_SKILLS]
     if args.strict_own and own_broken:
         print(f"\nБИТЫЕ ССЫЛКИ У СОБСТВЕННЫХ НАВЫКОВ: {len(own_broken)}")

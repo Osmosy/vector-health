@@ -670,6 +670,32 @@ def check_diagram_numbers(rep: Report) -> None:
     rep.note(f"диаграмма: числа согласованы с деревом ({total})")
 
 
+def check_broken_refs_report(rep: Report) -> None:
+    """Числа инвентаря битых ссылок в README совпадают с самим инвентарём.
+
+    Инвентарь — документ о дефектах; если его числа в README расходятся с отчётом,
+    читатель получает неверную картину масштаба. Случай не гипотетический: после
+    расширения шаблона ссылок число стало 515, а в README ещё стояло 485.
+    """
+    report = os.path.join(ROOT, "docs", "broken-refs.md")
+    if not os.path.isfile(report):
+        rep.fail("ссылки", "нет docs/broken-refs.md — инвентарь ссылок не сгенерирован")
+        return
+    text = open(report, encoding="utf-8").read()
+    m = re.search(r"Ссылок на файлы в дереве: (\d+); на месте: (\d+); битых: (\d+)", text)
+    if not m:
+        rep.fail("ссылки", "docs/broken-refs.md: не найдена строка со сводкой")
+        return
+    total, ok, broken = (int(x) for x in m.groups())
+    if ok + broken != total:
+        rep.fail("ссылки", f"docs/broken-refs.md: на месте {ok} + битых {broken} != {total}")
+    readme = open(os.path.join(ROOT, "README.md"), encoding="utf-8").read()
+    if not re.search(rf"(?<![\d.]){broken}(?![\d.])\s+битых", readme):
+        rep.fail("ссылки", f"README не называет число битых ссылок ({broken}) — "
+                           f"пересобери docs/broken-refs.md и обнови README")
+    rep.note(f"ссылки: инвентарь {total} ссылок, битых {broken}, README согласован")
+
+
 def check_secrets(rep: Report) -> None:
     """9. Живых секретов в дереве нет."""
     hits = []
@@ -863,6 +889,7 @@ def main() -> int:
     check_duplicates(rep)
     check_clinical_claims(rep)
     check_restricted_docs(rep)
+    check_broken_refs_report(rep)
     check_diagram_numbers(rep)
     check_secrets(rep)
     check_cjk(rep)
@@ -876,7 +903,7 @@ def main() -> int:
         for e in rep.errors:
             print(f"  {e}")
         return 1
-    print(f"\nOK: все проверки пройдены ({len(rep.notes)} проверок).")
+    print(f"\nOK: все проверки пройдены ({len(rep.notes)} — счёт в notes).")
     return 0
 
 

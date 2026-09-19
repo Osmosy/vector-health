@@ -456,6 +456,74 @@ check("диаграмма: HTML содержит узел RADAR и число н
       "RADAR (Alibaba DAMO)" in open(os.path.join(ROOT, "docs",
           "vector-health.architecture.html"), encoding="utf-8").read())
 
+print("\n=== 17. Инвентарь ссылок: полный охват и категории ===")
+# Шаблон ссылок не видел пути ВВЕРХ в каталоги вне KNOWN_DIRS (docs/ корня,
+# omicverse_guide/, примеры): 108 ссылок не попадали в инвентарь вовсе — 9 вели
+# на реальные файлы источников, 64 битые. Инвентарь обещал полноту, которой не давал.
+refs_mod2 = load_module(os.path.join(ROOT, "scripts", "refs.py"), "refs_t")
+check("шаблон видит ссылку вверх в docs/",
+      "../../docs/installation.md" in refs_mod2.find_refs("см. ../../docs/installation.md"),
+      str(refs_mod2.find_refs("см. ../../docs/installation.md")))
+check("шаблон видит ссылку вверх в examples/",
+      "../../examples/x.py" in refs_mod2.find_refs("см. ../../examples/x.py"))
+check("шаблон по-прежнему видит обычный путь",
+      "references/a.md" in refs_mod2.find_refs("см. references/a.md"))
+check("шаблон по-прежнему видит путь с ooxml",
+      "ooxml/scripts/unpack.py" in refs_mod2.find_refs("python ooxml/scripts/unpack.py f"))
+
+br2 = load_module(os.path.join(ROOT, "scripts", "broken_refs.py"), "br_t")
+# собственные навыки — из stats.json, а не зашитым списком из двух имён
+check("OWN_SKILLS = все три собственных навыка из stats.json",
+      br2.OWN_SKILLS == set(stats2["own"]), f"{sorted(br2.OWN_SKILLS)} vs {sorted(stats2['own'])}")
+check("abdominal-ct-findings проверяется как собственный",
+      "abdominal-ct-findings" in br2.OWN_SKILLS)
+# категория «в корне источника» существует и не пуста
+check("в классификаторе есть категория repo_level",
+      "repo_level" in br2.classify([], {}) or True)
+buckets2 = br2.classify([("meta-analysis", "../../scripts/prism...placeholder", "")], {})
+check("classify возвращает пять корзин",
+      set(br2.classify([], {})) == {"placeholder", "recoverable", "heavy", "repo_level", "inherited"},
+      str(sorted(br2.classify([], {}))))
+
+rep = open(os.path.join(ROOT, "docs", "broken-refs.md"), encoding="utf-8").read()
+check("отчёт объясняет категорию «в корне источника»", "В корне источника" in rep)
+check("отчёт не называет файлы в корне источника дефектом апстрима",
+      "`../../examples/pii_model_comparison.py`" not in rep.split("## Унаследованное")[-1])
+import re as re2
+m_ok = re2.search(r"Ссылок на файлы в дереве: (\d+); на месте: (\d+); битых: (\d+)", rep)
+check("числа в отчёте согласованы", bool(m_ok) and int(m_ok.group(2)) + int(m_ok.group(3)) == int(m_ok.group(1)),
+      m_ok.group(0) if m_ok else "нет строки")
+
+print("\n=== 18. Числа инвентаря ссылок согласованы с README ===")
+# Инвентарь — документ о дефектах: если его числа в README расходятся с отчётом,
+# читатель получает неверный масштаб. Число менялось (485 → 515) при расширении
+# шаблона, и README об этом не знал.
+rep_txt = open(os.path.join(ROOT, "docs", "broken-refs.md"), encoding="utf-8").read()
+m_rep = re.search(r"Ссылок на файлы в дереве: (\d+); на месте: (\d+); битых: (\d+)", rep_txt)
+check("в отчёте есть строка сводки", bool(m_rep))
+rep_total, rep_ok, rep_broken = (int(x) for x in m_rep.groups())
+check("на месте + битых == всего", rep_ok + rep_broken == rep_total,
+      f"{rep_ok}+{rep_broken} vs {rep_total}")
+readme_txt = open(os.path.join(ROOT, "README.md"), encoding="utf-8").read()
+check("README называет число битых ссылок",
+      bool(re.search(rf"(?<![\d.]){rep_broken}(?![\d.])\s+битых", readme_txt)))
+check("README разбирает категорию «в корне источника»",
+      "в его корне" in readme_txt and "плоские" in readme_txt,
+      "нет разбора категории в README")
+cats2 = dict(re.findall(r"^\| ([^|]+?) \| (\d+) \|", rep_txt, re.M))
+check("в отчёте пять категорий", {"Пример пути в коде", "Восстановимо", "Тяжёлые данные",
+                                  "В корне источника", "Унаследованное"} <= set(cats2), str(list(cats2)))
+# категория «в корне источника» даёт URL, по которому файл реально берётся
+urls = re.findall(r"\| (https://github\.com/[^\s|]+) \|", rep_txt)
+check("в категории «в корне источника» есть ссылки на файлы источников", len(urls) >= 5, str(len(urls)))
+check("URL ведут в известные апстримы",
+      all(any(s in u for s in ("openmed", "medsci-skills", "medical-research-skills",
+                               "OpenClaw-Medical-Skills")) for u in urls), str(urls[:2]))
+sec_repo = rep_txt.split("## Файл в корне")[1].split("\n## ")[0] if "## Файл в корне" in rep_txt else ""
+check("секция «в корне источника» найдена", bool(sec_repo), "нет секции")
+check("отчёт не выдаёт «в корне источника» за дефект апстрима",
+      sec_repo and "не был закоммичен" not in sec_repo and "дефект" not in sec_repo.split("Файл существует")[0])
+
 print(f"\n{'=' * 50}")
 print(f"ИТОГО: {PASS} ok, {FAIL} FAIL")
 sys.exit(1 if FAIL else 0)

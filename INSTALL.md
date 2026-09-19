@@ -91,7 +91,7 @@ cp -r skills/dicom-vlm-analysis ~/.hermes/skills/
 ### 3. Проверить целостность (если правите)
 
 ```bash
-python3 scripts/validate.py            # всё: 20 проверок — числа, лицензии, ссылки, диаграмма
+python3 scripts/validate.py            # всё: 21 проверка — числа, лицензии, ссылки, диаграмма
 python3 scripts/build_stats.py         # пересобрать единый источник чисел (stats.json)
 python3 scripts/broken_refs.py         # ссылки внутри навыков (инвентарь)
 python3 scripts/sync_upstreams.py --dry-run   # что изменилось в апстримах
@@ -103,7 +103,7 @@ python3 scripts/sync_upstreams.py --dry-run   # что изменилось в �
 |---|---|
 | «Есть ли навык под DICOM/радиомику?» | `skills-index.json` или `ls skills \| grep` |
 | «Как читать КТ/МРТ локальной моделью?» | `skills/dicom-vlm-analysis/SKILL.md` (нужны `pydicom`, локальная Ollama и модель `medgemma:4b` — см. раздел ниже) |
-| «Мета-анализ: как считать?» | `skills/meta-analysis/SKILL.md` + `references/` (часть скриптов апстрим не опубликовал — см. `docs/broken-refs.md`) |
+| «Мета-анализ: как считать?» | `skills/meta-analysis/SKILL.md` + `references/` (4 скрипта лежат в корне репозитория-источника, а не в каталоге навыка — ссылки и способ взять файл в `docs/broken-refs.md`) |
 | «Что нового в апстримах?» | `python3 scripts/sync_upstreams.py --dry-run` |
 | «Почему ссылка в навыке битая?» | `docs/broken-refs.md` (инвентарь с причиной) |
 | «Откуда этот навык пришёл?» | `scripts/upstream-origin.json`, `NOTICE.md` |
