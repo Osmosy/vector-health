@@ -7,7 +7,9 @@
 четырёх открытых коллекций плюс собственный пайплайн DICOM→VLM, дедупликация по именам и
 единая структура `skills/<name>/SKILL.md`.
 
-**1508 навыков** (из 1604 до дедупликации) · 4 источника + 1 собственный · MIT + Apache-2.0
+**1540 навыков** — в 1512 каталогах верхнего уровня и 28 вложенных (апстримы держат часть
+навыков внутри каталогов-контейнеров, например `variant-interpretation-acmg/bioSkills/…`) ·
+4 источника + 2 собственных · MIT + Apache-2.0
 
 ---
 
@@ -16,10 +18,10 @@
 | Источник | Уникальных навыков | Фокус | Лицензия |
 |---|---|---|---|
 | [OpenClaw-Medical-Skills](https://github.com/FreedomIntelligence/OpenClaw-Medical-Skills) | 777 | биоинформатика, геномика, клинические БД, drug discovery | MIT |
-| [medical-research-skills](https://github.com/aipoch/medical-research-skills) (AIPOCH) | 599 | исследовательский workflow: evidence, дизайн, анализ, письмо | MIT |
-| [openmed](https://github.com/maziyarpanahi/openmed) | 72 | клинический NLP, FHIR, деидентификация, HIPAA, ICD-10 | Apache-2.0 |
+| [medical-research-skills](https://github.com/aipoch/medical-research-skills) (AIPOCH) | 600 | исследовательский workflow: evidence, дизайн, анализ, письмо, аудит навыков | MIT |
+| [openmed](https://github.com/maziyarpanahi/openmed) | 74 | клинический NLP, FHIR, деидентификация, HIPAA, ICD-10 | Apache-2.0 |
 | [medsci-skills](https://github.com/Aperivue/medsci-skills) (Aperivue) | 59 | протоколы, статистика, мета-анализ, гранты, imaging | MIT |
-| dicom-vlm-analysis (собственный) | 1 | DICOM → локальная vision-модель (medgemma) | MIT |
+| собственные | 2 | DICOM → локальная vision-модель (medgemma); тактика при фибрилляции предсердий | MIT |
 
 **Домены**: клиника · геномика · биоинформатика (RNA-seq, scRNA-seq, GWAS, variant calling) ·
 drug discovery · медицинская визуализация (DICOM/радиомика) · FHIR/интероперабельность ·
@@ -31,10 +33,9 @@ drug discovery · медицинская визуализация (DICOM/рад�
 
 ```
 vector-health/
-├── skills/               # 1508 навыков, по одному каталогу на навык
-│   └── <name>/SKILL.md   # + references/, scripts/, templates/, assets/ (если есть)
-├── skills-index.json     # каталог: имя + описание каждого навыка (для поиска)
-├── scripts/              # build_index.py (генерация каталога), validate_skills.py (валидация+скан)
+├── skills/               # 1540 навыков (1512 верхних каталогов + 28 вложенных)
+├── skills-index.json     # каталог: имя, путь, описание каждого навыка (для поиска)
+├── scripts/              # build_index.py, validate_skills.py, sync_upstreams.py
 ├── .github/workflows/    # CI: валидация frontmatter + скан секретов/PII на каждый push
 ├── assets/               # логотип Vector
 ├── README.md

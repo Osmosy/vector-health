@@ -1,12 +1,23 @@
 #!/usr/bin/env python3
-"""Сгенерировать skills-index.json — каталог навыков (имя + описание) для поиска."""
+"""Сгенерировать skills-index.json — каталог навыков (имя + описание) для поиска.
+
+Обход рекурсивный: часть навыков апстримов лежит внутри каталогов-контейнеров
+(`spatial-transcriptomics-analysis/bioSkills/…`, `variant-interpretation-acmg/…`),
+и плоский обход верхнего уровня терял их из каталога — 28 навыков были в дереве,
+но не находились поиском. Поле `path` показывает, где навык лежит.
+
+Запуск: python3 scripts/build_index.py
+"""
+import datetime
 import json
 import os
 import re
-import datetime
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKILLS = os.path.join(ROOT, "skills")
+
+SKIP_DIRS = {"__pycache__", "node_modules", ".venv", ".git"}
+
 
 def parse_frontmatter(text):
     # пропустить ведущие HTML-комментарии (COPYRIGHT NOTICE у bio-* навыков)
@@ -26,32 +37,37 @@ def parse_frontmatter(text):
             fm[k.strip().lower()] = v.strip().strip('"\'')
     return fm
 
+
 def first_line(value):
     if not value:
         return ""
     return value.splitlines()[0].strip()
 
+
 skills = []
 errors = []
-for d in sorted(os.listdir(SKILLS)):
-    p = os.path.join(SKILLS, d)
-    smd = os.path.join(p, "SKILL.md")
-    if not os.path.isdir(p) or not os.path.isfile(smd):
+for root, dirs, files in os.walk(SKILLS):
+    dirs[:] = sorted(d for d in dirs if d not in SKIP_DIRS)
+    if "SKILL.md" not in files:
         continue
-    with open(smd, encoding="utf-8", errors="replace") as f:
+    rel = os.path.relpath(root, SKILLS)
+    name = fm_name = None
+    with open(os.path.join(root, "SKILL.md"), encoding="utf-8", errors="replace") as f:
         text = f.read()
     fm = parse_frontmatter(text)
-    name = fm.get("name") or d
+    name = fm.get("name") or os.path.basename(root)
     desc = first_line(fm.get("description"))
     if not desc:
-        errors.append(d)
-    skills.append({"name": name, "description": desc})
+        errors.append(rel)
+    skills.append({"name": name, "path": rel.replace(os.sep, "/"), "description": desc})
 
-skills.sort(key=lambda s: s["name"].lower())
+skills.sort(key=lambda s: (s["name"].lower(), s["path"]))
 out = {
     "project": "vector-health",
     "generated": datetime.date.today().isoformat(),
     "total": len(skills),
+    "note": "path — каталог навыка относительно skills/. Вложенные навыки "
+            "(контейнеры вроде spatial-transcriptomics-analysis) включены.",
     "skills": skills,
 }
 with open(os.path.join(ROOT, "skills-index.json"), "w", encoding="utf-8") as f:

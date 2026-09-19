@@ -2,9 +2,9 @@ name: validate-skills
 
 on:
   push:
-    branches: [main]
+    branches: [master, main]
   pull_request:
-    branches: [main]
+    branches: [master, main]
 
 jobs:
   validate:
@@ -24,3 +24,6 @@ jobs:
           python scripts/build_index.py
           git diff --exit-code skills-index.json || \
             (echo "::error::skills-index.json устарел — перегенерируй scripts/build_index.py" && exit 1)
+
+      - name: Проверить, что README не расходится с деревом
+        run: python scripts/validate_readme.py
