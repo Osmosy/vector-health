@@ -1,0 +1,1435 @@
+{
+ "source": "RADAR (Alibaba DAMO Academy), results/RADAR_infer_results_demo.csv",
+ "source_url": "https://github.com/alibaba-damo-academy/damo-radar/blob/HEAD/results/RADAR_infer_results_demo.csv",
+ "source_license": "Apache-2.0 (код репозитория; веса модели на HF — CC BY-NC-SA 4.0)",
+ "note": "Поле `*_zh` — оригинал апстрима (не переводить, не переименовывать: это ключ к CSV). `finding_en` — английское название модели. `finding_ru` — перевод этого репозитория.",
+ "modality": "КТ брюшной полости с контрастированием (contrast-enhanced abdominal CT)",
+ "organs_total": 18,
+ "findings_total": 146,
+ "organs": [
+  {
+   "organ_zh": "主动脉",
+   "organ_en": "Aorta",
+   "organ_ru": "Аорта",
+   "findings_total": 4
+  },
+  {
+   "organ_zh": "十二指肠",
+   "organ_en": "Duodenum",
+   "organ_ru": "Двенадцатиперстная кишка",
+   "findings_total": 5
+  },
+  {
+   "organ_zh": "大肠",
+   "organ_en": "Large bowel",
+   "organ_ru": "Ободочная кишка",
+   "findings_total": 18
+  },
+  {
+   "organ_zh": "小肠",
+   "organ_en": "Small bowel",
+   "organ_ru": "Тонкая кишка",
+   "findings_total": 13
+  },
+  {
+   "organ_zh": "心脏",
+   "organ_en": "Heart",
+   "organ_ru": "Сердце",
+   "findings_total": 2
+  },
+  {
+   "organ_zh": "肋骨",
+   "organ_en": "Rib",
+   "organ_ru": "Рёбра",
+   "findings_total": 3
+  },
+  {
+   "organ_zh": "肝",
+   "organ_en": "Liver",
+   "organ_ru": "Печень",
+   "findings_total": 18
+  },
+  {
+   "organ_zh": "肺",
+   "organ_en": "Lung",
+   "organ_ru": "Лёгкие",
+   "findings_total": 10
+  },
+  {
+   "organ_zh": "肾",
+   "organ_en": "Kidney",
+   "organ_ru": "Почки",
+   "findings_total": 14
+  },
+  {
+   "organ_zh": "肾上腺",
+   "organ_en": "Adrenal gland",
+   "organ_ru": "Надпочечники",
+   "findings_total": 6
+  },
+  {
+   "organ_zh": "胃",
+   "organ_en": "Stomach",
+   "organ_ru": "Желудок",
+   "findings_total": 6
+  },
+  {
+   "organ_zh": "胆囊",
+   "organ_en": "Gallbladder / extrahepatic bile ducts",
+   "organ_ru": "Жёлчный пузырь и жёлчные протоки",
+   "findings_total": 14
+  },
+  {
+   "organ_zh": "胰腺",
+   "organ_en": "Pancreas",
+   "organ_ru": "Поджелудочная железа",
+   "findings_total": 10
+  },
+  {
+   "organ_zh": "脾",
+   "organ_en": "Spleen",
+   "organ_ru": "Селезёнка",
+   "findings_total": 8
+  },
+  {
+   "organ_zh": "膀胱",
+   "organ_en": "Bladder",
+   "organ_ru": "Мочевой пузырь",
+   "findings_total": 6
+  },
+  {
+   "organ_zh": "门静脉",
+   "organ_en": "Portal vein",
+   "organ_ru": "Воротная вена",
+   "findings_total": 3
+  },
+  {
+   "organ_zh": "食管",
+   "organ_en": "Esophagus",
+   "organ_ru": "Пищевод",
+   "findings_total": 5
+  },
+  {
+   "organ_zh": "骶骨",
+   "organ_en": "Sacrum",
+   "organ_ru": "Крестец",
+   "findings_total": 1
+  }
+ ],
+ "findings": [
+  {
+   "organ_zh": "主动脉",
+   "organ_en": "Aorta",
+   "organ_ru": "Аорта",
+   "finding_zh": "主动脉夹层",
+   "finding_en": "Aortic dissection",
+   "finding_ru": "Расслоение аорты",
+   "csv_column_zh_en": "主动脉_主动脉夹层 (Aorta_Aortic dissection)"
+  },
+  {
+   "organ_zh": "主动脉",
+   "organ_en": "Aorta",
+   "organ_ru": "Аорта",
+   "finding_zh": "主动脉瘤",
+   "finding_en": "Aortic aneurysm",
+   "finding_ru": "Аневризма аорты",
+   "csv_column_zh_en": "主动脉_主动脉瘤 (Aorta_Aortic aneurysm)"
+  },
+  {
+   "organ_zh": "主动脉",
+   "organ_en": "Aorta",
+   "organ_ru": "Аорта",
+   "finding_zh": "粥样硬化",
+   "finding_en": "Atherosclerosis",
+   "finding_ru": "Атеросклероз аорты",
+   "csv_column_zh_en": "主动脉_粥样硬化 (Aorta_Atherosclerosis)"
+  },
+  {
+   "organ_zh": "主动脉",
+   "organ_en": "Aorta",
+   "organ_ru": "Аорта",
+   "finding_zh": "钙化",
+   "finding_en": "Calcification",
+   "finding_ru": "Кальциноз аорты",
+   "csv_column_zh_en": "主动脉_钙化 (Aorta_Calcification)"
+  },
+  {
+   "organ_zh": "十二指肠",
+   "organ_en": "Duodenum",
+   "organ_ru": "Двенадцатиперстная кишка",
+   "finding_zh": "占位",
+   "finding_en": "Mass",
+   "finding_ru": "Объёмное образование",
+   "csv_column_zh_en": "十二指肠_占位 (Duodenum_Mass)"
+  },
+  {
+   "organ_zh": "十二指肠",
+   "organ_en": "Duodenum",
+   "organ_ru": "Двенадцатиперстная кишка",
+   "finding_zh": "囊袋状突出影",
+   "finding_en": "Saccular outpouching",
+   "finding_ru": "Мешковидное выпячивание",
+   "csv_column_zh_en": "十二指肠_囊袋状突出影 (Duodenum_Saccular outpouching)"
+  },
+  {
+   "organ_zh": "十二指肠",
+   "organ_en": "Duodenum",
+   "organ_ru": "Двенадцатиперстная кишка",
+   "finding_zh": "憩室",
+   "finding_en": "Diverticulum",
+   "finding_ru": "Дивертикул",
+   "csv_column_zh_en": "十二指肠_憩室 (Duodenum_Diverticulum)"
+  },
+  {
+   "organ_zh": "十二指肠",
+   "organ_en": "Duodenum",
+   "organ_ru": "Двенадцатиперстная кишка",
+   "finding_zh": "梗阻",
+   "finding_en": "Obstruction",
+   "finding_ru": "Обструкция",
+   "csv_column_zh_en": "十二指肠_梗阻 (Duodenum_Obstruction)"
+  },
+  {
+   "organ_zh": "十二指肠",
+   "organ_en": "Duodenum",
+   "organ_ru": "Двенадцатиперстная кишка",
+   "finding_zh": "溃疡",
+   "finding_en": "Ulcer",
+   "finding_ru": "Язва",
+   "csv_column_zh_en": "十二指肠_溃疡 (Duodenum_Ulcer)"
+  },
+  {
+   "organ_zh": "大肠",
+   "organ_en": "Large bowel",
+   "organ_ru": "Ободочная кишка",
+   "finding_zh": "克罗恩病",
+   "finding_en": "Crohn's disease",
+   "finding_ru": "Болезнь Крона",
+   "csv_column_zh_en": "大肠_克罗恩病 (Large bowel_Crohn's disease)"
+  },
+  {
+   "organ_zh": "大肠",
+   "organ_en": "Large bowel",
+   "organ_ru": "Ободочная кишка",
+   "finding_zh": "大肠（壁）钙化",
+   "finding_en": "Mural calcification",
+   "finding_ru": "Кальциноз стенки кишки",
+   "csv_column_zh_en": "大肠_大肠（壁）钙化 (Large bowel_Mural calcification)"
+  },
+  {
+   "organ_zh": "大肠",
+   "organ_en": "Large bowel",
+   "organ_ru": "Ободочная кишка",
+   "finding_zh": "急慢性（结）肠炎",
+   "finding_en": "Colitis",
+   "finding_ru": "Колит (острый и хронический)",
+   "csv_column_zh_en": "大肠_急慢性（结）肠炎 (Large bowel_Colitis)"
+  },
+  {
+   "organ_zh": "大肠",
+   "organ_en": "Large bowel",
+   "organ_ru": "Ободочная кишка",
+   "finding_zh": "浆膜面毛糙",
+   "finding_en": "Serosal surface irregularity",
+   "finding_ru": "Неровность серозной поверхности",
+   "csv_column_zh_en": "大肠_浆膜面毛糙 (Large bowel_Serosal surface irregularity)"
+  },
+  {
+   "organ_zh": "大肠",
+   "organ_en": "Large bowel",
+   "organ_ru": "Ободочная кишка",
+   "finding_zh": "溃疡性结肠炎",
+   "finding_en": "Ulcerative colitis",
+   "finding_ru": "Язвенный колит",
+   "csv_column_zh_en": "大肠_溃疡性结肠炎 (Large bowel_Ulcerative colitis)"
+  },
+  {
+   "organ_zh": "大肠",
+   "organ_en": "Large bowel",
+   "organ_ru": "Ободочная кишка",
+   "finding_zh": "直肠癌",
+   "finding_en": "Rectal cancer",
+   "finding_ru": "Рак прямой кишки",
+   "csv_column_zh_en": "大肠_直肠癌 (Large bowel_Rectal cancer)"
+  },
+  {
+   "organ_zh": "大肠",
+   "organ_en": "Large bowel",
+   "organ_ru": "Ободочная кишка",
+   "finding_zh": "积液积气",
+   "finding_en": "Gas and fluid accumulation",
+   "finding_ru": "Скопление газа и жидкости",
+   "csv_column_zh_en": "大肠_积液积气 (Large bowel_Gas and fluid accumulation)"
+  },
+  {
+   "organ_zh": "大肠",
+   "organ_en": "Large bowel",
+   "organ_ru": "Ободочная кишка",
+   "finding_zh": "结肠癌",
+   "finding_en": "Colon cancer",
+   "finding_ru": "Рак ободочной кишки",
+   "csv_column_zh_en": "大肠_结肠癌 (Large bowel_Colon cancer)"
+  },
+  {
+   "organ_zh": "大肠",
+   "organ_en": "Large bowel",
+   "organ_ru": "Ободочная кишка",
+   "finding_zh": "肠壁毛糙",
+   "finding_en": "Wall irregularity",
+   "finding_ru": "Неровность стенки",
+   "csv_column_zh_en": "大肠_肠壁毛糙 (Large bowel_Wall irregularity)"
+  },
+  {
+   "organ_zh": "大肠",
+   "organ_en": "Large bowel",
+   "organ_ru": "Ободочная кишка",
+   "finding_zh": "肠壁水肿",
+   "finding_en": "Wall edema",
+   "finding_ru": "Отёк стенки",
+   "csv_column_zh_en": "大肠_肠壁水肿 (Large bowel_Wall edema)"
+  },
+  {
+   "organ_zh": "大肠",
+   "organ_en": "Large bowel",
+   "organ_ru": "Ободочная кишка",
+   "finding_zh": "肠套叠",
+   "finding_en": "Intussusception",
+   "finding_ru": "Инвагинация",
+   "csv_column_zh_en": "大肠_肠套叠 (Large bowel_Intussusception)"
+  },
+  {
+   "organ_zh": "大肠",
+   "organ_en": "Large bowel",
+   "organ_ru": "Ободочная кишка",
+   "finding_zh": "肠憩室",
+   "finding_en": "Diverticulum",
+   "finding_ru": "Дивертикул",
+   "csv_column_zh_en": "大肠_肠憩室 (Large bowel_Diverticulum)"
+  },
+  {
+   "organ_zh": "大肠",
+   "organ_en": "Large bowel",
+   "organ_ru": "Ободочная кишка",
+   "finding_zh": "肠梗阻",
+   "finding_en": "Obstruction",
+   "finding_ru": "Кишечная непроходимость",
+   "csv_column_zh_en": "大肠_肠梗阻 (Large bowel_Obstruction)"
+  },
+  {
+   "organ_zh": "大肠",
+   "organ_en": "Large bowel",
+   "organ_ru": "Ободочная кишка",
+   "finding_zh": "肠穿孔",
+   "finding_en": "Perforation",
+   "finding_ru": "Перфорация",
+   "csv_column_zh_en": "大肠_肠穿孔 (Large bowel_Perforation)"
+  },
+  {
+   "organ_zh": "大肠",
+   "organ_en": "Large bowel",
+   "organ_ru": "Ободочная кишка",
+   "finding_zh": "肠道扩张",
+   "finding_en": "Dilatation",
+   "finding_ru": "Расширение кишки",
+   "csv_column_zh_en": "大肠_肠道扩张 (Large bowel_Dilatation)"
+  },
+  {
+   "organ_zh": "大肠",
+   "organ_en": "Large bowel",
+   "organ_ru": "Ободочная кишка",
+   "finding_zh": "脂肪间隙模糊",
+   "finding_en": "Blurring of fat planes",
+   "finding_ru": "Смазанность жировых промежутков",
+   "csv_column_zh_en": "大肠_脂肪间隙模糊 (Large bowel_Blurring of fat planes)"
+  },
+  {
+   "organ_zh": "大肠",
+   "organ_en": "Large bowel",
+   "organ_ru": "Ободочная кишка",
+   "finding_zh": "阑尾炎",
+   "finding_en": "Appendicitis",
+   "finding_ru": "Аппендицит",
+   "csv_column_zh_en": "大肠_阑尾炎 (Large bowel_Appendicitis)"
+  },
+  {
+   "organ_zh": "大肠",
+   "organ_en": "Large bowel",
+   "organ_ru": "Ободочная кишка",
+   "finding_zh": "阑尾粪石",
+   "finding_en": "Appendicolith",
+   "finding_ru": "Аппендиколит (копролит)",
+   "csv_column_zh_en": "大肠_阑尾粪石 (Large bowel_Appendicolith)"
+  },
+  {
+   "organ_zh": "小肠",
+   "organ_en": "Small bowel",
+   "organ_ru": "Тонкая кишка",
+   "finding_zh": "克罗恩病",
+   "finding_en": "Crohn's disease",
+   "finding_ru": "Болезнь Крона",
+   "csv_column_zh_en": "小肠_克罗恩病 (Small bowel_Crohn's disease)"
+  },
+  {
+   "organ_zh": "小肠",
+   "organ_en": "Small bowel",
+   "organ_ru": "Тонкая кишка",
+   "finding_zh": "套叠",
+   "finding_en": "Intussusception",
+   "finding_ru": "Инвагинация",
+   "csv_column_zh_en": "小肠_套叠 (Small bowel_Intussusception)"
+  },
+  {
+   "organ_zh": "小肠",
+   "organ_en": "Small bowel",
+   "organ_ru": "Тонкая кишка",
+   "finding_zh": "扭转",
+   "finding_en": "Volvulus",
+   "finding_ru": "Заворот",
+   "csv_column_zh_en": "小肠_扭转 (Small bowel_Volvulus)"
+  },
+  {
+   "organ_zh": "小肠",
+   "organ_en": "Small bowel",
+   "organ_ru": "Тонкая кишка",
+   "finding_zh": "梗阻",
+   "finding_en": "Obstruction",
+   "finding_ru": "Обструкция",
+   "csv_column_zh_en": "小肠_梗阻 (Small bowel_Obstruction)"
+  },
+  {
+   "organ_zh": "小肠",
+   "organ_en": "Small bowel",
+   "organ_ru": "Тонкая кишка",
+   "finding_zh": "淋巴瘤",
+   "finding_en": "Lymphoma",
+   "finding_ru": "Лимфома",
+   "csv_column_zh_en": "小肠_淋巴瘤 (Small bowel_Lymphoma)"
+  },
+  {
+   "organ_zh": "小肠",
+   "organ_en": "Small bowel",
+   "organ_ru": "Тонкая кишка",
+   "finding_zh": "积气积液",
+   "finding_en": "Gas and fluid accumulation",
+   "finding_ru": "Скопление газа и жидкости",
+   "csv_column_zh_en": "小肠_积气积液 (Small bowel_Gas and fluid accumulation)"
+  },
+  {
+   "organ_zh": "小肠",
+   "organ_en": "Small bowel",
+   "organ_ru": "Тонкая кишка",
+   "finding_zh": "系膜指膜炎",
+   "finding_en": "Mesenteric panniculitis",
+   "finding_ru": "Панникулит брыжейки",
+   "csv_column_zh_en": "小肠_系膜指膜炎 (Small bowel_Mesenteric panniculitis)"
+  },
+  {
+   "organ_zh": "小肠",
+   "organ_en": "Small bowel",
+   "organ_ru": "Тонкая кишка",
+   "finding_zh": "系膜淋巴结肿大",
+   "finding_en": "Mesenteric lymphadenopathy",
+   "finding_ru": "Увеличение брыжеечных лимфоузлов",
+   "csv_column_zh_en": "小肠_系膜淋巴结肿大 (Small bowel_Mesenteric lymphadenopathy)"
+  },
+  {
+   "organ_zh": "小肠",
+   "organ_en": "Small bowel",
+   "organ_ru": "Тонкая кишка",
+   "finding_zh": "肠壁增厚",
+   "finding_en": "Wall thickening",
+   "finding_ru": "Утолщение стенки",
+   "csv_column_zh_en": "小肠_肠壁增厚 (Small bowel_Wall thickening)"
+  },
+  {
+   "organ_zh": "小肠",
+   "organ_en": "Small bowel",
+   "organ_ru": "Тонкая кишка",
+   "finding_zh": "肠管扩张",
+   "finding_en": "Dilatation",
+   "finding_ru": "Расширение кишки",
+   "csv_column_zh_en": "小肠_肠管扩张 (Small bowel_Dilatation)"
+  },
+  {
+   "organ_zh": "小肠",
+   "organ_en": "Small bowel",
+   "organ_ru": "Тонкая кишка",
+   "finding_zh": "脂肪瘤",
+   "finding_en": "Lipoma",
+   "finding_ru": "Липома",
+   "csv_column_zh_en": "小肠_脂肪瘤 (Small bowel_Lipoma)"
+  },
+  {
+   "organ_zh": "小肠",
+   "organ_en": "Small bowel",
+   "organ_ru": "Тонкая кишка",
+   "finding_zh": "间质瘤（胃肠间质瘤-gist）",
+   "finding_en": "Gastrointestinal stromal tumor",
+   "finding_ru": "Гастроинтестинальная стромальная опухоль (GIST)",
+   "csv_column_zh_en": "小肠_间质瘤（胃肠间质瘤-gist） (Small bowel_Gastrointestinal stromal tumor)"
+  },
+  {
+   "organ_zh": "小肠",
+   "organ_en": "Small bowel",
+   "organ_ru": "Тонкая кишка",
+   "finding_zh": "（急慢性）小肠炎",
+   "finding_en": "Enteritis",
+   "finding_ru": "Энтерит (острый и хронический)",
+   "csv_column_zh_en": "小肠_（急慢性）小肠炎 (Small bowel_Enteritis)"
+  },
+  {
+   "organ_zh": "心脏",
+   "organ_en": "Heart",
+   "organ_ru": "Сердце",
+   "finding_zh": "心包积液",
+   "finding_en": "Pericardial effusion",
+   "finding_ru": "Выпот в перикарде",
+   "csv_column_zh_en": "心脏_心包积液 (Heart_Pericardial effusion)"
+  },
+  {
+   "organ_zh": "心脏",
+   "organ_en": "Heart",
+   "organ_ru": "Сердце",
+   "finding_zh": "心影（脏）增大",
+   "finding_en": "Cardiomegaly",
+   "finding_ru": "Кардиомегалия",
+   "csv_column_zh_en": "心脏_心影（脏）增大 (Heart_Cardiomegaly)"
+  },
+  {
+   "organ_zh": "肋骨",
+   "organ_en": "Rib",
+   "organ_ru": "Рёбра",
+   "finding_zh": "转移瘤（乳腺癌 骨转移）",
+   "finding_en": "Metastasis",
+   "finding_ru": "Метастаз (в т.ч. костный при раке молочной железы)",
+   "csv_column_zh_en": "肋骨_转移瘤（乳腺癌 骨转移） (Rib_Metastasis)"
+  },
+  {
+   "organ_zh": "肋骨",
+   "organ_en": "Rib",
+   "organ_ru": "Рёбра",
+   "finding_zh": "骨折",
+   "finding_en": "Fracture",
+   "finding_ru": "Перелом",
+   "csv_column_zh_en": "肋骨_骨折 (Rib_Fracture)"
+  },
+  {
+   "organ_zh": "肋骨",
+   "organ_en": "Rib",
+   "organ_ru": "Рёбра",
+   "finding_zh": "骨质破坏",
+   "finding_en": "Bone destruction",
+   "finding_ru": "Деструкция костной ткани",
+   "csv_column_zh_en": "肋骨_骨质破坏 (Rib_Bone destruction)"
+  },
+  {
+   "organ_zh": "肝",
+   "organ_en": "Liver",
+   "organ_ru": "Печень",
+   "finding_zh": "低密度影",
+   "finding_en": "Hypoattenuating lesion",
+   "finding_ru": "Гиподенсный очаг",
+   "csv_column_zh_en": "肝_低密度影 (Liver_Hypoattenuating lesion)"
+  },
+  {
+   "organ_zh": "肝",
+   "organ_en": "Liver",
+   "organ_ru": "Печень",
+   "finding_zh": "格林森鞘积液",
+   "finding_en": "Periportal edema",
+   "finding_ru": "Перипортальный отёк (отёк вокруг глиссоновой капсулы)",
+   "csv_column_zh_en": "肝_格林森鞘积液 (Liver_Periportal edema)"
+  },
+  {
+   "organ_zh": "肝",
+   "organ_en": "Liver",
+   "organ_ru": "Печень",
+   "finding_zh": "比例失调",
+   "finding_en": "Lobar volume disproportion",
+   "finding_ru": "Диспропорция объёма долей",
+   "csv_column_zh_en": "肝_比例失调 (Liver_Lobar volume disproportion)"
+  },
+  {
+   "organ_zh": "肝",
+   "organ_en": "Liver",
+   "organ_ru": "Печень",
+   "finding_zh": "波浪状改变",
+   "finding_en": "Undulating contour",
+   "finding_ru": "Волнистость контура",
+   "csv_column_zh_en": "肝_波浪状改变 (Liver_Undulating contour)"
+  },
+  {
+   "organ_zh": "肝",
+   "organ_en": "Liver",
+   "organ_ru": "Печень",
+   "finding_zh": "硬化",
+   "finding_en": "Cirrhosis",
+   "finding_ru": "Цирроз",
+   "csv_column_zh_en": "肝_硬化 (Liver_Cirrhosis)"
+  },
+  {
+   "organ_zh": "肝",
+   "organ_en": "Liver",
+   "organ_ru": "Печень",
+   "finding_zh": "结节状强化",
+   "finding_en": "Nodular enhancement",
+   "finding_ru": "Узловое накопление контраста",
+   "csv_column_zh_en": "肝_结节状强化 (Liver_Nodular enhancement)"
+  },
+  {
+   "organ_zh": "肝",
+   "organ_en": "Liver",
+   "organ_ru": "Печень",
+   "finding_zh": "肝内胆管扩张",
+   "finding_en": "Intrahepatic bile duct dilatation",
+   "finding_ru": "Расширение внутрипечёночных желчных протоков",
+   "csv_column_zh_en": "肝_肝内胆管扩张 (Liver_Intrahepatic bile duct dilatation)"
+  },
+  {
+   "organ_zh": "肝",
+   "organ_en": "Liver",
+   "organ_ru": "Печень",
+   "finding_zh": "肝内胆管结石",
+   "finding_en": "Hepatolithiasis",
+   "finding_ru": "Внутрипечёночный холелитиаз",
+   "csv_column_zh_en": "肝_肝内胆管结石 (Liver_Hepatolithiasis)"
+  },
+  {
+   "organ_zh": "肝",
+   "organ_en": "Liver",
+   "organ_ru": "Печень",
+   "finding_zh": "肝内钙化灶",
+   "finding_en": "Intrahepatic calcification",
+   "finding_ru": "Внутрипечёночные кальцинаты",
+   "csv_column_zh_en": "肝_肝内钙化灶 (Liver_Intrahepatic calcification)"
+  },
+  {
+   "organ_zh": "肝",
+   "organ_en": "Liver",
+   "organ_ru": "Печень",
+   "finding_zh": "肝囊肿",
+   "finding_en": "Cyst",
+   "finding_ru": "Киста печени",
+   "csv_column_zh_en": "肝_肝囊肿 (Liver_Cyst)"
+  },
+  {
+   "organ_zh": "肝",
+   "organ_en": "Liver",
+   "organ_ru": "Печень",
+   "finding_zh": "肝细胞癌",
+   "finding_en": "Hepatocellular carcinoma",
+   "finding_ru": "Гепатоцеллюлярная карцинома",
+   "csv_column_zh_en": "肝_肝细胞癌 (Liver_Hepatocellular carcinoma)"
+  },
+  {
+   "organ_zh": "肝",
+   "organ_en": "Liver",
+   "organ_ru": "Печень",
+   "finding_zh": "肝胆管内高密度影",
+   "finding_en": "Hyperattenuating lesion in intrahepatic bile ducts",
+   "finding_ru": "Гиперденсный очаг во внутрипечёночных жёлчных протоках",
+   "csv_column_zh_en": "肝_肝胆管内高密度影 (Liver_Hyperattenuating lesion in intrahepatic bile ducts)"
+  },
+  {
+   "organ_zh": "肝",
+   "organ_en": "Liver",
+   "organ_ru": "Печень",
+   "finding_zh": "肝血管瘤",
+   "finding_en": "Hemangioma",
+   "finding_ru": "Гемангиома печени",
+   "csv_column_zh_en": "肝_肝血管瘤 (Liver_Hemangioma)"
+  },
+  {
+   "organ_zh": "肝",
+   "organ_en": "Liver",
+   "organ_ru": "Печень",
+   "finding_zh": "胆管癌",
+   "finding_en": "Intrahepatic cholangiocarcinoma",
+   "finding_ru": "Внутрипечёночная холангиокарцинома",
+   "csv_column_zh_en": "肝_胆管癌 (Liver_Intrahepatic cholangiocarcinoma)"
+  },
+  {
+   "organ_zh": "肝",
+   "organ_en": "Liver",
+   "organ_ru": "Печень",
+   "finding_zh": "脂肪肝",
+   "finding_en": "Steatotic liver disease",
+   "finding_ru": "Стеатоз печени",
+   "csv_column_zh_en": "肝_脂肪肝 (Liver_Steatotic liver disease)"
+  },
+  {
+   "organ_zh": "肝",
+   "organ_en": "Liver",
+   "organ_ru": "Печень",
+   "finding_zh": "脓肿",
+   "finding_en": "Abscess",
+   "finding_ru": "Абсцесс",
+   "csv_column_zh_en": "肝_脓肿 (Liver_Abscess)"
+  },
+  {
+   "organ_zh": "肝",
+   "organ_en": "Liver",
+   "organ_ru": "Печень",
+   "finding_zh": "转移瘤",
+   "finding_en": "Metastasis",
+   "finding_ru": "Метастаз",
+   "csv_column_zh_en": "肝_转移瘤 (Liver_Metastasis)"
+  },
+  {
+   "organ_zh": "肝",
+   "organ_en": "Liver",
+   "organ_ru": "Печень",
+   "finding_zh": "边缘不规则",
+   "finding_en": "Irregular margin",
+   "finding_ru": "Неровность края",
+   "csv_column_zh_en": "肝_边缘不规则 (Liver_Irregular margin)"
+  },
+  {
+   "organ_zh": "肺",
+   "organ_en": "Lung",
+   "organ_ru": "Лёгкие",
+   "finding_zh": "斑片影",
+   "finding_en": "Patchy opacity",
+   "finding_ru": "Очаговое затемнение (пятнистое)",
+   "csv_column_zh_en": "肺_斑片影 (Lung_Patchy opacity)"
+  },
+  {
+   "organ_zh": "肺",
+   "organ_en": "Lung",
+   "organ_ru": "Лёгкие",
+   "finding_zh": "气胸",
+   "finding_en": "Pneumothorax",
+   "finding_ru": "Пневмоторакс",
+   "csv_column_zh_en": "肺_气胸 (Lung_Pneumothorax)"
+  },
+  {
+   "organ_zh": "肺",
+   "organ_en": "Lung",
+   "organ_ru": "Лёгкие",
+   "finding_zh": "结节",
+   "finding_en": "Nodule",
+   "finding_ru": "Узел",
+   "csv_column_zh_en": "肺_结节 (Lung_Nodule)"
+  },
+  {
+   "organ_zh": "肺",
+   "organ_en": "Lung",
+   "organ_ru": "Лёгкие",
+   "finding_zh": "肺占位",
+   "finding_en": "Mass",
+   "finding_ru": "Объёмное образование",
+   "csv_column_zh_en": "肺_肺占位 (Lung_Mass)"
+  },
+  {
+   "organ_zh": "肺",
+   "organ_en": "Lung",
+   "organ_ru": "Лёгкие",
+   "finding_zh": "肺萎陷",
+   "finding_en": "Pulmonary collapse",
+   "finding_ru": "Коллапс лёгкого",
+   "csv_column_zh_en": "肺_肺萎陷 (Lung_Pulmonary collapse)"
+  },
+  {
+   "organ_zh": "肺",
+   "organ_en": "Lung",
+   "organ_ru": "Лёгкие",
+   "finding_zh": "胸腔积液",
+   "finding_en": "Pleural effusion",
+   "finding_ru": "Плевральный выпот",
+   "csv_column_zh_en": "肺_胸腔积液 (Lung_Pleural effusion)"
+  },
+  {
+   "organ_zh": "肺",
+   "organ_en": "Lung",
+   "organ_ru": "Лёгкие",
+   "finding_zh": "膨胀不全",
+   "finding_en": "Atelectasis",
+   "finding_ru": "Ателектаз",
+   "csv_column_zh_en": "肺_膨胀不全 (Lung_Atelectasis)"
+  },
+  {
+   "organ_zh": "肺",
+   "organ_en": "Lung",
+   "organ_ru": "Лёгкие",
+   "finding_zh": "转移瘤",
+   "finding_en": "Metastasis",
+   "finding_ru": "Метастаз",
+   "csv_column_zh_en": "肺_转移瘤 (Lung_Metastasis)"
+  },
+  {
+   "organ_zh": "肺",
+   "organ_en": "Lung",
+   "organ_ru": "Лёгкие",
+   "finding_zh": "钙化灶",
+   "finding_en": "Calcification",
+   "finding_ru": "Кальцинат",
+   "csv_column_zh_en": "肺_钙化灶 (Lung_Calcification)"
+  },
+  {
+   "organ_zh": "肺",
+   "organ_en": "Lung",
+   "organ_ru": "Лёгкие",
+   "finding_zh": "高密度影",
+   "finding_en": "Hyperattenuating opacity",
+   "finding_ru": "Гиперденсное затемнение",
+   "csv_column_zh_en": "肺_高密度影 (Lung_Hyperattenuating opacity)"
+  },
+  {
+   "organ_zh": "肾",
+   "organ_en": "Kidney",
+   "organ_ru": "Почки",
+   "finding_zh": "低密度影",
+   "finding_en": "Hypoattenuating lesion",
+   "finding_ru": "Гиподенсный очаг",
+   "csv_column_zh_en": "肾_低密度影 (Kidney_Hypoattenuating lesion)"
+  },
+  {
+   "organ_zh": "肾",
+   "organ_en": "Kidney",
+   "organ_ru": "Почки",
+   "finding_zh": "囊肿",
+   "finding_en": "Cyst",
+   "finding_ru": "Киста",
+   "csv_column_zh_en": "肾_囊肿 (Kidney_Cyst)"
+  },
+  {
+   "organ_zh": "肾",
+   "organ_en": "Kidney",
+   "organ_ru": "Почки",
+   "finding_zh": "多囊肾",
+   "finding_en": "Polycystic kidney disease",
+   "finding_ru": "Поликистоз почек",
+   "csv_column_zh_en": "肾_多囊肾 (Kidney_Polycystic kidney disease)"
+  },
+  {
+   "organ_zh": "肾",
+   "organ_en": "Kidney",
+   "organ_ru": "Почки",
+   "finding_zh": "实质变薄",
+   "finding_en": "Parenchymal thinning",
+   "finding_ru": "Истончение паренхимы",
+   "csv_column_zh_en": "肾_实质变薄 (Kidney_Parenchymal thinning)"
+  },
+  {
+   "organ_zh": "肾",
+   "organ_en": "Kidney",
+   "organ_ru": "Почки",
+   "finding_zh": "无强化囊性灶",
+   "finding_en": "Nonenhancing cystic lesion",
+   "finding_ru": "Неусиливающийся кистозный очаг",
+   "csv_column_zh_en": "肾_无强化囊性灶 (Kidney_Nonenhancing cystic lesion)"
+  },
+  {
+   "organ_zh": "肾",
+   "organ_en": "Kidney",
+   "organ_ru": "Почки",
+   "finding_zh": "肾动脉瘤",
+   "finding_en": "Renal artery aneurysm",
+   "finding_ru": "Аневризма почечной артерии",
+   "csv_column_zh_en": "肾_肾动脉瘤 (Kidney_Renal artery aneurysm)"
+  },
+  {
+   "organ_zh": "肾",
+   "organ_en": "Kidney",
+   "organ_ru": "Почки",
+   "finding_zh": "肾盂扩张",
+   "finding_en": "Renal pelvic dilatation",
+   "finding_ru": "Расширение почечной лоханки",
+   "csv_column_zh_en": "肾_肾盂扩张 (Kidney_Renal pelvic dilatation)"
+  },
+  {
+   "organ_zh": "肾",
+   "organ_en": "Kidney",
+   "organ_ru": "Почки",
+   "finding_zh": "肾盂癌",
+   "finding_en": "Renal pelvic cancer",
+   "finding_ru": "Рак почечной лоханки",
+   "csv_column_zh_en": "肾_肾盂癌 (Kidney_Renal pelvic cancer)"
+  },
+  {
+   "organ_zh": "肾",
+   "organ_en": "Kidney",
+   "organ_ru": "Почки",
+   "finding_zh": "肾盂积水",
+   "finding_en": "Hydronephrosis",
+   "finding_ru": "Гидронефроз",
+   "csv_column_zh_en": "肾_肾盂积水 (Kidney_Hydronephrosis)"
+  },
+  {
+   "organ_zh": "肾",
+   "organ_en": "Kidney",
+   "organ_ru": "Почки",
+   "finding_zh": "肾细胞癌（透明细胞癌）",
+   "finding_en": "Renal cell carcinoma",
+   "finding_ru": "Почечно-клеточный рак (светлоклеточный)",
+   "csv_column_zh_en": "肾_肾细胞癌（透明细胞癌） (Kidney_Renal cell carcinoma)"
+  },
+  {
+   "organ_zh": "肾",
+   "organ_en": "Kidney",
+   "organ_ru": "Почки",
+   "finding_zh": "肾萎缩",
+   "finding_en": "Atrophy",
+   "finding_ru": "Атрофия почки",
+   "csv_column_zh_en": "肾_肾萎缩 (Kidney_Atrophy)"
+  },
+  {
+   "organ_zh": "肾",
+   "organ_en": "Kidney",
+   "organ_ru": "Почки",
+   "finding_zh": "肾血管平滑肌脂肪瘤",
+   "finding_en": "Angiomyolipoma",
+   "finding_ru": "Ангиомиолипома",
+   "csv_column_zh_en": "肾_肾血管平滑肌脂肪瘤 (Kidney_Angiomyolipoma)"
+  },
+  {
+   "organ_zh": "肾",
+   "organ_en": "Kidney",
+   "organ_ru": "Почки",
+   "finding_zh": "肾（盂）结石",
+   "finding_en": "Nephrolithiasis",
+   "finding_ru": "Нефролитиаз (камни почек/лоханки)",
+   "csv_column_zh_en": "肾_肾（盂）结石 (Kidney_Nephrolithiasis)"
+  },
+  {
+   "organ_zh": "肾",
+   "organ_en": "Kidney",
+   "organ_ru": "Почки",
+   "finding_zh": "高密度影",
+   "finding_en": "Hyperattenuating lesion",
+   "finding_ru": "Гиперденсный очаг",
+   "csv_column_zh_en": "肾_高密度影 (Kidney_Hyperattenuating lesion)"
+  },
+  {
+   "organ_zh": "肾上腺",
+   "organ_en": "Adrenal gland",
+   "organ_ru": "Надпочечники",
+   "finding_zh": "增生",
+   "finding_en": "Hyperplasia",
+   "finding_ru": "Гиперплазия",
+   "csv_column_zh_en": "肾上腺_增生 (Adrenal gland_Hyperplasia)"
+  },
+  {
+   "organ_zh": "肾上腺",
+   "organ_en": "Adrenal gland",
+   "organ_ru": "Надпочечники",
+   "finding_zh": "结节",
+   "finding_en": "Nodule",
+   "finding_ru": "Узел",
+   "csv_column_zh_en": "肾上腺_结节 (Adrenal gland_Nodule)"
+  },
+  {
+   "organ_zh": "肾上腺",
+   "organ_en": "Adrenal gland",
+   "organ_ru": "Надпочечники",
+   "finding_zh": "脂肪瘤",
+   "finding_en": "Lipoma",
+   "finding_ru": "Липома",
+   "csv_column_zh_en": "肾上腺_脂肪瘤 (Adrenal gland_Lipoma)"
+  },
+  {
+   "organ_zh": "肾上腺",
+   "organ_en": "Adrenal gland",
+   "organ_ru": "Надпочечники",
+   "finding_zh": "腺瘤",
+   "finding_en": "Adenoma",
+   "finding_ru": "Аденома",
+   "csv_column_zh_en": "肾上腺_腺瘤 (Adrenal gland_Adenoma)"
+  },
+  {
+   "organ_zh": "肾上腺",
+   "organ_en": "Adrenal gland",
+   "organ_ru": "Надпочечники",
+   "finding_zh": "转移瘤",
+   "finding_en": "Metastasis",
+   "finding_ru": "Метастаз",
+   "csv_column_zh_en": "肾上腺_转移瘤 (Adrenal gland_Metastasis)"
+  },
+  {
+   "organ_zh": "肾上腺",
+   "organ_en": "Adrenal gland",
+   "organ_ru": "Надпочечники",
+   "finding_zh": "钙化",
+   "finding_en": "Calcification",
+   "finding_ru": "Кальцинат",
+   "csv_column_zh_en": "肾上腺_钙化 (Adrenal gland_Calcification)"
+  },
+  {
+   "organ_zh": "胃",
+   "organ_en": "Stomach",
+   "organ_ru": "Желудок",
+   "finding_zh": "壁水肿",
+   "finding_en": "Wall edema",
+   "finding_ru": "Отёк стенки",
+   "csv_column_zh_en": "胃_壁水肿 (Stomach_Wall edema)"
+  },
+  {
+   "organ_zh": "胃",
+   "organ_en": "Stomach",
+   "organ_ru": "Желудок",
+   "finding_zh": "扩张",
+   "finding_en": "Dilatation",
+   "finding_ru": "Расширение",
+   "csv_column_zh_en": "胃_扩张 (Stomach_Dilatation)"
+  },
+  {
+   "organ_zh": "胃",
+   "organ_en": "Stomach",
+   "organ_ru": "Желудок",
+   "finding_zh": "胃底静脉曲张",
+   "finding_en": "Gastric fundal varices",
+   "finding_ru": "Варикоз вен дна желудка",
+   "csv_column_zh_en": "胃_胃底静脉曲张 (Stomach_Gastric fundal varices)"
+  },
+  {
+   "organ_zh": "胃",
+   "organ_en": "Stomach",
+   "organ_ru": "Желудок",
+   "finding_zh": "胃溃疡",
+   "finding_en": "Ulcer",
+   "finding_ru": "Язва желудка",
+   "csv_column_zh_en": "胃_胃溃疡 (Stomach_Ulcer)"
+  },
+  {
+   "organ_zh": "胃",
+   "organ_en": "Stomach",
+   "organ_ru": "Желудок",
+   "finding_zh": "胃癌",
+   "finding_en": "Gastric cancer",
+   "finding_ru": "Рак желудка",
+   "csv_column_zh_en": "胃_胃癌 (Stomach_Gastric cancer)"
+  },
+  {
+   "organ_zh": "胃",
+   "organ_en": "Stomach",
+   "organ_ru": "Желудок",
+   "finding_zh": "间质瘤（gist）",
+   "finding_en": "Gastrointestinal stromal tumor (GIST)",
+   "finding_ru": "Гастроинтестинальная стромальная опухоль (GIST)",
+   "csv_column_zh_en": "胃_间质瘤（gist） (Stomach_Gastrointestinal stromal tumor (GIST))"
+  },
+  {
+   "organ_zh": "胆囊",
+   "organ_en": "Gallbladder / extrahepatic bile ducts",
+   "organ_ru": "Жёлчный пузырь и жёлчные протоки",
+   "finding_zh": "结石",
+   "finding_en": "Cholecystolithiasis",
+   "finding_ru": "Желчнокаменная болезнь",
+   "csv_column_zh_en": "胆囊_结石 (Gallbladder_Cholecystolithiasis)"
+  },
+  {
+   "organ_zh": "胆囊",
+   "organ_en": "Gallbladder / extrahepatic bile ducts",
+   "organ_ru": "Жёлчный пузырь и жёлчные протоки",
+   "finding_zh": "结节状致密影",
+   "finding_en": "Nodular stone-like hyperattenuating lesion",
+   "finding_ru": "Узловой камнеподобный гиперденсный очаг",
+   "csv_column_zh_en": "胆囊_结节状致密影 (Gallbladder_Nodular stone-like hyperattenuating lesion)"
+  },
+  {
+   "organ_zh": "胆囊",
+   "organ_en": "Gallbladder / extrahepatic bile ducts",
+   "organ_ru": "Жёлчный пузырь и жёлчные протоки",
+   "finding_zh": "胆囊增大",
+   "finding_en": "Distention",
+   "finding_ru": "Увеличение желчного пузыря",
+   "csv_column_zh_en": "胆囊_胆囊增大 (Gallbladder_Distention)"
+  },
+  {
+   "organ_zh": "胆囊",
+   "organ_en": "Gallbladder / extrahepatic bile ducts",
+   "organ_ru": "Жёлчный пузырь и жёлчные протоки",
+   "finding_zh": "胆囊炎",
+   "finding_en": "Cholecystitis",
+   "finding_ru": "Холецистит",
+   "csv_column_zh_en": "胆囊_胆囊炎 (Gallbladder_Cholecystitis)"
+  },
+  {
+   "organ_zh": "胆囊",
+   "organ_en": "Gallbladder / extrahepatic bile ducts",
+   "organ_ru": "Жёлчный пузырь и жёлчные протоки",
+   "finding_zh": "胆囊癌",
+   "finding_en": "Gallbladder cancer",
+   "finding_ru": "Рак желчного пузыря",
+   "csv_column_zh_en": "胆囊_胆囊癌 (Gallbladder_Gallbladder cancer)"
+  },
+  {
+   "organ_zh": "胆囊",
+   "organ_en": "Gallbladder / extrahepatic bile ducts",
+   "organ_ru": "Жёлчный пузырь и жёлчные протоки",
+   "finding_zh": "胆囊腺肌症",
+   "finding_en": "Adenomyomatosis",
+   "finding_ru": "Аденомиоматоз",
+   "csv_column_zh_en": "胆囊_胆囊腺肌症 (Gallbladder_Adenomyomatosis)"
+  },
+  {
+   "organ_zh": "胆囊",
+   "organ_en": "Gallbladder / extrahepatic bile ducts",
+   "organ_ru": "Жёлчный пузырь и жёлчные протоки",
+   "finding_zh": "胆管壁增厚",
+   "finding_en": "Extrahepatic bile duct wall thickening",
+   "finding_ru": "Утолщение стенки внепечёночных жёлчных протоков",
+   "csv_column_zh_en": "胆囊_胆管壁增厚 (Gallbladder_Extrahepatic bile duct wall thickening)"
+  },
+  {
+   "organ_zh": "胆囊",
+   "organ_en": "Gallbladder / extrahepatic bile ducts",
+   "organ_ru": "Жёлчный пузырь и жёлчные протоки",
+   "finding_zh": "胆管扩张",
+   "finding_en": "Extrahepatic bile duct dilatation",
+   "finding_ru": "Расширение внепечёночных жёлчных протоков",
+   "csv_column_zh_en": "胆囊_胆管扩张 (Gallbladder_Extrahepatic bile duct dilatation)"
+  },
+  {
+   "organ_zh": "胆囊",
+   "organ_en": "Gallbladder / extrahepatic bile ducts",
+   "organ_ru": "Жёлчный пузырь и жёлчные протоки",
+   "finding_zh": "胆管炎",
+   "finding_en": "Cholangitis",
+   "finding_ru": "Холангит",
+   "csv_column_zh_en": "胆囊_胆管炎 (Gallbladder_Cholangitis)"
+  },
+  {
+   "organ_zh": "胆囊",
+   "organ_en": "Gallbladder / extrahepatic bile ducts",
+   "organ_ru": "Жёлчный пузырь и жёлчные протоки",
+   "finding_zh": "胆管癌",
+   "finding_en": "Cholangiocarcinoma",
+   "finding_ru": "Холангиокарцинома",
+   "csv_column_zh_en": "胆囊_胆管癌 (Gallbladder_Cholangiocarcinoma)"
+  },
+  {
+   "organ_zh": "胆囊",
+   "organ_en": "Gallbladder / extrahepatic bile ducts",
+   "organ_ru": "Жёлчный пузырь и жёлчные протоки",
+   "finding_zh": "胆管积气",
+   "finding_en": "Pneumobilia",
+   "finding_ru": "Пневмобилия (газ в жёлчных путях)",
+   "csv_column_zh_en": "胆囊_胆管积气 (Gallbladder_Pneumobilia)"
+  },
+  {
+   "organ_zh": "胆囊",
+   "organ_en": "Gallbladder / extrahepatic bile ducts",
+   "organ_ru": "Жёлчный пузырь и жёлчные протоки",
+   "finding_zh": "胆管结石",
+   "finding_en": "Extrahepatic bile duct stone",
+   "finding_ru": "Камень внепечёночных жёлчных протоков",
+   "csv_column_zh_en": "胆囊_胆管结石 (Gallbladder_Extrahepatic bile duct stone)"
+  },
+  {
+   "organ_zh": "胆囊",
+   "organ_en": "Gallbladder / extrahepatic bile ducts",
+   "organ_ru": "Жёлчный пузырь и жёлчные протоки",
+   "finding_zh": "高密度影",
+   "finding_en": "Hyperattenuating lesion",
+   "finding_ru": "Гиперденсный очаг",
+   "csv_column_zh_en": "胆囊_高密度影 (Gallbladder_Hyperattenuating lesion)"
+  },
+  {
+   "organ_zh": "胆囊",
+   "organ_en": "Gallbladder / extrahepatic bile ducts",
+   "organ_ru": "Жёлчный пузырь и жёлчные протоки",
+   "finding_zh": "黄色肉芽肿",
+   "finding_en": "Xanthogranuloma",
+   "finding_ru": "Ксантогранулёма",
+   "csv_column_zh_en": "胆囊_黄色肉芽肿 (Gallbladder_Xanthogranuloma)"
+  },
+  {
+   "organ_zh": "胰腺",
+   "organ_en": "Pancreas",
+   "organ_ru": "Поджелудочная железа",
+   "finding_zh": "低密度影",
+   "finding_en": "Low-density lesion",
+   "finding_ru": "Гиподенсный очаг",
+   "csv_column_zh_en": "胰腺_低密度影 (Pancreas_Low-density lesion)"
+  },
+  {
+   "organ_zh": "胰腺",
+   "organ_en": "Pancreas",
+   "organ_ru": "Поджелудочная железа",
+   "finding_zh": "囊肿",
+   "finding_en": "Cyst",
+   "finding_ru": "Киста",
+   "csv_column_zh_en": "胰腺_囊肿 (Pancreas_Cyst)"
+  },
+  {
+   "organ_zh": "胰腺",
+   "organ_en": "Pancreas",
+   "organ_ru": "Поджелудочная железа",
+   "finding_zh": "围脂肪间隙模糊",
+   "finding_en": "Blurring of peripancreatic fat planes",
+   "finding_ru": "Смазанность парапанкреатической клетчатки",
+   "csv_column_zh_en": "胰腺_围脂肪间隙模糊 (Pancreas_Blurring of peripancreatic fat planes)"
+  },
+  {
+   "organ_zh": "胰腺",
+   "organ_en": "Pancreas",
+   "organ_ru": "Поджелудочная железа",
+   "finding_zh": "肿瘤或胰腺癌",
+   "finding_en": "Pancreatic cancer",
+   "finding_ru": "Опухоль / рак поджелудочной железы",
+   "csv_column_zh_en": "胰腺_肿瘤或胰腺癌 (Pancreas_Pancreatic cancer)"
+  },
+  {
+   "organ_zh": "胰腺",
+   "organ_en": "Pancreas",
+   "organ_ru": "Поджелудочная железа",
+   "finding_zh": "胰周假性囊肿",
+   "finding_en": "Peripancreatic pseudocyst",
+   "finding_ru": "Парапанкреатическая псевдокиста",
+   "csv_column_zh_en": "胰腺_胰周假性囊肿 (Pancreas_Peripancreatic pseudocyst)"
+  },
+  {
+   "organ_zh": "胰腺",
+   "organ_en": "Pancreas",
+   "organ_ru": "Поджелудочная железа",
+   "finding_zh": "胰管扩张",
+   "finding_en": "Pancreatic duct dilatation",
+   "finding_ru": "Расширение панкреатического протока",
+   "csv_column_zh_en": "胰腺_胰管扩张 (Pancreas_Pancreatic duct dilatation)"
+  },
+  {
+   "organ_zh": "胰腺",
+   "organ_en": "Pancreas",
+   "organ_ru": "Поджелудочная железа",
+   "finding_zh": "胰管结石",
+   "finding_en": "Pancreatic duct calculus",
+   "finding_ru": "Конкремент панкреатического протока",
+   "csv_column_zh_en": "胰腺_胰管结石 (Pancreas_Pancreatic duct calculus)"
+  },
+  {
+   "organ_zh": "胰腺",
+   "organ_en": "Pancreas",
+   "organ_ru": "Поджелудочная железа",
+   "finding_zh": "胰腺炎",
+   "finding_en": "Pancreatitis",
+   "finding_ru": "Панкреатит",
+   "csv_column_zh_en": "胰腺_胰腺炎 (Pancreas_Pancreatitis)"
+  },
+  {
+   "organ_zh": "胰腺",
+   "organ_en": "Pancreas",
+   "organ_ru": "Поджелудочная железа",
+   "finding_zh": "胰腺饱满",
+   "finding_en": "Enlargement",
+   "finding_ru": "Увеличение поджелудочной железы",
+   "csv_column_zh_en": "胰腺_胰腺饱满 (Pancreas_Enlargement)"
+  },
+  {
+   "organ_zh": "胰腺",
+   "organ_en": "Pancreas",
+   "organ_ru": "Поджелудочная железа",
+   "finding_zh": "萎缩",
+   "finding_en": "Atrophy",
+   "finding_ru": "Атрофия",
+   "csv_column_zh_en": "胰腺_萎缩 (Pancreas_Atrophy)"
+  },
+  {
+   "organ_zh": "脾",
+   "organ_en": "Spleen",
+   "organ_ru": "Селезёнка",
+   "finding_zh": "低密度灶",
+   "finding_en": "Hypoattenuating lesion",
+   "finding_ru": "Гиподенсный очаг",
+   "csv_column_zh_en": "脾_低密度灶 (Spleen_Hypoattenuating lesion)"
+  },
+  {
+   "organ_zh": "脾",
+   "organ_en": "Spleen",
+   "organ_ru": "Селезёнка",
+   "finding_zh": "副脾",
+   "finding_en": "Accessory spleen",
+   "finding_ru": "Добавочная селезёнка",
+   "csv_column_zh_en": "脾_副脾 (Spleen_Accessory spleen)"
+  },
+  {
+   "organ_zh": "脾",
+   "organ_en": "Spleen",
+   "organ_ru": "Селезёнка",
+   "finding_zh": "囊肿",
+   "finding_en": "Cyst",
+   "finding_ru": "Киста",
+   "csv_column_zh_en": "脾_囊肿 (Spleen_Cyst)"
+  },
+  {
+   "organ_zh": "脾",
+   "organ_en": "Spleen",
+   "organ_ru": "Селезёнка",
+   "finding_zh": "梗死",
+   "finding_en": "Infarction",
+   "finding_ru": "Инфаркт",
+   "csv_column_zh_en": "脾_梗死 (Spleen_Infarction)"
+  },
+  {
+   "organ_zh": "脾",
+   "organ_en": "Spleen",
+   "organ_ru": "Селезёнка",
+   "finding_zh": "片状低密度区",
+   "finding_en": "Patchy hypoattenuating lesion",
+   "finding_ru": "Очаговый гиподенсный участок",
+   "csv_column_zh_en": "脾_片状低密度区 (Spleen_Patchy hypoattenuating lesion)"
+  },
+  {
+   "organ_zh": "脾",
+   "organ_en": "Spleen",
+   "organ_ru": "Селезёнка",
+   "finding_zh": "脾大",
+   "finding_en": "Splenomegaly",
+   "finding_ru": "Спленомегалия",
+   "csv_column_zh_en": "脾_脾大 (Spleen_Splenomegaly)"
+  },
+  {
+   "organ_zh": "脾",
+   "organ_en": "Spleen",
+   "organ_ru": "Селезёнка",
+   "finding_zh": "脾脏淋巴瘤",
+   "finding_en": "Lymphoma",
+   "finding_ru": "Лимфома селезёнки",
+   "csv_column_zh_en": "脾_脾脏淋巴瘤 (Spleen_Lymphoma)"
+  },
+  {
+   "organ_zh": "脾",
+   "organ_en": "Spleen",
+   "organ_ru": "Селезёнка",
+   "finding_zh": "钙化",
+   "finding_en": "Calcification",
+   "finding_ru": "Кальцинат",
+   "csv_column_zh_en": "脾_钙化 (Spleen_Calcification)"
+  },
+  {
+   "organ_zh": "膀胱",
+   "organ_en": "Bladder",
+   "organ_ru": "Мочевой пузырь",
+   "finding_zh": "憩室",
+   "finding_en": "Diverticulum",
+   "finding_ru": "Дивертикул",
+   "csv_column_zh_en": "膀胱_憩室 (Bladder_Diverticulum)"
+  },
+  {
+   "organ_zh": "膀胱",
+   "organ_en": "Bladder",
+   "organ_ru": "Мочевой пузырь",
+   "finding_zh": "结石",
+   "finding_en": "Stone",
+   "finding_ru": "Камень",
+   "csv_column_zh_en": "膀胱_结石 (Bladder_Stone)"
+  },
+  {
+   "organ_zh": "膀胱",
+   "organ_en": "Bladder",
+   "organ_ru": "Мочевой пузырь",
+   "finding_zh": "膀胱壁毛糙",
+   "finding_en": "Wall irregularity",
+   "finding_ru": "Неровность стенки",
+   "csv_column_zh_en": "膀胱_膀胱壁毛糙 (Bladder_Wall irregularity)"
+  },
+  {
+   "organ_zh": "膀胱",
+   "organ_en": "Bladder",
+   "organ_ru": "Мочевой пузырь",
+   "finding_zh": "膀胱炎",
+   "finding_en": "Cystitis",
+   "finding_ru": "Цистит",
+   "csv_column_zh_en": "膀胱_膀胱炎 (Bladder_Cystitis)"
+  },
+  {
+   "organ_zh": "膀胱",
+   "organ_en": "Bladder",
+   "organ_ru": "Мочевой пузырь",
+   "finding_zh": "膀胱癌",
+   "finding_en": "Bladder cancer",
+   "finding_ru": "Рак мочевого пузыря",
+   "csv_column_zh_en": "膀胱_膀胱癌 (Bladder_Bladder cancer)"
+  },
+  {
+   "organ_zh": "膀胱",
+   "organ_en": "Bladder",
+   "organ_ru": "Мочевой пузырь",
+   "finding_zh": "软组织密度影",
+   "finding_en": "Soft-tissue attenuation lesion",
+   "finding_ru": "Очаг мягкотканной плотности",
+   "csv_column_zh_en": "膀胱_软组织密度影 (Bladder_Soft-tissue attenuation lesion)"
+  },
+  {
+   "organ_zh": "门静脉",
+   "organ_en": "Portal vein",
+   "organ_ru": "Воротная вена",
+   "finding_zh": "增宽",
+   "finding_en": "Dilatation",
+   "finding_ru": "Расширение",
+   "csv_column_zh_en": "门静脉_增宽 (Portal vein_Dilatation)"
+  },
+  {
+   "organ_zh": "门静脉",
+   "organ_en": "Portal vein",
+   "organ_ru": "Воротная вена",
+   "finding_zh": "栓塞",
+   "finding_en": "Thrombosis",
+   "finding_ru": "Тромбоз",
+   "csv_column_zh_en": "门静脉_栓塞 (Portal vein_Thrombosis)"
+  },
+  {
+   "organ_zh": "门静脉",
+   "organ_en": "Portal vein",
+   "organ_ru": "Воротная вена",
+   "finding_zh": "高压",
+   "finding_en": "Hypertension",
+   "finding_ru": "Портальная гипертензия",
+   "csv_column_zh_en": "门静脉_高压 (Portal vein_Hypertension)"
+  },
+  {
+   "organ_zh": "食管",
+   "organ_en": "Esophagus",
+   "organ_ru": "Пищевод",
+   "finding_zh": "增粗迂曲血管影",
+   "finding_en": "Dilated and tortuous tubular opacities",
+   "finding_ru": "Расширенные извитые трубчатые тени (сосуды)",
+   "csv_column_zh_en": "食管_增粗迂曲血管影 (Esophagus_Dilated and tortuous tubular opacities)"
+  },
+  {
+   "organ_zh": "食管",
+   "organ_en": "Esophagus",
+   "organ_ru": "Пищевод",
+   "finding_zh": "管壁增厚",
+   "finding_en": "Wall thickening",
+   "finding_ru": "Утолщение стенки",
+   "csv_column_zh_en": "食管_管壁增厚 (Esophagus_Wall thickening)"
+  },
+  {
+   "organ_zh": "食管",
+   "organ_en": "Esophagus",
+   "organ_ru": "Пищевод",
+   "finding_zh": "裂孔疝",
+   "finding_en": "Hiatal hernia",
+   "finding_ru": "Грыжа пищеводного отверстия диафрагмы",
+   "csv_column_zh_en": "食管_裂孔疝 (Esophagus_Hiatal hernia)"
+  },
+  {
+   "organ_zh": "食管",
+   "organ_en": "Esophagus",
+   "organ_ru": "Пищевод",
+   "finding_zh": "静脉扩张迂曲",
+   "finding_en": "Dilated and tortuous veins",
+   "finding_ru": "Расширенные извитые вены",
+   "csv_column_zh_en": "食管_静脉扩张迂曲 (Esophagus_Dilated and tortuous veins)"
+  },
+  {
+   "organ_zh": "食管",
+   "organ_en": "Esophagus",
+   "organ_ru": "Пищевод",
+   "finding_zh": "静脉曲张",
+   "finding_en": "Varices",
+   "finding_ru": "Варикозное расширение вен",
+   "csv_column_zh_en": "食管_静脉曲张 (Esophagus_Varices)"
+  },
+  {
+   "organ_zh": "骶骨",
+   "organ_en": "Sacrum",
+   "organ_ru": "Крестец",
+   "finding_zh": "骨炎",
+   "finding_en": "Osteitis",
+   "finding_ru": "Остеит",
+   "csv_column_zh_en": "骶骨_骨炎 (Sacrum_Osteitis)"
+  }
+ ]
+}

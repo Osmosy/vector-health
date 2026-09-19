@@ -10,6 +10,7 @@
   "TorchDrug-English": "aipoch",
   "XGBoost-analysis": "aipoch",
   "aav-vector-design-agent": "OpenClaw",
+  "abdominal-ct-findings": "own",
   "abstract-summarizer": "aipoch",
   "abstract-trimmer": "aipoch",
   "academic-abstract-refiner": "aipoch",

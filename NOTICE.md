@@ -12,7 +12,8 @@
 | [aipoch/medical-research-skills](https://github.com/aipoch/medical-research-skills) | MIT (© AIPOCH) | `skills/` — 600 навыков: evidence, дизайн исследования, анализ, письмо, аудит навыков | тексты байт-в-байт |
 | [maziyarpanahi/openmed](https://github.com/maziyarpanahi/openmed) | Apache-2.0 | `skills/` — 74 навыка: клинический NLP, FHIR, деидентификация, HIPAA, ICD-10 | тексты байт-в-байт |
 | [Aperivue/medsci-skills](https://github.com/Aperivue/medsci-skills) | MIT (© Aperivue) | `skills/` — 59 навыков: протоколы, статистика, мета-анализ, гранты, imaging | тексты байт-в-байт |
-| собственные | MIT (© Osmosy) | `skills/dicom-vlm-analysis`, `skills/atrial-fibrillation-treatment` | написаны здесь |
+| собственные | MIT (© Osmosy) | `skills/dicom-vlm-analysis`, `skills/atrial-fibrillation-treatment`, `skills/abdominal-ct-findings` | написаны здесь (таксономия в последнем — из RADAR, см. ниже) |
+| [alibaba-damo-academy/damo-radar](https://github.com/alibaba-damo-academy/damo-radar) | Apache-2.0 (© Alibaba DAMO Academy) | таксономия 146 находок × 18 органов в `skills/abdominal-ct-findings/references/radar-taxonomy.json` | названия на ZH/EN взяты из `results/RADAR_infer_results_demo.csv` без изменений; переводы на русский — наши |
 
 Коллизии имён разрешались в пользу одного источника: один и тот же навык в
 разных коллекциях бывает с разным содержимым, и в библиотеке остаётся одна

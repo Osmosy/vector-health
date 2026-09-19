@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Vector Health — библиотека медицинских навыков для AI-агентов</title>
-<meta name="description" content="1540 медицинских и биомедицинских навыков из четырёх открытых коллекций плюс собственный пайплайн DICOM→VLM. Синхронизация с апстримами, каталог для поиска, учёт ограниченных лицензий.">
+<meta name="description" content="1541 медицинских и биомедицинских навыков из четырёх открытых коллекций плюс собственный пайплайн DICOM→VLM. Синхронизация с апстримами, каталог для поиска, учёт ограниченных лицензий.">
 <style>
   :root {
     --bg: #0d1117; --panel: #161b22; --line: #26303d;
@@ -60,8 +60,8 @@
 <header>
   <h1>Vector Health</h1>
   <p class="lede">
-    Библиотека медицинских и биомедицинских навыков: <b>1540 навыков</b> из четырёх
-    открытых коллекций плюс два собственных. Единая структура
+    Библиотека медицинских и биомедицинских навыков: <b>1541 навык</b> из четырёх
+    открытых коллекций плюс три собственных. Единая структура
     <code>skills/&lt;имя&gt;/SKILL.md</code>, каталог для поиска и карта
     происхождения по каждому навыку.
   </p>
@@ -71,7 +71,7 @@
     смещения; клиническое решение остаётся за специалистом.
   </p>
   <div class="stats">
-    <div class="stat"><b>1540</b><span>навыков</span></div>
+    <div class="stat"><b>1541</b><span>навыков</span></div>
     <div class="stat"><b>4</b><span>коллекции-источника</span></div>
     <div class="stat"><b>28</b><span>вложенных навыков</span></div>
     <div class="stat"><b>11</b><span>проверок CI</span></div>
@@ -85,14 +85,14 @@
   <tr><td>AIPOCH medical-research-skills</td><td>600</td><td>evidence, дизайн исследования, анализ, письмо</td><td>MIT</td></tr>
   <tr><td>openmed</td><td>74</td><td>клинический NLP, FHIR, деидентификация, HIPAA</td><td>Apache-2.0</td></tr>
   <tr><td>Aperivue medsci-skills</td><td>59</td><td>протоколы, статистика, мета-анализ, гранты</td><td>MIT</td></tr>
-  <tr><td>собственные</td><td>2</td><td>DICOM → локальная vision-модель; фибрилляция предсердий</td><td>MIT</td></tr>
+  <tr><td>собственные</td><td>3</td><td>DICOM → vision-модель; фибрилляция предсердий; таксономия находок КТ брюшной полости</td><td>MIT</td></tr>
 </table>
 
 <h2>Как это работает</h2>
 <pre>
 Четыре апстрима ──┐
 OpenClaw  777     │
-AIPOCH    600     ├─→ sync_upstreams.py ─→ skills/ (1540) ─→ агент читает по запросу
+AIPOCH    600     ├─→ sync_upstreams.py ─→ skills/ (1541) ─→ агент читает по запросу
 openmed    74     │   идемпотентна:           │
 Aperivue   59     │   повторный запуск = 0    ├─→ build_index.py ─→ skills-index.json
                   │                           │

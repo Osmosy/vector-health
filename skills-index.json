@@ -1,13 +1,18 @@
 {
   "project": "vector-health",
   "generated": "2026-09-19",
-  "total": 1540,
+  "total": 1541,
   "note": "path — каталог навыка относительно skills/. Вложенные навыки (контейнеры вроде spatial-transcriptomics-analysis) включены.",
   "skills": [
     {
       "name": "aav-vector-design-agent",
       "path": "aav-vector-design-agent",
       "description": "AI-powered adeno-associated virus (AAV) vector design for gene therapy including capsid engineering, promoter selection, and tropism optimization."
+    },
+    {
+      "name": "abdominal-ct-findings",
+      "path": "abdominal-ct-findings",
+      "description": "Таксономия находок КТ брюшной полости (146 находок × 18 органов) с русскими, английскими и китайскими названиями, плюс методика замера качества модели на внешнем тесте. Источник — RADAR (Alibaba DAMO Academy, Science 2026, Apache-2.0). Use when naming/labelling abdominal CT findings, building a report checklist, or measuring an imaging model's quality."
     },
     {
       "name": "abstract-summarizer",

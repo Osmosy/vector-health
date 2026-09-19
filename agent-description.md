@@ -1,8 +1,8 @@
 # vector-health — часть экосистемы Vector
 
-Библиотека медицинских и биомедицинских навыков: 1540 навыков из четырёх
+Библиотека медицинских и биомедицинских навыков: 1541 навык из четырёх
 открытых коллекций (OpenClaw-Medical-Skills, AIPOCH medical-research-skills,
-openmed, Aperivue medsci-skills) плюс два собственных. Дедупликация по именам,
+openmed, Aperivue medsci-skills) плюс три собственных. Дедупликация по именам,
 единая структура `skills/<имя>/SKILL.md`, карта происхождения по каждому навыку.
 
 Содержание — не программа, а справочники и методики: markdown-навыки и скрипты
@@ -18,9 +18,10 @@ openmed, Aperivue medsci-skills) плюс два собственных. Дед�
 ## Для агентов
 
 - Читай сначала `README.md`, для установки — `INSTALL.md`
-- Навыки — `skills/<имя>/SKILL.md` (1540; вендоренные наборы с атрибуцией в `NOTICE.md`)
+- Навыки — `skills/<имя>/SKILL.md` (1541; вендоренные наборы с атрибуцией в `NOTICE.md`)
 - Каталог для поиска — `skills-index.json` (имя, путь, описание)
-- Два собственных навыка — `skills/dicom-vlm-analysis`, `skills/atrial-fibrillation-treatment`
+- Три собственных навыка — `skills/dicom-vlm-analysis`, `skills/atrial-fibrillation-treatment`,
+  `skills/abdominal-ct-findings`
 - Архитектура (живая диаграмма) — `docs/vector-health.architecture.html`
 - Инвентарь битых ссылок — `docs/broken-refs.md`
 - Перед коммитом прогони проверки: `python3 scripts/validate.py`,
@@ -33,17 +34,18 @@ openmed, Aperivue medsci-skills) плюс два собственных. Дед�
 
 | Что | Сколько |
 |-----|---------|
-| Навыки | 1540 (`skills/`), из них 1538 из четырёх сторонних коллекций |
-| Навыки верхнего уровня | 1512 каталогов |
+| Навыки | 1541 (`skills/`), из них 1538 из четырёх сторонних коллекций |
+| Навыки верхнего уровня | 1513 каталогов |
+| Навыки верхнего уровня | 1513 каталогов |
 | Вложенные навыки | 28 (внутри каталогов-контейнеров апстримов) |
-| Собственные навыки | 2 (`dicom-vlm-analysis`, `atrial-fibrillation-treatment`) |
+| Собственные навыки | 3 (`dicom-vlm-analysis`, `atrial-fibrillation-treatment`, `abdominal-ct-findings`) |
 | Скрипты | 6 (`scripts/`) |
 | Тесты | 1 файл (`tests/test_scripts.py`) |
 | Диаграмма | 1 живая (`docs/vector-health.architecture.html`) |
 
 ## Источник и лицензии
 
-Собственный вклад (сборка, скрипты, документация, два навыка) — MIT (© Osmosy).
+Собственный вклад (сборка, скрипты, документация, три навыка) — MIT (© Osmosy).
 Вендоренные навыки сохраняют лицензии источников: MIT (OpenClaw-Medical-Skills,
 AIPOCH, Aperivue) и Apache-2.0 (openmed). Полные тексты лицензий —
 `THIRD_PARTY_LICENSES/`, сводка и оговорки — `NOTICE.md`.

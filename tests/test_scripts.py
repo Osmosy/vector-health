@@ -122,8 +122,10 @@ origin = json.load(open(os.path.join(ROOT, "scripts", "upstream-origin.json"), e
 known = set(su.SOURCES) | {"own"}
 check("нет неизвестных меток источников", all(v in known for v in origin.values()),
       str({v for v in origin.values() if v not in known}))
-check("собственные навыки ровно 2",
-      {n for n, s in origin.items() if s == "own"} == {"dicom-vlm-analysis", "atrial-fibrillation-treatment"})
+check("собственные навыки — только наши (три)",
+      {n for n, s in origin.items() if s == "own"}
+      == {"dicom-vlm-analysis", "atrial-fibrillation-treatment", "abdominal-ct-findings"},
+      str({n for n, s in origin.items() if s == "own"}))
 check("medical-specialty-briefs атрибутирован OpenClaw, а не себе",
       origin.get("medical-specialty-briefs") == "OpenClaw", str(origin.get("medical-specialty-briefs")))
 
@@ -148,7 +150,11 @@ try:
     shutil.copytree(ROOT, tmp, ignore=shutil.ignore_patterns(".git", "__pycache__", "docs"), dirs_exist_ok=True)
     rm = os.path.join(tmp, "README.md")
     text = open(rm, encoding="utf-8").read()
-    open(rm, "w", encoding="utf-8").write(text.replace("Skills-1540", "Skills-999"))
+    real = json.load(open(os.path.join(ROOT, "skills-index.json"), encoding="utf-8"))["total"]
+    mutated = text.replace(f"Skills-{real}", "Skills-999")
+    check("бейдж с фактическим числом найден (иначе тест бесполезен)", mutated != text,
+          f"в README нет Skills-{real}")
+    open(rm, "w", encoding="utf-8").write(mutated)
     r2 = run([sys.executable, "scripts/validate.py"], cwd=tmp)
     check("неверный бейдж числа навыков роняет валидатор (exit 1)", r2.returncode == 1,
           f"exit={r2.returncode}")
@@ -201,6 +207,48 @@ try:
           r5.stdout[-300:])
 finally:
     shutil.rmtree(tmp3, ignore_errors=True)
+
+print("\n=== 12. Двуязычный слой: китайский только в полях-источниках ===")
+# Разделение «оригинал апстрима» и «наш перевод» должно быть видно по имени поля,
+# иначе читатель не отличит цитату от собственного текста, а переводчик не поймёт,
+# что можно менять. Проверяем и правило, и сами данные.
+tax = json.load(open(os.path.join(SKILLS, "abdominal-ct-findings", "references",
+                                  "radar-taxonomy.json"), encoding="utf-8"))
+CJK = re.compile(r"[\u3000-\u9fff\uff00-\uffef]")
+ALLOWED = {"finding_zh", "organ_zh", "csv_column_zh_en"}
+viol = [(k, v) for f in tax["findings"] for k, v in f.items()
+        if isinstance(v, str) and CJK.search(v) and k not in ALLOWED]
+check("CJK не выходит за поля-источники", not viol, str(viol[:3]))
+check("все находки имеют русский перевод",
+      all(f.get("finding_ru") for f in tax["findings"]))
+check("все находки имеют английское название",
+      all(f.get("finding_en") for f in tax["findings"]))
+check("китайский ключ сохранён для сопоставления с CSV модели",
+      all(f.get("csv_column_zh_en", "").startswith(f.get("organ_zh", "")) for f in tax["findings"]))
+check("findings_total совпадает с числом записей",
+      tax["findings_total"] == len(tax["findings"]), f"{tax['findings_total']} vs {len(tax['findings'])}")
+check("organs_total совпадает", tax["organs_total"] == len(tax["organs"]))
+check("заявлено 146 находок × 18 органов",
+      tax["findings_total"] == 146 and tax["organs_total"] == 18,
+      f"{tax['findings_total']}×{tax['organs_total']}")
+sum_by_organ = sum(o["findings_total"] for o in tax["organs"])
+check("сумма находок по органам = общему числу", sum_by_organ == tax["findings_total"],
+      f"{sum_by_organ} vs {tax['findings_total']}")
+
+# мутация: перевод с китайскими символами вне поля-источника должен ронять валидатор
+tmp4 = tempfile.mkdtemp()
+try:
+    shutil.copytree(ROOT, tmp4, ignore=shutil.ignore_patterns(".git", "__pycache__", "docs"),
+                    dirs_exist_ok=True)
+    tp = os.path.join(tmp4, "skills", "abdominal-ct-findings", "references", "radar-taxonomy.json")
+    data = json.load(open(tp, encoding="utf-8"))
+    data["findings"][0]["finding_ru"] = "肝囊肿 (китайский протёк в перевод)"
+    open(tp, "w", encoding="utf-8").write(json.dumps(data, ensure_ascii=False))
+    r6 = run([sys.executable, "scripts/validate.py"], cwd=tmp4)
+    check("CJK в поле перевода роняет валидатор", r6.returncode == 1, f"exit={r6.returncode}")
+    check("нарушившее поле названо", "finding_ru" in r6.stdout, r6.stdout[-200:])
+finally:
+    shutil.rmtree(tmp4, ignore_errors=True)
 
 print(f"\n{'=' * 50}")
 print(f"ИТОГО: {PASS} ok, {FAIL} FAIL")

@@ -39,7 +39,7 @@ SOURCES = {
     "Aperivue": ("Aperivue/medsci-skills", "aperivue-medsci-skills-MIT.txt"),
 }
 THIRD_PARTY = os.path.join(ROOT, "THIRD_PARTY_LICENSES")
-OWN_SKILLS = {"dicom-vlm-analysis", "atrial-fibrillation-treatment"}
+OWN_SKILLS = {"dicom-vlm-analysis", "atrial-fibrillation-treatment", "abdominal-ct-findings"}
 
 # Живые формы секретов. Тестовые фикстуры (tests/, */tests/) исключены: там
 # фальшивые ключи стоят намеренно, чтобы проверять их обнаружение.
@@ -338,6 +338,47 @@ def check_secrets(rep: Report) -> None:
     rep.note("секреты: живых форм ключей не найдено")
 
 
+def check_language_layers(rep: Report) -> None:
+    """13. Двуязычный слой: китайский оригинал — ТОЛЬКО в полях `*_zh`.
+
+    В `references/radar-taxonomy.json` рядом лежат оригинал апстрима и наш
+    перевод. Если имя поля не говорит, что это источник, читатель не может
+    отличить цитату от собственного текста, а переводчик — понять, что можно
+    менять. Правило: CJK-символы допустимы в `finding_zh`/`organ_zh`/
+    `csv_column_zh_en` и больше нигде (плюс в самих вендоренных навыках,
+    которые не переводились).
+    """
+    path = os.path.join(SKILLS, "abdominal-ct-findings", "references", "radar-taxonomy.json")
+    if not os.path.isfile(path):
+        rep.fail("языки", "нет references/radar-taxonomy.json — двуязычного списка находок")
+        return
+    with open(path, encoding="utf-8") as f:
+        data = json.load(f)
+    allowed = {"finding_zh", "organ_zh", "csv_column_zh_en"}
+    bad = []
+    def walk(node, field=None):
+        if isinstance(node, dict):
+            for k, v in node.items():
+                walk(v, k)
+        elif isinstance(node, list):
+            for v in node:
+                walk(v, field)
+        elif isinstance(node, str) and CJK_RE.search(node) and field not in allowed:
+            bad.append((field, node[:40]))
+    walk(data)
+    if bad:
+        rep.fail("языки", f"CJK вне полей-источников ({len(bad)}): {bad[:3]}")
+    if data.get("findings_total") != len(data.get("findings", [])):
+        rep.fail("языки", f"findings_total={data.get('findings_total')} при {len(data.get('findings', []))} записях")
+    if data.get("organs_total") != len(data.get("organs", [])):
+        rep.fail("языки", f"organs_total={data.get('organs_total')} при {len(data.get('organs', []))} органах")
+    empty = [f.get("finding_ru") for f in data.get("findings", []) if not f.get("finding_ru")]
+    if empty:
+        rep.fail("языки", f"{len(empty)} находок без русского перевода")
+    rep.note(f"языки: таксономия {data.get('findings_total')} находок × "
+             f"{data.get('organs_total')} органов, CJK только в полях-источниках")
+
+
 def check_cjk(rep: Report) -> None:
     """10. Собственный текст репозитория — без CJK (навыки на языке источника)."""
     hits = []
@@ -448,6 +489,7 @@ def main() -> int:
     check_diagram(rep)
     check_secrets(rep)
     check_cjk(rep)
+    check_language_layers(rep)
 
     for note in rep.notes:
         print(f"  · {note}")
