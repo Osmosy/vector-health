@@ -59,6 +59,8 @@ OWN_SKILLS = own_skills()
 # Для категории «в корне источника»: путь файла в дереве апстрима —
 # чтобы отчёт давал не только диагноз, но и место, откуда файл брать.
 REPO_LEVEL_PATHS: dict[tuple[str, str], str] = {}
+EXTERNAL_URLS: dict[tuple[str, str], str] = {}
+EXTERNAL_STATE: dict[tuple[str, str], tuple[str, str]] = {}
 
 SOURCES = {
     "OpenClaw": "FreedomIntelligence/OpenClaw-Medical-Skills",
@@ -143,8 +145,17 @@ def scan() -> list[tuple[str, str]]:
         for raw in refs_mod.find_refs(body):
             rel = refs_mod.to_skill_relative(raw, name) or raw
             rel = os.path.normpath(rel)
-            if not os.path.exists(os.path.join(root, rel)):
-                broken.append((rel_skill, rel, raw))
+            if os.path.exists(os.path.join(root, rel)):
+                continue
+            # Ссылка могла писаться не от каталога навыка, а от КОРНЯ репозитория
+            # (`skills/<другой>/x.py`, `medsci-skills/skills/<другой>/x.py`). Тогда
+            # файл лежит в чужом каталоге и находится — ссылка живая. Без этой
+            # проверки 15 живых ссылок стояли в отчёте битыми: среди них
+            # кросс-ссылки, на которых держатся write-paper, self-review и revise.
+            if any(os.path.exists(os.path.join(ROOT, c))
+                   for c in refs_mod.repo_root_candidates(raw)):
+                continue
+            broken.append((rel_skill, rel, raw))
     return broken
 
 
@@ -164,9 +175,81 @@ def upstream_dir_of(name: str, label: str, trees: dict[str, dict[str, int]]) -> 
     return None
 
 
+# Внешние ресурсы: путь ведёт не в репозиторий навыка и не в его апстрим, а в
+# сторонний проект или в каталог, который создаётся при работе навыка. Отличать
+# их от «файла нет нигде» обязательно: у каждой такой ссылки есть место, откуда
+# ресурс берётся или в котором он появится, — и читатель должен это видеть, а не
+# читать «дефект апстрима» там, где дефекта нет.
+#
+# Проверено фактом (19.09.2026):
+#   omicverse_guide — git-подмодуль пакета omicverse, ведёт в
+#     github.com/omicverse/omicverse-tutorials: 24 из 34 ссылок совпадают точно,
+#     8 переехали (docs/Tutorials-single/a.ipynb → docs/Tutorials-single/anno-zoo/a.ipynb
+#     либо docs/Tutorials-Multi-Omics/...), 2 отсутствуют;
+#   opt/ — каталог установленного инструмента (/opt/bin, /opt/hap.py): путь
+#     появляется после установки, в репозитории его быть не может;
+#   src/, output_dir/, tests/, repo/, .claude/ — каталоги, создаваемые при запуске
+#     навыка (код проекта, выходные данные, тесты), а не файлы навыка.
+EXTERNAL_RESOURCES = {
+    "omicverse_guide": ("внешний проект", "https://github.com/omicverse/omicverse-tutorials"),
+    "opt": ("установленный инструмент", "—"),
+    "src": ("каталог запуска", "—"),
+    "output_dir": ("каталог запуска", "—"),
+    "tests": ("каталог запуска", "—"),
+    "test_output": ("каталог запуска", "—"),
+    "output": ("каталог запуска", "—"),
+    "repo": ("каталог запуска", "—"),
+    ".claude": ("каталог запуска", "—"),
+    "scientific-packages": ("внешний пакет", "—"),
+    "sample": ("данные примера", "—"),
+}
+
+
+def external_kind(ref: str) -> tuple[str, str] | None:
+    """Внешний ресурс ли это — и какого рода. None, если ссылка на файл навыка."""
+    r = re.sub(r"^(\.\./)+", "", ref)
+    top = r.split("/")[0]
+    return EXTERNAL_RESOURCES.get(top)
+
+
+EXTERNAL_TREES: dict[str, set[str]] = {}
+
+
+def resolve_external(project_url: str, ref: str, subdir: str) -> tuple[str, str]:
+    """Где файл внешнего проекта лежит НА САМОМ ДЕЛЕ.
+
+    Возвращает (состояние, путь): `точный` (путь совпадает), `переехал` (файл с
+    таким именем есть в другом подкаталоге проекта) или `нет` (файла в проекте
+    больше нет). Нужно потому, что ссылка в чужом тексте — единственный след
+    ресурса, и без этой сверки читатель не знает, работает ли она.
+
+    Один запрос дерева на проект, результат кэшируется в EXTERNAL_TREES.
+    """
+    if project_url in EXTERNAL_TREES:
+        paths = EXTERNAL_TREES[project_url]
+    else:
+        repo = project_url.removeprefix("https://github.com/").removesuffix(".git")
+        try:
+            tree = api(f"https://api.github.com/repos/{repo}/git/trees/HEAD?recursive=1")
+            paths = {x["path"] for x in tree.get("tree", []) if x.get("type") == "blob"}
+        except Exception:  # noqa: BLE001 — сеть: помечаем как непроверенное
+            paths = set()
+        EXTERNAL_TREES[project_url] = paths
+    if not paths:
+        return ("не проверено", "")
+    clean = re.sub(rf"^(\.\./)*{re.escape(subdir)}/", "", ref)
+    if clean in paths:
+        return ("точный", clean)
+    same_name = [x for x in paths if x.endswith("/" + clean.split("/")[-1])]
+    if same_name:
+        return ("переехал", sorted(same_name)[0])
+    return ("нет", "")
+
+
 def classify(broken, trees):
     buckets: dict[str, list[tuple[str, str, str]]] = {
-        "placeholder": [], "recoverable": [], "heavy": [], "repo_level": [], "inherited": []}
+        "placeholder": [], "recoverable": [], "heavy": [], "repo_level": [],
+        "external": [], "inherited": []}
     origin = load_origin()
     for rel_skill, ref, _raw in broken:
         name = rel_skill.rsplit("/", 1)[-1]
@@ -175,6 +258,17 @@ def classify(broken, trees):
         # нельзя: навык описывает, каким путём пользоваться.
         if refs_mod.is_placeholder(ref):
             buckets["placeholder"].append((rel_skill, ref, "пример пути"))
+            continue
+        # Внешний ресурс: место есть, файла в репозитории быть не может
+        ext = external_kind(ref)
+        if ext:
+            state, where = ("", "")
+            if ext[1].startswith("http"):
+                top_dir = re.sub(r"^(\.\./)+", "", ref).split("/")[0]
+                state, where = resolve_external(ext[1], ref, top_dir)
+            buckets["external"].append((rel_skill, ref, f"{ext[0]}"))
+            EXTERNAL_URLS[(rel_skill, ref)] = ext[1]
+            EXTERNAL_STATE[(rel_skill, ref)] = (state, where)
             continue
         # Ссылка может быть записана абсолютным путём или от корня репозитория:
         # нормализуем её до пути относительно навыка, прежде чем считать битой.
@@ -226,13 +320,36 @@ def load_origin() -> dict[str, str]:
         return json.load(f).get("origin", {})
 
 
+# Единый источник имён: одно место задаёт и строку таблицы, и заголовок секции.
+# Держать их порознь означало бы тот же дефект, что чинится весь этот отчёт:
+# название в сводке расходится с названием в разборе, и проверка «у каждой
+# непустой категории есть секция» падает на ровном месте.
+CATEGORIES = (
+    ("placeholder", "Пример пути в коде", "Пример пути в коде (не ссылка)",
+     "форма пути (`YYYY`, `xxx`, `<file>`), а не файл — требовать его нельзя"),
+    ("recoverable", "Восстановимо", "Восстановимо",
+     "файл есть у источника — закрывается `scripts/sync_upstreams.py`"),
+    ("external", "Внешний ресурс", "Внешний ресурс (не файл этого репозитория)",
+     "путь ведёт в сторонний проект (git-подмодуль) или в каталог, создаваемый при работе "
+     "(`src/`, `output_dir/`, `/opt`) — в репозитории такого файла быть не может"),
+    ("repo_level", "В корне источника", "Файл в корне репозитория-источника (вне каталога навыка)",
+     "файл ЕСТЬ в репозитории-источнике, но вне каталога навыка (`scripts/`, `examples/`, "
+     "`docs/`) — ссылка писалась под их раскладку, где навыки лежат глубже"),
+    ("heavy", "Тяжёлые данные", "Тяжёлые данные (не тянем)",
+     "файл есть, но это демо-датасет на мегабайты — сознательно не тянем"),
+    ("inherited", "Унаследованное", "Унаследованное (дефект источника)",
+     "файла нет ни у одного источника — дефект апстрима"),
+)
+
+
 def write_report(buckets, total_ok: int, origin: dict[str, str]) -> None:
     os.makedirs(os.path.dirname(REPORT), exist_ok=True)
+    total = total_ok + sum(len(v) for v in buckets.values())
     lines = [
         "# Ссылки на файлы внутри навыков: инвентарь",
         "",
-        f"Сгенерировано `scripts/broken_refs.py`. Ссылок на файлы в дереве: {total_ok + sum(len(v) for v in buckets.values())}; "
-        f"на месте: {total_ok}; битых: {sum(len(v) for v in buckets.values())}.",
+        f"Сгенерировано `scripts/broken_refs.py`. Ссылок на файлы в дереве: {total}; "
+        f"на месте: {total_ok}; битых: {total - total_ok}.",
         "",
         "Битые ссылки — унаследованное свойство апстримов: файл, который навык упоминает, "
         "у них лежал в отрезанном служебном каталоге (`tests/`, `evals/`) либо не был "
@@ -240,20 +357,34 @@ def write_report(buckets, total_ok: int, origin: dict[str, str]) -> None:
         "",
         "| Категория | Сколько | Что значит |",
         "|---|---|---|",
-        f"| Пример пути в коде | {len(buckets['placeholder'])} | форма пути (`YYYY`, `xxx`, `<file>`), а не файл — требовать его нельзя |",
-        f"| Восстановимо | {len(buckets['recoverable'])} | файл есть у источника — закрывается `scripts/sync_upstreams.py` |",
-        f"| Тяжёлые данные | {len(buckets['heavy'])} | файл есть, но это демо-датасет на мегабайты — сознательно не тянем |",
-        f"| В корне источника | {len(buckets['repo_level'])} | файл ЕСТЬ в репозитории-источнике, но вне каталога навыка (`scripts/`, `examples/`, `docs/`) — ссылка писалась под их раскладку, где навыки лежат глубже |",
-        f"| Унаследованное | {len(buckets['inherited'])} | файла нет ни у одного источника — дефект апстрима |",
-        "",
     ]
-    for key, title in (("placeholder", "Пример пути в коде (не ссылка)"),
-                       ("recoverable", "Восстановимо"),
-                       ("repo_level", "Файл в корне репозитория-источника (вне каталога навыка)"),
-                       ("heavy", "Тяжёлые данные (не тянем)"),
-                       ("inherited", "Унаследованное (дефект источника)")):
+    for key, short, _title, meaning in CATEGORIES:
+        lines.append(f"| {short} | {len(buckets[key])} | {meaning} |")
+    lines.append("")
+
+    for key, short, title, _meaning in CATEGORIES:
         items = buckets[key]
         if not items:
+            continue
+        if key == "external":
+            lines += [f"## {title}", "",
+                      "Путь ведёт **не** в репозиторий навыка: в сторонний проект или в "
+                      "каталог, который создаётся при работе. Файла здесь быть не может — "
+                      "ссылка описывает, где ресурс лежит или появится.", "",
+                      "| Навык | Ссылка в тексте | Что это | Где взять | Состояние |",
+                      "|---|---|---|---|---|"]
+            kinds: dict[str, list[tuple[str, str]]] = {}
+            for rel_skill, ref, kind in items:
+                kinds.setdefault(kind, []).append((rel_skill, ref))
+            for kind in sorted(kinds):
+                for rel_skill, ref in sorted(kinds[kind]):
+                    url = EXTERNAL_URLS.get((rel_skill, ref), "—")
+                    state, where = EXTERNAL_STATE.get((rel_skill, ref), ("", ""))
+                    note = {"точный": "путь совпадает",
+                            "переехал": f"переехал → `{where}`",
+                            "нет": "**в проекте нет**"}.get(state, "—")
+                    lines.append(f"| `{rel_skill}` | `{ref}` | {kind} | {url} | {note} |")
+            lines.append("")
             continue
         if key == "repo_level":
             lines += [f"## {title}", "",
@@ -264,12 +395,13 @@ def write_report(buckets, total_ok: int, origin: dict[str, str]) -> None:
                       "репозитория. Ссылка не станет рабочей от простой закачки файла в "
                       "навык: путь в тексте останется прежним. Брать файл — по URL ниже, "
                       "требовать его внутри репозитория нельзя.", "",
-                      "| Навык | Ссылка в тексте | Файл в источнике | Взять |", "|---|---|---|---|"]
+                      "| Навык | Ссылка в тексте | Файл в источнике | Взять |",
+                      "|---|---|---|---|"]
             for rel_skill, ref, src in sorted(items):
-                full = ref
                 note = src or origin.get(rel_skill, "") or "—"
                 up = REPO_LEVEL_PATHS.get((rel_skill, ref), "")
-                url = (f"https://github.com/{SOURCES[note]}/blob/HEAD/{up}" if note in SOURCES and up else "—")
+                url = (f"https://github.com/{SOURCES[note]}/blob/HEAD/{up}"
+                       if note in SOURCES and up else "—")
                 lines.append(f"| `{rel_skill}` | `{ref}` | `{up or '—'}` | {url} |")
             lines.append("")
             continue
@@ -306,6 +438,7 @@ def main() -> int:
     print(f"ссылок на файлы: {total_refs} | на месте: {total_ok} | битых: {len(broken)}")
     print(f"  примеры путей: {len(buckets['placeholder'])}"
           f" | восстановимо: {len(buckets['recoverable'])}"
+          f" | внешних ресурсов: {len(buckets['external'])}"
           f" | в корне источника: {len(buckets['repo_level'])}"
           f" | тяжёлые: {len(buckets['heavy'])}"
           f" | унаследовано: {len(buckets['inherited'])}")

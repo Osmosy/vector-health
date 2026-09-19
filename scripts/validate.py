@@ -687,6 +687,38 @@ def check_broken_refs_report(rep: Report) -> None:
         rep.fail("ссылки", "docs/broken-refs.md: не найдена строка со сводкой")
         return
     total, ok, broken = (int(x) for x in m.groups())
+    # Категории в отчёте обязаны сходиться с числом битых: разбор, где сумма
+    # частей меньше целого, скрывает непроверенную часть.
+    cats = {k.strip(): int(v) for k, v in re.findall(r"^\| ([^|]+?) \| (\d+) \|", text, re.M)}
+    known = ("Пример пути в коде", "Восстановимо", "Тяжёлые данные",
+             "Внешний ресурс", "В корне источника", "Унаследованное")
+    s = sum(cats.get(k, 0) for k in known)
+    if s != broken:
+        rep.fail("ссылки", f"docs/broken-refs.md: категории дают {s}, а битых {broken} — "
+                           f"часть ссылок не разобрана")
+    # У каждой непустой категории должна быть своя секция со строками: сводка без
+    # разбора — обещание причины, которой читатель не найдёт.
+    # Короткое имя в таблице и заголовок секции различаются («В корне источника» /
+    # «Файл в корне репозитория-источника (вне каталога навыка)»), поэтому сверяем по
+    # соответствию ключ→короткое имя→заголовок, взятому из самого генератора: держать
+    # это соответствие в двух местах — тот же дефект, который здесь и чинится.
+    sections_by_short: dict[str, str] = {}
+    try:
+        sys.path.insert(0, os.path.join(ROOT, "scripts"))
+        import broken_refs as br_mod  # noqa: PLC0415 — нужен только для имён категорий
+        sections_by_short = {short: title for _key, short, title, _m in br_mod.CATEGORIES}
+    except Exception:  # noqa: BLE001 — имена категорий не критичны для остальных проверок
+        pass
+    for name, count in cats.items():
+        if name not in known or count == 0:
+            continue
+        title = sections_by_short.get(name)
+        if title and f"## {title}" in text:
+            continue
+        # запасной вариант: заголовок начинается с короткого имени
+        if not [h for h in re.findall(r"^## (.+)$", text, re.M) if h.startswith(name)]:
+            rep.fail("ссылки", f"docs/broken-refs.md: у категории «{name}» ({count}) "
+                               f"нет секции со строками")
     if ok + broken != total:
         rep.fail("ссылки", f"docs/broken-refs.md: на месте {ok} + битых {broken} != {total}")
     readme = open(os.path.join(ROOT, "README.md"), encoding="utf-8").read()

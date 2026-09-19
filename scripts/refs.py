@@ -82,6 +82,43 @@ def is_placeholder(ref: str) -> bool:
     return ref in PLACEHOLDER_NAMES or ref.rsplit("/", 1)[-1] in PLACEHOLDER_NAMES
 
 
+# Чужие префиксы репозитория: ссылка писалась от корня апстрима, и его имя надо
+# снять, чтобы получить путь внутри нашего дерева. Каждый вид давал ложно-битую
+# ссылку: `medsci-skills/skills/<name>/x.py` — репозиторий Aperivue (7 ссылок),
+# `vector-health/…` — наш собственный корень в чужом тексте.
+FOREIGN_PREFIXES = ("medsci-skills/", "vector-health/", "OpenClaw-Medical-Skills/")
+
+
+def repo_root_candidates(ref: str) -> list[str]:
+    """Варианты пути ОТ КОРНЯ репозитория; существование проверяет вызывающий.
+
+    Отличается от `to_skill_relative` принципиально: там ссылка ведёт ВНУТРЬ
+    навыка (`.../<name>/x.py` → `x.py`), здесь — В ДРУГОЙ навык
+    (`skills/<other>/x.py`). Смешивать нельзя: во втором случае файл лежит в
+    чужом каталоге, и «привести к навыку» значит потерять его.
+
+    Зачем нужна: такие ссылки выглядят битыми, хотя файл на месте — нормализация
+    не снимала префикс репозитория. В инвентаре стояло 15 таких: 8 вида
+    `skills/<other>/...` (кросс-ссылки между навыками — на них держатся
+    `write-paper`, `self-review`, `revise`) и 7 вида `medsci-skills/skills/...`
+    (у Aperivue навыки лежат под этим префиксом).
+
+    Возвращается СПИСОК, а не один путь: у `skills/<name>/...` правильный вариант —
+    сам путь (у нас корневой каталог так и называется), а у
+    `medsci-skills/skills/<name>/...` — путь без чужого префикса. Одна функция,
+    два ответа, проверка существования — на стороне вызывающего.
+    """
+    if not ref:
+        return []
+    out = [ref]
+    for pref in FOREIGN_PREFIXES:
+        if ref.startswith(pref):
+            out.append(ref[len(pref):])
+    if ref.startswith("Skills/"):          # старая раскладка апстрима с заглавной
+        out.append("skills/" + ref[len("Skills/"):])
+    return [x for x in dict.fromkeys(out) if x]
+
+
 def to_skill_relative(ref: str, skill_name: str) -> str | None:
     """Привести ссылку к пути относительно каталога навыка.
 

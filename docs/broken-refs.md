@@ -1,6 +1,6 @@
 # Ссылки на файлы внутри навыков: инвентарь
 
-Сгенерировано `scripts/broken_refs.py`. Ссылок на файлы в дереве: 3528; на месте: 3013; битых: 515.
+Сгенерировано `scripts/broken_refs.py`. Ссылок на файлы в дереве: 3528; на месте: 3028; битых: 500.
 
 Битые ссылки — унаследованное свойство апстримов: файл, который навык упоминает, у них лежал в отрезанном служебном каталоге (`tests/`, `evals/`) либо не был закоммичен. Правится не ссылка в чужом тексте, а знание о том, где файл есть.
 
@@ -8,9 +8,10 @@
 |---|---|---|
 | Пример пути в коде | 14 | форма пути (`YYYY`, `xxx`, `<file>`), а не файл — требовать его нельзя |
 | Восстановимо | 0 | файл есть у источника — закрывается `scripts/sync_upstreams.py` |
-| Тяжёлые данные | 5 | файл есть, но это демо-датасет на мегабайты — сознательно не тянем |
+| Внешний ресурс | 81 | путь ведёт в сторонний проект (git-подмодуль) или в каталог, создаваемый при работе (`src/`, `output_dir/`, `/opt`) — в репозитории такого файла быть не может |
 | В корне источника | 9 | файл ЕСТЬ в репозитории-источнике, но вне каталога навыка (`scripts/`, `examples/`, `docs/`) — ссылка писалась под их раскладку, где навыки лежат глубже |
-| Унаследованное | 487 | файла нет ни у одного источника — дефект апстрима |
+| Тяжёлые данные | 2 | файл есть, но это демо-датасет на мегабайты — сознательно не тянем |
+| Унаследованное | 394 | файла нет ни у одного источника — дефект апстрима |
 
 ## Пример пути в коде (не ссылка)
 
@@ -30,6 +31,94 @@
 | `variant-interpretation-acmg/bioSkills/deepvariant` | `data/output.vcf.gz` | пример пути |
 | `weightloss-analyzer` | `data/health-logs/YYYY-MM/YYYY-MM-DD.json` | пример пути |
 | `writing-plans` | `src/path/file.py` | пример пути |
+
+## Внешний ресурс (не файл этого репозитория)
+
+Путь ведёт **не** в репозиторий навыка: в сторонний проект или в каталог, который создаётся при работе. Файла здесь быть не может — ссылка описывает, где ресурс лежит или появится.
+
+| Навык | Ссылка в тексте | Что это | Где взять | Состояние |
+|---|---|---|---|---|
+| `scientific-visualization` | `scientific-packages/seaborn/references/examples.md` | внешний пакет | — | — |
+| `scientific-visualization` | `scientific-packages/seaborn/references/function_reference.md` | внешний пакет | — | — |
+| `scientific-visualization` | `scientific-packages/seaborn/references/objects_interface.md` | внешний пакет | — | — |
+| `bulk-combat-correction` | `../../omicverse_guide/docs/Tutorials-bulk/t_bulk_combat.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | путь совпадает |
+| `bulk-deg-analysis` | `../../omicverse_guide/docs/Tutorials-bulk/t_deg.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | путь совпадает |
+| `bulk-deseq2-analysis` | `../../omicverse_guide/docs/Tutorials-bulk/t_deseq2.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | путь совпадает |
+| `bulk-stringdb-ppi` | `../../omicverse_guide/docs/Tutorials-bulk/t_network.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | путь совпадает |
+| `bulk-to-single-deconvolution` | `../../omicverse_guide/docs/Tutorials-bulk2single/t_bulk2single.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | переехал → `docs/Tutorials-Multi-Omics/bulk-single/t_bulk2single.ipynb` |
+| `bulk-trajblend-interpolation` | `../../omicverse_guide/docs/Tutorials-bulk2single/t_bulktrajblend.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | переехал → `docs/Tutorials-Multi-Omics/bulk-single/t_bulktrajblend.ipynb` |
+| `bulk-wgcna-analysis` | `../../omicverse_guide/docs/Tutorials-bulk/t_wgcna.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | путь совпадает |
+| `gsea-enrichment` | `../../omicverse_guide/docs/Tutorials-bulk/t_deg.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | путь совпадает |
+| `single-annotation` | `../../../omicverse_guide/docs/Tutorials-single/t_anno_trans.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | путь совпадает |
+| `single-annotation` | `../../../omicverse_guide/docs/Tutorials-single/t_cellanno.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | переехал → `docs/Tutorials-single/anno-zoo/t_cellanno.ipynb` |
+| `single-annotation` | `../../../omicverse_guide/docs/Tutorials-single/t_cellmatch.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | путь совпадает |
+| `single-annotation` | `../../../omicverse_guide/docs/Tutorials-single/t_cellvote.md` | внешний проект | https://github.com/omicverse/omicverse-tutorials | **в проекте нет** |
+| `single-annotation` | `../../../omicverse_guide/docs/Tutorials-single/t_cellvote_pbmc3k.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | переехал → `docs_zh/Tutorials-single/t_cellvote_pbmc3k.ipynb` |
+| `single-annotation` | `../../../omicverse_guide/docs/Tutorials-single/t_gptanno.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | переехал → `docs/Tutorials-single/anno-zoo/t_gptanno.ipynb` |
+| `single-annotation` | `../../../omicverse_guide/docs/Tutorials-single/t_metatime.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | переехал → `docs/Tutorials-single/anno-zoo/t_metatime.ipynb` |
+| `single-cellphone-db` | `../../omicverse_guide/docs/Tutorials-single/t_cellphonedb.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | **в проекте нет** |
+| `single-clustering` | `../../omicverse_guide/docs/Tutorials-single/t_cluster.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | путь совпадает |
+| `single-clustering` | `../../omicverse_guide/docs/Tutorials-single/t_single_batch.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | переехал → `docs/Tutorials-single/batch/t_single_batch.ipynb` |
+| `single-preprocessing` | `../../omicverse_guide/docs/Tutorials-single/t_preprocess.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | путь совпадает |
+| `single-preprocessing` | `../../omicverse_guide/docs/Tutorials-single/t_preprocess_cpu.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | путь совпадает |
+| `single-preprocessing` | `../../omicverse_guide/docs/Tutorials-single/t_preprocess_gpu.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | путь совпадает |
+| `single-to-spatial-mapping` | `../../omicverse_guide/docs/Tutorials-bulk2single/t_single2spatial.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | переехал → `docs/Tutorials-Multi-Omics/bulk-single/t_single2spatial.ipynb` |
+| `spatial-tutorials` | `../../omicverse_guide/docs/Tutorials-space/t_cellpose.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | путь совпадает |
+| `spatial-tutorials` | `../../omicverse_guide/docs/Tutorials-space/t_cluster_space.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | путь совпадает |
+| `spatial-tutorials` | `../../omicverse_guide/docs/Tutorials-space/t_commot_flowsig.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | путь совпадает |
+| `spatial-tutorials` | `../../omicverse_guide/docs/Tutorials-space/t_crop_rotate.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | путь совпадает |
+| `spatial-tutorials` | `../../omicverse_guide/docs/Tutorials-space/t_decov.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | путь совпадает |
+| `spatial-tutorials` | `../../omicverse_guide/docs/Tutorials-space/t_gaston.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | путь совпадает |
+| `spatial-tutorials` | `../../omicverse_guide/docs/Tutorials-space/t_slat.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | путь совпадает |
+| `spatial-tutorials` | `../../omicverse_guide/docs/Tutorials-space/t_spaceflow.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | путь совпадает |
+| `spatial-tutorials` | `../../omicverse_guide/docs/Tutorials-space/t_staligner.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | путь совпадает |
+| `spatial-tutorials` | `../../omicverse_guide/docs/Tutorials-space/t_starfysh.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | путь совпадает |
+| `spatial-tutorials` | `../../omicverse_guide/docs/Tutorials-space/t_stt.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | путь совпадает |
+| `tcga-preprocessing` | `../../omicverse_guide/docs/Tutorials-bulk/t_tcga.ipynb` | внешний проект | https://github.com/omicverse/omicverse-tutorials | путь совпадает |
+| `bulk-deg-analysis` | `../../sample/counts.txt` | данные примера | — | — |
+| `bulk-deseq2-analysis` | `../../sample/counts.txt` | данные примера | — | — |
+| `chemistry-agent` | `src/chemistry/main.py` | каталог запуска | — | — |
+| `crisis-response-protocol` | `src/lib/ai/chat-handler.ts` | каталог запуска | — | — |
+| `crisis-response-protocol` | `src/lib/ai/crisis-detection.ts` | каталог запуска | — | — |
+| `crisis-response-protocol` | `src/lib/crisis/emergency-contacts.ts` | каталог запуска | — | — |
+| `crisis-response-protocol` | `src/lib/crisis/resources.ts` | каталог запуска | — | — |
+| `deep-research-swarm` | `src/research/agents/agent_coordinator.py` | каталог запуска | — | — |
+| `differential-expression-analysis` | `tests/data/Combined_Datasets_Matrix_mus.csv` | каталог запуска | — | — |
+| `dispatching-parallel-agents` | `src/agents/agent-tool-abort.test.ts` | каталог запуска | — | — |
+| `dnanexus-integration` | `src/my-app.py` | каталог запуска | — | — |
+| `estimate-immune-score-analysis` | `tests/output/data/estimate_input.gct` | каталог запуска | — | — |
+| `estimate-immune-score-analysis` | `tests/output/data/estimate_score.gct` | каталог запуска | — | — |
+| `estimate-immune-score-analysis` | `tests/output/data/expression_input.tsv` | каталог запуска | — | — |
+| `gsea` | `test_output/data/GSEA_list.rda` | каталог запуска | — | — |
+| `gsva-analysis-and-visualization` | `tests/data/expr_matrix.csv` | каталог запуска | — | — |
+| `gsva-analysis-and-visualization` | `tests/output/data/GSVA_list.rda` | каталог запуска | — | — |
+| `hipaa-compliance` | `src/lib/auth.ts` | каталог запуска | — | — |
+| `hipaa-compliance` | `src/lib/hipaa/audit.ts` | каталог запуска | — | — |
+| `knn-imputation` | `tests/data/sample_expression_matrix.csv` | каталог запуска | — | — |
+| `lit-sync` | `src/refs.bib` | каталог запуска | — | — |
+| `lncrna-regulatory-network-construction-analysis` | `output_dir/data/lncrna_network.rda` | каталог запуска | — | — |
+| `lncrna-regulatory-network-construction-analysis` | `tests/output/data/lncrna_network.rda` | каталог запуска | — | — |
+| `ma-scout` | `.claude/skills/search-lit/references/parse_pubmed.py` | каталог запуска | — | — |
+| `ma-scout` | `.claude/skills/search-lit/references/pubmed_eutils.sh` | каталог запуска | — | — |
+| `manage-refs` | `src/refs.bib` | каталог запуска | — | — |
+| `nomogram-construction` | `output/data/Nomogram_list.qs` | каталог запуска | — | — |
+| `obsidian-paper-vault` | `src/refs.bib` | каталог запуска | — | — |
+| `orchestrate` | `src/refs.bib` | каталог запуска | — | — |
+| `ppi-network-analysis` | `output_dir/data/ppi_result.rds` | каталог запуска | — | — |
+| `ppi-network-analysis` | `tests/output/basic-run/data/ppi_result.rds` | каталог запуска | — | — |
+| `review-paper` | `src/refs.bib` | каталог запуска | — | — |
+| `rf-model-importance-analysis` | `output_dir/data/rf_result.rds` | каталог запуска | — | — |
+| `sample-group-sankey-plot` | `tests/data/minimal_annotations.csv` | каталог запуска | — | — |
+| `search-lit` | `src/refs.bib` | каталог запуска | — | — |
+| `spatial-transcriptomics-agent` | `repo/src/main.py` | каталог запуска | — | — |
+| `spatial-transcriptomics-analysis/STAgent` | `repo/src/main.py` | каталог запуска | — | — |
+| `svm-model-importance-analysis` | `output_dir/data/svm_result.rds` | каталог запуска | — | — |
+| `time-dependent-roc` | `tests/validation_output/data/time_roc_points.csv` | каталог запуска | — | — |
+| `verify-refs` | `src/refs.bib` | каталог запуска | — | — |
+| `write-paper` | `src/refs.bib` | каталог запуска | — | — |
+| `bio-long-read-sequencing-clair3-variants` | `opt/bin/run_clair3.sh` | установленный инструмент | — | — |
+| `bio-variant-calling-deepvariant` | `opt/hap.py/bin/hap.py` | установленный инструмент | — | — |
+| `variant-interpretation-acmg/bioSkills/deepvariant` | `opt/hap.py/bin/hap.py` | установленный инструмент | — | — |
 
 ## Файл в корне репозитория-источника (вне каталога навыка)
 
@@ -51,11 +140,8 @@
 
 | Навык | Файл | Источник |
 |---|---|---|
-| `differential-expression-analysis` | `tests/data/Combined_Datasets_Matrix_mus.csv` | aipoch |
 | `genome-compare` | `data/george_church_23andme.txt.gz` | OpenClaw |
 | `genome-compare` | `data/manuel_corpas_23andme.txt.gz` | OpenClaw |
-| `gsva-analysis-and-visualization` | `tests/data/expr_matrix.csv` | aipoch |
-| `knn-imputation` | `tests/data/sample_expression_matrix.csv` | aipoch |
 
 ## Унаследованное (дефект источника)
 
@@ -94,7 +180,6 @@
 | `bio-epidemiological-genomics-amr-surveillance` | `data/genome.fasta` | OpenClaw |
 | `bio-long-read-sequencing-clair3-variants` | `data/reference.fasta` | OpenClaw |
 | `bio-long-read-sequencing-clair3-variants` | `data/sample.bam` | OpenClaw |
-| `bio-long-read-sequencing-clair3-variants` | `opt/bin/run_clair3.sh` | OpenClaw |
 | `bio-long-read-sequencing-isoseq-analysis` | `data/clustered.bam` | OpenClaw |
 | `bio-long-read-sequencing-isoseq-analysis` | `data/refined.bam` | OpenClaw |
 | `bio-read-qc-quality-reports` | `data/multiqc_fastqc.txt` | OpenClaw |
@@ -119,7 +204,6 @@
 | `bio-variant-calling-deepvariant` | `data/reference.fa` | OpenClaw |
 | `bio-variant-calling-deepvariant` | `data/sample.bam` | OpenClaw |
 | `bio-variant-calling-deepvariant` | `data/targets.bed` | OpenClaw |
-| `bio-variant-calling-deepvariant` | `opt/hap.py/bin/hap.py` | OpenClaw |
 | `bio-workflow-management-cwl-workflows` | `data/sample1_R1.fq.gz` | OpenClaw |
 | `bio-workflow-management-cwl-workflows` | `data/sample1_R2.fq.gz` | OpenClaw |
 | `bio-workflow-management-snakemake-workflows` | `data/all_samples.txt` | OpenClaw |
@@ -148,22 +232,12 @@
 | `boltz` | `../../docs/installation.md` | OpenClaw |
 | `boltzgen` | `../../docs/installation.md` | OpenClaw |
 | `buffer-calculator` | `references/troubleshooting.md` | aipoch |
-| `bulk-combat-correction` | `../../omicverse_guide/docs/Tutorials-bulk/t_bulk_combat.ipynb` | OpenClaw |
-| `bulk-deg-analysis` | `../../omicverse_guide/docs/Tutorials-bulk/t_deg.ipynb` | OpenClaw |
-| `bulk-deg-analysis` | `../../sample/counts.txt` | OpenClaw |
-| `bulk-deseq2-analysis` | `../../omicverse_guide/docs/Tutorials-bulk/t_deseq2.ipynb` | OpenClaw |
-| `bulk-deseq2-analysis` | `../../sample/counts.txt` | OpenClaw |
-| `bulk-stringdb-ppi` | `../../omicverse_guide/docs/Tutorials-bulk/t_network.ipynb` | OpenClaw |
-| `bulk-to-single-deconvolution` | `../../omicverse_guide/docs/Tutorials-bulk2single/t_bulk2single.ipynb` | OpenClaw |
 | `bulk-to-single-deconvolution` | `../dg_vae.pth` | OpenClaw |
-| `bulk-trajblend-interpolation` | `../../omicverse_guide/docs/Tutorials-bulk2single/t_bulktrajblend.ipynb` | OpenClaw |
 | `bulk-trajblend-interpolation` | `../dg_btb_vae.pth` | OpenClaw |
-| `bulk-wgcna-analysis` | `../../omicverse_guide/docs/Tutorials-bulk/t_wgcna.ipynb` | OpenClaw |
 | `bulk-wgcna-analysis` | `../sampleInfo.csv` | OpenClaw |
 | `calc-sample-size` | `references/templates/sample_size.R` | Aperivue |
 | `chai` | `../../docs/installation.md` | OpenClaw |
 | `check-reporting` | `references/analysis_guides/burden_decomposition_forecasting.md` | Aperivue |
-| `chemistry-agent` | `src/chemistry/main.py` | OpenClaw |
 | `cibersort-immune-infiltration-analysis` | `data/cibersort_input.rds` | aipoch |
 | `cibersort-immune-infiltration-analysis` | `data/cibersort_null_distribution.rds` | aipoch |
 | `cibersort-immune-infiltration-analysis` | `data/cibersort_result.rds` | aipoch |
@@ -191,27 +265,17 @@
 | `computational-pathology-agent` | `data/biopsy_001.svs` | OpenClaw |
 | `cover-letter-generator` | `assets/cover_letter_template.md` | aipoch |
 | `cover-letter-generator` | `references/guide.md` | aipoch |
-| `crisis-response-protocol` | `src/lib/ai/chat-handler.ts` | OpenClaw |
-| `crisis-response-protocol` | `src/lib/ai/crisis-detection.ts` | OpenClaw |
-| `crisis-response-protocol` | `src/lib/crisis/emergency-contacts.ts` | OpenClaw |
-| `crisis-response-protocol` | `src/lib/crisis/resources.ts` | OpenClaw |
 | `cross-disciplinary-bridge-finder` | `references/guide.md` | aipoch |
-| `cross-national` | `medsci-skills/skills/analyze-stats/references/analysis_guides/survey_weighted.md` | Aperivue |
-| `cross-national` | `medsci-skills/skills/replicate-study/references/harmonization_knhanes_nhanes.csv` | Aperivue |
-| `cross-national` | `medsci-skills/skills/write-paper/references/paper_types/cross_national.md` | Aperivue |
 | `data-visualization-biomedical` | `references/color_guidelines.md` | OpenClaw |
 | `data-visualization-biomedical` | `scripts/figure_templates.py` | OpenClaw |
 | `decision-curve-analysis` | `data/dca_model.rds` | aipoch |
 | `decision-tree-analysis` | `data/decision_tree_model.rds` | aipoch |
 | `decision-tree-analysis` | `data/decision_tree_predictions.csv` | aipoch |
-| `deep-research-swarm` | `src/research/agents/agent_coordinator.py` | OpenClaw |
 | `deg-screening-analysis` | `data/DEG_list.rda` | aipoch |
 | `diffdock-molecular-docking` | `data/protein.pdb` | aipoch |
 | `diffdock-molecular-docking` | `references/workflows_examples.md` | aipoch |
 | `digital-twin-discharge-drafter` | `scripts/discharge_drafter.py` | aipoch |
 | `discussion-section-architect` | `references/guide.md` | aipoch |
-| `dispatching-parallel-agents` | `src/agents/agent-tool-abort.test.ts` | OpenClaw |
-| `dnanexus-integration` | `src/my-app.py` | aipoch |
 | `emergency-card` | `data/allergies.json` | OpenClaw |
 | `emergency-card` | `data/copd-tracker.json` | OpenClaw |
 | `emergency-card` | `data/diabetes-tracker.json` | OpenClaw |
@@ -228,9 +292,6 @@
 | `estimate-immune-score-analysis` | `data/estimate_input.gct` | aipoch |
 | `estimate-immune-score-analysis` | `data/estimate_score.gct` | aipoch |
 | `estimate-immune-score-analysis` | `data/expression_input.tsv` | aipoch |
-| `estimate-immune-score-analysis` | `tests/output/data/estimate_input.gct` | aipoch |
-| `estimate-immune-score-analysis` | `tests/output/data/estimate_score.gct` | aipoch |
-| `estimate-immune-score-analysis` | `tests/output/data/expression_input.tsv` | aipoch |
 | `exporting-bulk-fhir` | `data/export.html` | openmed |
 | `external-model-validation` | `data/risk_data.rds` | aipoch |
 | `family-health-analyzer` | `data/diabetes-tracker.json` | OpenClaw |
@@ -252,18 +313,13 @@
 | `grant-proposal-assistant` | `references/budget_templates.xlsx` | aipoch |
 | `graph-interpretation` | `scripts/graph_interpreter.py` | aipoch |
 | `gsea` | `data/GSEA_list.rda` | aipoch |
-| `gsea` | `test_output/data/GSEA_list.rda` | aipoch |
-| `gsea-enrichment` | `../../omicverse_guide/docs/Tutorials-bulk/t_deg.ipynb` | OpenClaw |
 | `gsva-analysis-and-visualization` | `data/GSVA_list.rda` | aipoch |
-| `gsva-analysis-and-visualization` | `tests/output/data/GSVA_list.rda` | aipoch |
 | `health-trend-analyzer` | `data/allergies.json` | OpenClaw |
 | `health-trend-analyzer` | `data/cycle-tracker.json` | OpenClaw |
 | `health-trend-analyzer` | `data/menopause-tracker.json` | OpenClaw |
 | `health-trend-analyzer` | `data/pregnancy-tracker.json` | OpenClaw |
 | `health-trend-analyzer` | `data/profile.json` | OpenClaw |
 | `health-trend-analyzer` | `data/radiation-records.json` | OpenClaw |
-| `hipaa-compliance` | `src/lib/auth.ts` | OpenClaw |
-| `hipaa-compliance` | `src/lib/hipaa/audit.ts` | OpenClaw |
 | `hipaa-compliance-auditor` | `references/hipaa_safe_harbor_guide.pdf` | aipoch |
 | `hmdb-database` | `data/hmdb_metabolites.xml` | aipoch |
 | `humanize` | `references/r2r_voice.md` | Aperivue |
@@ -293,23 +349,16 @@
 | `linkedin-optimizer` | `scripts/linkedin_optimizer.py` | aipoch |
 | `lit-sync` | `references/fulltext_retrieval.json` | Aperivue |
 | `lit-sync` | `references/zotero_collection.json` | Aperivue |
-| `lit-sync` | `skills/fulltext-retrieval/references/find_available_pdf.js` | Aperivue |
-| `lit-sync` | `src/refs.bib` | Aperivue |
 | `literature-management` | `references/examples.md` | aipoch |
 | `literature-management` | `scripts/import_library.py` | aipoch |
 | `literature-management` | `scripts/requirements.txt` | aipoch |
 | `literature-review` | `scripts/generate_schematic.py` | aipoch |
 | `literature-statistics` | `scripts/process_references.py` | aipoch |
 | `lncrna-regulatory-network-construction-analysis` | `data/lncrna_network.rda` | aipoch |
-| `lncrna-regulatory-network-construction-analysis` | `output_dir/data/lncrna_network.rda` | aipoch |
-| `lncrna-regulatory-network-construction-analysis` | `tests/output/data/lncrna_network.rda` | aipoch |
-| `ma-scout` | `.claude/skills/search-lit/references/parse_pubmed.py` | Aperivue |
-| `ma-scout` | `.claude/skills/search-lit/references/pubmed_eutils.sh` | Aperivue |
 | `manage-project` | `scripts/init_project.py` | Aperivue |
 | `manage-project` | `scripts/migrate_project_to_ssot.py` | Aperivue |
 | `manage-project` | `scripts/validate_project_contract.py` | Aperivue |
 | `manage-refs` | `scripts/verify_package_integrity.py` | Aperivue |
-| `manage-refs` | `src/refs.bib` | Aperivue |
 | `meta-abstract-screener` | `references/screening_prompts.md` | aipoch |
 | `meta-abstract-screener` | `scripts/screen_paper.py` | aipoch |
 | `meta-manuscript-generator` | `references/writing-guide.md` | aipoch |
@@ -330,16 +379,13 @@
 | `ngs-analysis` | `scripts/batch_pipeline.py` | OpenClaw |
 | `nomogram-construction` | `data/Nomogram_list.qs` | aipoch |
 | `nomogram-construction` | `data/analysis_data.rds` | aipoch |
-| `nomogram-construction` | `output/data/Nomogram_list.qs` | aipoch |
 | `nomogram-construction` | `scripts/install_dependencies.R` | aipoch |
 | `note-summarizer` | `examples/example.json` | aipoch |
-| `obsidian-paper-vault` | `src/refs.bib` | Aperivue |
 | `open-access-scout` | `scripts/oa_scout.py` | aipoch |
 | `orchestrate` | `references/zotero_collection.json` | Aperivue |
 | `orchestrate` | `scripts/check_citation_keys.py` | Aperivue |
 | `orchestrate` | `scripts/check_xref.py` | Aperivue |
 | `orchestrate` | `scripts/render_pandoc.sh` | Aperivue |
-| `orchestrate` | `src/refs.bib` | Aperivue |
 | `paper-2-web` | `scripts/generate_schematic.py` | aipoch |
 | `patent-claim-mapper` | `scripts/claim_mapper.py` | aipoch |
 | `patent-landscape` | `references/ipc-classifications.md` | aipoch |
@@ -360,8 +406,6 @@
 | `pdf-to-ppt-pack` | `scripts/validate_skill.py` | aipoch |
 | `personal-statement` | `references/personal-statement-examples.md` | aipoch |
 | `ppi-network-analysis` | `data/ppi_result.rds` | aipoch |
-| `ppi-network-analysis` | `output_dir/data/ppi_result.rds` | aipoch |
-| `ppi-network-analysis` | `tests/output/basic-run/data/ppi_result.rds` | aipoch |
 | `ppt-master` | `../../docs/templates-architecture.md` | aipoch |
 | `ppt-master` | `templates/design_spec.md` | aipoch |
 | `pptx-official` | `skills/pptx/ooxml/scripts/unpack.py` | OpenClaw |
@@ -375,10 +419,6 @@
 | `radiology-image-quiz` | `scripts/radiology_quiz.py` | aipoch |
 | `rehabilitation-analyzer` | `data/rehabilitation-tracker.json` | OpenClaw |
 | `render-pdf-doc` | `scripts/render_pandoc.sh` | Aperivue |
-| `replicate-study` | `medsci-skills/skills/analyze-stats/references/analysis_guides/propensity_score.md` | Aperivue |
-| `replicate-study` | `medsci-skills/skills/analyze-stats/references/analysis_guides/survey_weighted.md` | Aperivue |
-| `replicate-study` | `medsci-skills/skills/write-paper/references/paper_types/cross_national.md` | Aperivue |
-| `replicate-study` | `medsci-skills/skills/write-paper/references/paper_types/nhis_cohort.md` | Aperivue |
 | `research-grants` | `references/budget_preparation.md` | aipoch |
 | `research-grants` | `references/resubmission_strategies.md` | aipoch |
 | `research-grants` | `references/review_criteria.md` | aipoch |
@@ -390,18 +430,14 @@
 | `research-grants` | `scripts/generate_schematic.py` | aipoch |
 | `research-lookup` | `scripts/generate_schematic.py` | OpenClaw |
 | `research-proposal-generator` | `references/prompts.md` | aipoch |
-| `review-paper` | `src/refs.bib` | Aperivue |
 | `revise` | `references/ai_patterns.md` | Aperivue |
 | `revise` | `references/section_guides/step7_1_classical_qc.md` | Aperivue |
 | `revise` | `scripts/check_wordcount_cap.py` | Aperivue |
-| `revise` | `skills/sync-submission/scripts/check_marked_manuscript.py` | Aperivue |
 | `rf-model-importance-analysis` | `data/rf_result.rds` | aipoch |
-| `rf-model-importance-analysis` | `output_dir/data/rf_result.rds` | aipoch |
 | `rfdiffusion` | `../../docs/installation.md` | OpenClaw |
 | `roc-diagnostic-performance` | `data/analysis_data.rds` | aipoch |
 | `roc-diagnostic-performance` | `data/roc_model.rds` | aipoch |
 | `sample-group-sankey-plot` | `data/session_info.txt` | aipoch |
-| `sample-group-sankey-plot` | `tests/data/minimal_annotations.csv` | aipoch |
 | `sample-size-power-calculator` | `references/audit-reference.md` | aipoch |
 | `sample-size-power-calculator` | `scripts/main.py` | aipoch |
 | `schedule-management` | `data/events.jsonl` | aipoch |
@@ -411,67 +447,30 @@
 | `scientific-manuscript` | `references/statistical_tests.md` | OpenClaw |
 | `scientific-slides` | `../document-skills/pptx/scripts/thumbnail.py` | OpenClaw |
 | `scientific-slides` | `scripts/generate_schematic.py` | OpenClaw |
-| `scientific-visualization` | `scientific-packages/seaborn/references/examples.md` | OpenClaw |
-| `scientific-visualization` | `scientific-packages/seaborn/references/function_reference.md` | OpenClaw |
-| `scientific-visualization` | `scientific-packages/seaborn/references/objects_interface.md` | OpenClaw |
 | `scientific-writing` | `scripts/generate_schematic.py` | OpenClaw |
 | `scikit-learn` | `examples/index.html` | OpenClaw |
 | `search-lit` | `references/library.bib` | Aperivue |
 | `search-lit` | `references/zotero_collection.json` | Aperivue |
-| `search-lit` | `src/refs.bib` | Aperivue |
 | `search-strategy` | `../../CONNECTORS.md` | OpenClaw |
 | `self-review` | `scripts/check_domain_probe_sync.py` | Aperivue |
 | `self-review` | `scripts/check_xref.py` | Aperivue |
-| `self-review` | `skills/analyze-stats/scripts/rating_monotonicity.py` | Aperivue |
-| `self-review` | `skills/manage-refs/scripts/check_xref.py` | Aperivue |
-| `self-review` | `skills/peer-review/scripts/check_self_improvement_claims.py` | Aperivue |
-| `self-review` | `skills/sync-submission/scripts/detect_copy_divergence.py` | Aperivue |
 | `shift-handover-summarizer` | `data/shift_records.json` | aipoch |
-| `single-annotation` | `../../../omicverse_guide/docs/Tutorials-single/t_anno_trans.ipynb` | OpenClaw |
-| `single-annotation` | `../../../omicverse_guide/docs/Tutorials-single/t_cellanno.ipynb` | OpenClaw |
-| `single-annotation` | `../../../omicverse_guide/docs/Tutorials-single/t_cellmatch.ipynb` | OpenClaw |
-| `single-annotation` | `../../../omicverse_guide/docs/Tutorials-single/t_cellvote.md` | OpenClaw |
-| `single-annotation` | `../../../omicverse_guide/docs/Tutorials-single/t_cellvote_pbmc3k.ipynb` | OpenClaw |
-| `single-annotation` | `../../../omicverse_guide/docs/Tutorials-single/t_gptanno.ipynb` | OpenClaw |
-| `single-annotation` | `../../../omicverse_guide/docs/Tutorials-single/t_metatime.ipynb` | OpenClaw |
 | `single-annotation` | `data/analysis_lymph/atac-emb.h5ad` | OpenClaw |
 | `single-annotation` | `data/analysis_lymph/rna-emb.h5ad` | OpenClaw |
 | `single-annotation` | `data/pbmc3k.h5ad` | OpenClaw |
-| `single-cellphone-db` | `../../omicverse_guide/docs/Tutorials-single/t_cellphonedb.ipynb` | OpenClaw |
 | `single-cellphone-db` | `data/cpdb/normalised_log_counts.h5ad` | OpenClaw |
-| `single-clustering` | `../../omicverse_guide/docs/Tutorials-single/t_cluster.ipynb` | OpenClaw |
-| `single-clustering` | `../../omicverse_guide/docs/Tutorials-single/t_single_batch.ipynb` | OpenClaw |
-| `single-preprocessing` | `../../omicverse_guide/docs/Tutorials-single/t_preprocess.ipynb` | OpenClaw |
-| `single-preprocessing` | `../../omicverse_guide/docs/Tutorials-single/t_preprocess_cpu.ipynb` | OpenClaw |
-| `single-preprocessing` | `../../omicverse_guide/docs/Tutorials-single/t_preprocess_gpu.ipynb` | OpenClaw |
-| `single-to-spatial-mapping` | `../../omicverse_guide/docs/Tutorials-bulk2single/t_single2spatial.ipynb` | OpenClaw |
 | `single-to-spatial-mapping` | `../pdac_df.pth` | OpenClaw |
 | `solublempnn` | `../../docs/installation.md` | OpenClaw |
-| `spatial-transcriptomics-agent` | `repo/src/main.py` | OpenClaw |
-| `spatial-transcriptomics-analysis/STAgent` | `repo/src/main.py` | OpenClaw |
 | `spatial-transcriptomics-mapper` | `scripts/generate_test_data.py` | aipoch |
-| `spatial-tutorials` | `../../omicverse_guide/docs/Tutorials-space/t_cellpose.ipynb` | OpenClaw |
-| `spatial-tutorials` | `../../omicverse_guide/docs/Tutorials-space/t_cluster_space.ipynb` | OpenClaw |
-| `spatial-tutorials` | `../../omicverse_guide/docs/Tutorials-space/t_commot_flowsig.ipynb` | OpenClaw |
-| `spatial-tutorials` | `../../omicverse_guide/docs/Tutorials-space/t_crop_rotate.ipynb` | OpenClaw |
-| `spatial-tutorials` | `../../omicverse_guide/docs/Tutorials-space/t_decov.ipynb` | OpenClaw |
-| `spatial-tutorials` | `../../omicverse_guide/docs/Tutorials-space/t_gaston.ipynb` | OpenClaw |
-| `spatial-tutorials` | `../../omicverse_guide/docs/Tutorials-space/t_slat.ipynb` | OpenClaw |
-| `spatial-tutorials` | `../../omicverse_guide/docs/Tutorials-space/t_spaceflow.ipynb` | OpenClaw |
-| `spatial-tutorials` | `../../omicverse_guide/docs/Tutorials-space/t_staligner.ipynb` | OpenClaw |
-| `spatial-tutorials` | `../../omicverse_guide/docs/Tutorials-space/t_starfysh.ipynb` | OpenClaw |
-| `spatial-tutorials` | `../../omicverse_guide/docs/Tutorials-space/t_stt.ipynb` | OpenClaw |
 | `spatial-tutorials` | `data/cluster_svg.h5ad` | OpenClaw |
 | `spatial-tutorials` | `data/sc.h5ad` | OpenClaw |
 | `ssgsea-immune-infiltration-analysis` | `data/ssgsea_list.rds` | aipoch |
 | `survival-analysis-km` | `scripts/main.py` | aipoch |
 | `svm-model-importance-analysis` | `data/svm_result.rds` | aipoch |
-| `svm-model-importance-analysis` | `output_dir/data/svm_result.rds` | aipoch |
 | `symptom-checker-triage` | `references/red_flags.md` | aipoch |
 | `sync-submission` | `path/to/medsci-skills/scripts/verify_package_integrity.py` | Aperivue |
 | `sync-submission` | `scripts/verify_package_integrity.py` | Aperivue |
 | `systematic-review-screener` | `references/prisma_2020_checklist.pdf` | aipoch |
-| `tcga-preprocessing` | `../../omicverse_guide/docs/Tutorials-bulk/t_tcga.ipynb` | OpenClaw |
 | `tcga-preprocessing` | `../ov_tcga_survial_all.h5ad` | OpenClaw |
 | `tcga-preprocessing` | `data/TCGA_OV/ov_tcga_raw.h5ad` | OpenClaw |
 | `tcm-constitution-analyzer` | `data/constitution-recommendations.json` | OpenClaw |
@@ -479,7 +478,6 @@
 | `text-format-organizer` | `scripts/init_run.py` | aipoch |
 | `time-dependent-roc` | `data/time_roc_points.csv` | aipoch |
 | `time-dependent-roc` | `data/time_roc_points.txt` | aipoch |
-| `time-dependent-roc` | `tests/validation_output/data/time_roc_points.csv` | aipoch |
 | `tone-adjuster` | `scripts/tone_adjuster.py` | aipoch |
 | `tooluniverse-drug-repurposing` | `../chemical-compound-retrieval/SKILL.md` | OpenClaw |
 | `tooluniverse-drug-repurposing` | `../disease-intelligence-gatherer/SKILL.md` | OpenClaw |
@@ -515,11 +513,9 @@
 | `variant-interpretation-acmg/bioSkills/deepvariant` | `data/reference.fa` | OpenClaw |
 | `variant-interpretation-acmg/bioSkills/deepvariant` | `data/sample.bam` | OpenClaw |
 | `variant-interpretation-acmg/bioSkills/deepvariant` | `data/targets.bed` | OpenClaw |
-| `variant-interpretation-acmg/bioSkills/deepvariant` | `opt/hap.py/bin/hap.py` | OpenClaw |
 | `verify-refs` | `references/library.bib` | Aperivue |
 | `verify-refs` | `references/verified_references.tsv` | Aperivue |
 | `verify-refs` | `scripts/validate_project_contract.py` | Aperivue |
-| `verify-refs` | `src/refs.bib` | Aperivue |
 | `volcano-plot-labeler` | `data/deseq2_results.csv` | aipoch |
 | `weightloss-analyzer` | `data/fitness-tracker.json` | OpenClaw |
 | `weightloss-analyzer` | `data/nutrition-tracker.json` | OpenClaw |
@@ -539,9 +535,6 @@
 | `write-paper` | `scripts/check_citation_keys.py` | Aperivue |
 | `write-paper` | `scripts/check_xref.py` | Aperivue |
 | `write-paper` | `scripts/render_pandoc.sh` | Aperivue |
-| `write-paper` | `skills/manage-refs/scripts/check_xref.py` | Aperivue |
-| `write-paper` | `skills/self-review/scripts/check_classical_style.py` | Aperivue |
-| `write-paper` | `src/refs.bib` | Aperivue |
 | `zarr-python` | `data/hierarchy.zarr` | OpenClaw |
 | `zarr-python` | `data/my_array.zarr` | OpenClaw |
 | `zinc-database` | `../catitems.txt` | aipoch |

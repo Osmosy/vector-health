@@ -481,8 +481,9 @@ check("abdominal-ct-findings проверяется как собственны�
 check("в классификаторе есть категория repo_level",
       "repo_level" in br2.classify([], {}) or True)
 buckets2 = br2.classify([("meta-analysis", "../../scripts/prism...placeholder", "")], {})
-check("classify возвращает пять корзин",
-      set(br2.classify([], {})) == {"placeholder", "recoverable", "heavy", "repo_level", "inherited"},
+check("classify возвращает шесть корзин",
+      set(br2.classify([], {})) == {"placeholder", "recoverable", "heavy", "repo_level",
+                                    "external", "inherited"},
       str(sorted(br2.classify([], {}))))
 
 rep = open(os.path.join(ROOT, "docs", "broken-refs.md"), encoding="utf-8").read()
@@ -499,6 +500,7 @@ print("\n=== 18. Числа инвентаря ссылок согласован
 # читатель получает неверный масштаб. Число менялось (485 → 515) при расширении
 # шаблона, и README об этом не знал.
 rep_txt = open(os.path.join(ROOT, "docs", "broken-refs.md"), encoding="utf-8").read()
+br2_rep = rep_txt
 m_rep = re.search(r"Ссылок на файлы в дереве: (\d+); на месте: (\d+); битых: (\d+)", rep_txt)
 check("в отчёте есть строка сводки", bool(m_rep))
 rep_total, rep_ok, rep_broken = (int(x) for x in m_rep.groups())
@@ -514,15 +516,58 @@ cats2 = dict(re.findall(r"^\| ([^|]+?) \| (\d+) \|", rep_txt, re.M))
 check("в отчёте пять категорий", {"Пример пути в коде", "Восстановимо", "Тяжёлые данные",
                                   "В корне источника", "Унаследованное"} <= set(cats2), str(list(cats2)))
 # категория «в корне источника» даёт URL, по которому файл реально берётся
-urls = re.findall(r"\| (https://github\.com/[^\s|]+) \|", rep_txt)
+sec_rl = rep_txt.split("## Файл в корне")[1].split("\n## ")[0] if "## Файл в корне" in rep_txt else ""
+urls = re.findall(r"\| (https://github\.com/[^\s|]+) \|", sec_rl)
 check("в категории «в корне источника» есть ссылки на файлы источников", len(urls) >= 5, str(len(urls)))
-check("URL ведут в известные апстримы",
+check("URL в этой категории ведут в известные апстримы",
       all(any(s in u for s in ("openmed", "medsci-skills", "medical-research-skills",
                                "OpenClaw-Medical-Skills")) for u in urls), str(urls[:2]))
 sec_repo = rep_txt.split("## Файл в корне")[1].split("\n## ")[0] if "## Файл в корне" in rep_txt else ""
 check("секция «в корне источника» найдена", bool(sec_repo), "нет секции")
 check("отчёт не выдаёт «в корне источника» за дефект апстрима",
       sec_repo and "не был закоммичен" not in sec_repo and "дефект" not in sec_repo.split("Файл существует")[0])
+
+print("\n=== 19. Внешние ресурсы и ложно-битые ссылки ===")
+# Ссылки от корня репозитория (`skills/<другой>/x.py`, `medsci-skills/skills/<другой>/x.py`)
+# резолвятся в файлы, которые у нас ЕСТЬ: 15 таких стояли в отчёте битыми. На
+# кросс-ссылках держатся write-paper, self-review, revise. И унаследованный
+# остаток делится: 81 ссылка ведёт во внешние проекты и каталоги запуска, а не в
+# забытые файлы апстрима.
+check("repo_root_candidates: skills/<другой>/... резолвится",
+      any(os.path.exists(os.path.join(ROOT, c))
+          for c in refs_mod2.repo_root_candidates("skills/manage-refs/scripts/check_xref.py")))
+check("repo_root_candidates: префикс medsci-skills/ снимается",
+      "skills/analyze-stats/references/analysis_guides/survey_weighted.md"
+      in refs_mod2.repo_root_candidates(
+          "medsci-skills/skills/analyze-stats/references/analysis_guides/survey_weighted.md"))
+check("кросс-ссылка write-paper → manage-refs не считается битой",
+      not any(s == "write-paper" and "manage-refs" in r
+              for s, r in [(s, r) for s, r, _ in br2.scan()]),
+      "кросс-ссылка попала в битые")
+check("кросс-ссылка self-review → analyze-stats не считается битой",
+      not any(s == "self-review" and "analyze-stats" in r for s, r, _ in br2.scan()))
+
+check("внешний ресурс распознан: omicverse_guide",
+      br2.external_kind("../../omicverse_guide/docs/Tutorials-bulk/t_deg.ipynb") is not None)
+check("внешний ресурс распознан: каталог запуска output_dir/",
+      br2.external_kind("output_dir/data/ppi_result.rds") is not None)
+check("внешний ресурс распознан: установленный инструмент opt/",
+      br2.external_kind("opt/hap.py/bin/hap.py") is not None)
+check("файл навыка внешним ресурсом НЕ считается",
+      br2.external_kind("references/a.md") is None)
+check("ссылка вверх в корень источника внешним ресурсом не считается",
+      br2.external_kind("../../scripts/tag_cleanup_gate.sh") is None)
+# omicverse_guide ведёт в реальный внешний проект с описанием
+check("omicverse_guide ведёт в omicverse-tutorials",
+      "omicverse-tutorials" in br2.EXTERNAL_RESOURCES["omicverse_guide"][1])
+
+sec_ext = rep_txt.split("## Внешний ресурс")[1].split("\n## ")[0] if "## Внешний ресурс" in rep_txt else ""
+check("секция «Внешний ресурс» есть", bool(sec_ext))
+check("у ссылок omicverse есть URL проекта",
+      "github.com/omicverse/omicverse-tutorials" in sec_ext)
+check("внешние ссылки размечены состоянием (совпадает/переехал)",
+      "путь совпадает" in sec_ext or "переехал" in sec_ext)
+check("в отчёте есть вид «каталог запуска»", "каталог запуска" in sec_ext)
 
 print(f"\n{'=' * 50}")
 print(f"ИТОГО: {PASS} ok, {FAIL} FAIL")
