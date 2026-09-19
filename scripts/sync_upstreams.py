@@ -72,9 +72,13 @@ HEAVY_MAX = 1_500_000  # байт: крупнее — демо-датасет, �
 # они не вендорились; тянуть их обратно — удвоить библиотеку мусором.
 EXCLUDE_MARKERS = ("_audit_result", "audit_result", "eval_report", "POLISH_CHANGELOG",
                    "CHANGELOG", "_coverage", "coverage.json", "conftest.py")
-# Ссылки на файлы внутри текста навыка: `references/x.md`, `scripts/y.py`.
-# По ним и определяется, что из апстрима реально нужно локально.
-REF_RE = re.compile(r"(?:references|scripts|templates|assets|prompts|data)/[A-Za-z0-9_./-]+\.[A-Za-z0-9]+")
+# Разбор ссылок на файлы — общий модуль (scripts/refs.py): синхронизация,
+# инвентарь и валидатор должны отвечать на вопрос «какие файлы нужны навыку»
+# одинаково, иначе один тянет одно, а другой ругает.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import refs as refs_mod  # noqa: E402
+
+REF_RE = refs_mod.REF_RE
 
 # Что имеет смысл вендорить кроме SKILL.md: контент навыка, а не его CI.
 AUX_PREFIXES = ("references/", "scripts/", "templates/", "assets/", "prompts/", "data/",
@@ -314,7 +318,7 @@ def fork_files(name: str, trees: dict[str, dict[str, str]], sizes: dict[str, int
     if not os.path.isfile(skill_md):
         return out
     body = open(skill_md, encoding="utf-8", errors="replace").read()
-    for rel in sorted(set(re.findall(REF_RE, body))):
+    for rel in refs_mod.find_refs(body):
         rel = os.path.normpath(rel)
         if rel.startswith("..") or rel.startswith("/"):
             continue
@@ -352,23 +356,39 @@ def index_by_skill(head_paths: set[str], local_names: set[str]) -> dict[str, lis
 
 def upstream_of(name: str, rel: str, index: dict[str, list[str]], roots: list[str],
                 local_sha: str | None = None, shas: dict[str, str] | None = None) -> str | None:
-    """Апстрим-путь для файла навыка: <root>/[<категория>/]<навык>/<rel>.
+    """Апстрим-путь для файла навыка: [<root>/][<категория>/]<навык>/<rel>.
 
-    У aipoch один и тот же навык лежит в нескольких категориях («Data Analysis» и
-    «Evidence Insight») с РАЗНЫМ содержимым. Если передан local_sha, выбирается
-    версия, которая уже совпадает с локальной: иначе планировщик берёт первую по
-    алфавиту и «обновляет» файл чужой категорией.
+    Три случая, каждый ломал поиск по-своему:
+      1. навык в категории: `skills/<name>/<rel>` или
+         `scientific-skills/Data Analysis/<name>/<rel>`;
+      2. навык В КОРНЕ репозитория: `<name>/<rel>` без префикса категории
+         (так у AIPOCH лежит skill-auditor) — проверка «путь начинается с
+         известного корня» его отбрасывала, и файлы навыка не докачивались;
+      3. один навык в нескольких категориях с РАЗНЫМ содержимым (aipoch:
+         «Data Analysis» и «Evidence Insight»). При переданном local_sha берётся
+         версия, совпадающая с локальной, — иначе файл подменяется чужим.
+
+    Совпадение проверяется по концу пути, а корни (roots) задают только
+    приоритет, а не жёсткий фильтр: иначе случай 2 теряется.
     """
     target = f"/{name}/{rel}"
     cands = [p for p in index.get(name, []) if p.endswith(target)]
-    cands = [p for root in roots for p in cands if p.startswith(root + "/")] or cands
+    if not cands:
+        # Навык в КОРНЕ репозитория: путь не «.../<name>/<rel>», а «<name>/<rel>» —
+        # без ведущего слэша, поэтому поиск по «/<name>/<rel>» его не находит
+        # (так у AIPOCH лежит skill-auditor). Проверяем точное совпадение начала.
+        head_target = f"{name}/{rel}"
+        cands = [p for p in index.get(name, []) if p == head_target]
     if not cands:
         return None
+    # приоритет: сначала пути под известными корнями, потом остальные (корень репо)
+    preferred = [p for p in cands if any(p.startswith(r + "/") for r in roots)]
+    ordered = preferred + [p for p in cands if p not in preferred]
     if local_sha and shas:
-        exact = [p for p in cands if shas.get(p) == local_sha]
+        exact = [p for p in ordered if shas.get(p) == local_sha]
         if exact:
             return exact[0]
-    return cands[0]
+    return ordered[0]
 
 
 def plan(label: str, cfg: dict, origin: dict[str, str]) -> dict:
@@ -433,7 +453,12 @@ def plan(label: str, cfg: dict, origin: dict[str, str]) -> dict:
         if not os.path.isfile(skill_md):
             continue
         body = open(skill_md, encoding="utf-8", errors="replace").read()
-        for rel in sorted(set(re.findall(REF_RE, body))):
+        for raw_ref in refs_mod.find_refs(body):
+            # Ссылка может быть записана абсолютным путём или от корня репозитория
+            # (`/Users/.../skills/<name>/scripts/main.py`, `skills/<name>/...`) —
+            # приводим её к пути относительно навыка, иначе файл считается
+            # отсутствующим навсегда, хотя лежит в апстриме.
+            rel = refs_mod.to_skill_relative(raw_ref, name) or raw_ref
             rel = os.path.normpath(rel)
             if rel.startswith("..") or rel.startswith("/"):
                 continue

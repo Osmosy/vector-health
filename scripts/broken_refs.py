@@ -46,9 +46,15 @@ SOURCES = {
     "openmed": "maziyarpanahi/openmed",
 }
 
-REF_RE = re.compile(r"`?((?:references|scripts|templates|assets|prompts|data)/[A-Za-z0-9_./-]+\.[A-Za-z0-9]+)`?")
+# Разбор ссылок — общий модуль: инвентарь, синхронизация и валидатор должны
+# отвечать «какие файлы нужны навыку» одинаково.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import refs as refs_mod  # noqa: E402
+
+REF_RE = refs_mod.REF_RE
 HEAVY_SUFFIX = (".gz", ".tgz", ".bz2", ".xz", ".tar", ".7z", ".npy", ".bam", ".h5ad")
 HEAVY_MAX = 1_500_000
+ORIGIN = os.path.join(ROOT, "scripts", "upstream-origin.json")
 
 
 def token() -> str:
@@ -97,29 +103,47 @@ def upstream_blobs() -> dict[str, dict[str, int]]:
 
 
 def scan() -> list[tuple[str, str]]:
-    """[(навык, относительный путь)] — все битые ссылки дерева."""
-    broken: list[tuple[str, str]] = []
+    """[(навык, путь, исходная ссылка)] — ссылки, файлов по которым нет.
+
+    Ссылка сначала приводится к пути относительно навыка: апстримы пишут их
+    абсолютными (`/Users/.../skills/<name>/scripts/x.py`), от корня репозитория
+    (`skills/<name>/scripts/x.py`) или с `./`. Без нормализации живой файл
+    попадает в отчёт как битый — и отчёт начинает врать в самую дорогую сторону
+    (читатель идёт «чинить» то, что на месте).
+    """
+    broken: list[tuple[str, str, str]] = []
     for root, dirs, files in os.walk(SKILLS):
         dirs[:] = [d for d in dirs if d != "__pycache__"]
         if "SKILL.md" not in files:
             continue
         rel_skill = os.path.relpath(root, SKILLS).replace(os.sep, "/")
+        name = rel_skill.rsplit("/", 1)[-1]
         body = open(os.path.join(root, "SKILL.md"), encoding="utf-8", errors="replace").read()
-        for ref in sorted(set(REF_RE.findall(body))):
-            if not os.path.exists(os.path.join(root, ref)):
-                broken.append((rel_skill, ref))
+        for raw in refs_mod.find_refs(body):
+            rel = refs_mod.to_skill_relative(raw, name) or raw
+            rel = os.path.normpath(rel)
+            if not os.path.exists(os.path.join(root, rel)):
+                broken.append((rel_skill, rel, raw))
     return broken
 
 
 def classify(broken, trees):
     buckets: dict[str, list[tuple[str, str, str]]] = {
-        "recoverable": [], "heavy": [], "inherited": []}
-    for rel_skill, ref in broken:
+        "placeholder": [], "recoverable": [], "heavy": [], "inherited": []}
+    for rel_skill, ref, _raw in broken:
         name = rel_skill.rsplit("/", 1)[-1]
+        # «Пример пути в коде» — не ссылка на файл, а форма пути
+        # (data/fitness-logs/YYYY-MM/..., scripts/xxx.py). Требовать такой файл
+        # нельзя: навык описывает, каким путём пользоваться.
+        if refs_mod.is_placeholder(ref):
+            buckets["placeholder"].append((rel_skill, ref, "пример пути"))
+            continue
+        # Ссылка может быть записана абсолютным путём или от корня репозитория:
+        # нормализуем её до пути относительно навыка, прежде чем считать битой.
         found = None
         for label, paths in trees.items():
             for up, size in paths.items():
-                if up.endswith(f"/{name}/{ref}"):
+                if up.endswith(f"/{name}/{ref}") or up == f"{name}/{ref}":
                     found = (label, up, size)
                     break
             if found:
@@ -133,7 +157,17 @@ def classify(broken, trees):
     return buckets
 
 
-def write_report(buckets, total_ok: int) -> None:
+def load_origin() -> dict[str, str]:
+    """Карта происхождения: имя навыка → источник. Нужна, чтобы в инвентаре у
+    каждой строки был источник, а не прочерк: читатель должен видеть, чей это
+    файл, не открывая второй документ."""
+    if not os.path.isfile(ORIGIN):
+        return {}
+    with open(ORIGIN, encoding="utf-8") as f:
+        return json.load(f).get("origin", {})
+
+
+def write_report(buckets, total_ok: int, origin: dict[str, str]) -> None:
     os.makedirs(os.path.dirname(REPORT), exist_ok=True)
     lines = [
         "# Ссылки на файлы внутри навыков: инвентарь",
@@ -147,12 +181,14 @@ def write_report(buckets, total_ok: int) -> None:
         "",
         "| Категория | Сколько | Что значит |",
         "|---|---|---|",
+        f"| Пример пути в коде | {len(buckets['placeholder'])} | форма пути (`YYYY`, `xxx`, `<file>`), а не файл — требовать его нельзя |",
         f"| Восстановимо | {len(buckets['recoverable'])} | файл есть у источника — закрывается `scripts/sync_upstreams.py` |",
         f"| Тяжёлые данные | {len(buckets['heavy'])} | файл есть, но это демо-датасет на мегабайты — сознательно не тянем |",
         f"| Унаследованное | {len(buckets['inherited'])} | файла нет ни у одного источника — дефект апстрима |",
         "",
     ]
-    for key, title in (("recoverable", "Восстановимо"),
+    for key, title in (("placeholder", "Пример пути в коде (не ссылка)"),
+                       ("recoverable", "Восстановимо"),
                        ("heavy", "Тяжёлые данные (не тянем)"),
                        ("inherited", "Унаследованное (дефект источника)")):
         items = buckets[key]
@@ -161,7 +197,8 @@ def write_report(buckets, total_ok: int) -> None:
         lines += [f"## {title}", "",
                   "| Навык | Файл | Источник |", "|---|---|---|"]
         for rel_skill, ref, src in sorted(items):
-            lines.append(f"| `{rel_skill}` | `{ref}` | {src or '—'} |")
+            note = src or origin.get(rel_skill, "") or "—"
+            lines.append(f"| `{rel_skill}` | `{ref}` | {note} |")
         lines.append("")
     with open(REPORT, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
@@ -188,10 +225,12 @@ def main() -> int:
     total_ok = total_refs - len(broken)
 
     print(f"ссылок на файлы: {total_refs} | на месте: {total_ok} | битых: {len(broken)}")
-    print(f"  восстановимо: {len(buckets['recoverable'])} | тяжёлые: {len(buckets['heavy'])}"
+    print(f"  примеры путей: {len(buckets['placeholder'])}"
+          f" | восстановимо: {len(buckets['recoverable'])}"
+          f" | тяжёлые: {len(buckets['heavy'])}"
           f" | унаследовано: {len(buckets['inherited'])}")
     if not args.no_report:
-        write_report(buckets, total_ok)
+        write_report(buckets, total_ok, load_origin())
         print(f"  отчёт: {os.path.relpath(REPORT, ROOT)}")
 
     own_broken = [(s, r) for s, r, _ in buckets["recoverable"] + buckets["heavy"] + buckets["inherited"]

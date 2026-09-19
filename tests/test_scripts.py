@@ -133,10 +133,21 @@ print("\n=== 7. Битые ссылки: классификация, не уда
 br = load_module(os.path.join(ROOT, "scripts", "broken_refs.py"), "broken_refs")
 broken = br.scan()
 check("сканер вернул список (может быть пуст)", isinstance(broken, list))
-check("сканер не мутирует дерево (только читает)", all(os.path.isfile(os.path.join(SKILLS, s, ref))
-                                                     or True for s, ref in broken[:5]))
+check("каждый элемент — (навык, путь, исходная ссылка)",
+      all(len(x) == 3 for x in broken[:20]), str(broken[:1]))
+# Ссылка может быть записана абсолютным путём: инвентарь обязан нормализовать её
+# до пути относительно навыка, иначе живой файл попадает в отчёт как битый.
+R = load_module(os.path.join(ROOT, "scripts", "refs.py"), "refs_mod")
+check("абсолютный путь нормализуется до пути в навыке",
+      R.to_skill_relative("/Users/x/.openclaw/workspace/skills/foo/scripts/main.py", "foo")
+      == "scripts/main.py")
+check("путь от корня репо нормализуется",
+      R.to_skill_relative("skills/foo/scripts/main.py", "foo") == "scripts/main.py")
+check("ссылка с ./ нормализуется", R.to_skill_relative("./data/x.json", "foo") == "data/x.json")
+check("чужая ссылка не нормализуется (остаётся как есть)",
+      R.to_skill_relative("references/a.md", "foo") is None)
 # классификация с пустыми деревьями: всё уходит в «унаследовано», ничего не теряется
-buckets = br.classify([("some-skill", "references/missing.md")], {})
+buckets = br.classify([("some-skill", "references/missing.md", "references/missing.md")], {})
 check("без данных апстрима ссылка классифицируется как унаследованная",
       len(buckets["inherited"]) == 1 and not buckets["recoverable"])
 
