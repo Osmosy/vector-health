@@ -340,6 +340,58 @@ for doc in ("AGENTS.md", "INSTALL.md", "agent-description.md"):
     check(f"{doc}: ссылается на NOTICE и называет ограничение",
           "NOTICE.md" in body and "308" in body)
 
+print("\n=== 15. Сверка диаграммы: HTML воспроизводится из спецификации ===")
+# Сравнение нормализует версию рендерера: она вписывается в артефакт, и локальная
+# сборка отличается от CI ровно этой строкой. Без нормализации проверка валилась бы
+# при каждом обновлении archify, ничего не сообщая о содержимом диаграммы.
+cd_mod = load_module(os.path.join(ROOT, "scripts", "check_diagram.py"), "check_diagram")
+sample = '<html><meta name="generator" content="archify 2.17.0-dev.0"><body>x</body></html>'
+other = '<html><meta name="generator" content="archify 2.16.0"><body>x</body></html>'
+tmp6 = tempfile.mkdtemp()
+try:
+    a = os.path.join(tmp6, "a.html"); b = os.path.join(tmp6, "b.html"); c = os.path.join(tmp6, "c.html")
+    open(a, "w", encoding="utf-8").write(sample)
+    open(b, "w", encoding="utf-8").write(other)
+    open(c, "w", encoding="utf-8").write(sample.replace(">x<", ">y<"))
+    check("разные версии рендерера считаются одинаковым содержимым",
+          cd_mod.normalized(a) == cd_mod.normalized(b))
+    check("реальное различие содержимого видно",
+          cd_mod.normalized(a) != cd_mod.normalized(c))
+    r8 = run([sys.executable, "scripts/check_diagram.py", a, b])
+    check("совпадение по содержимому → exit 0", r8.returncode == 0, r8.stdout[-150:])
+    r9 = run([sys.executable, "scripts/check_diagram.py", a, c])
+    check("расхождение → exit 1", r9.returncode == 1, f"exit={r9.returncode}")
+    check("в сообщении о расхождении есть команда пересборки",
+          "deliver" in r9.stderr, r9.stderr[-200:])
+    check("несуществующий файл → exit 1, а не исключение",
+          run([sys.executable, "scripts/check_diagram.py", a, "/nope.html"]).returncode == 1)
+finally:
+    shutil.rmtree(tmp6, ignore_errors=True)
+
+# спецификация и доставленный артефакт на месте, спецификация валидна по структуре
+spec_path = os.path.join(ROOT, "docs", "vector-health.architecture.json")
+check("спецификация диаграммы существует", os.path.isfile(spec_path))
+spec = json.load(open(spec_path, encoding="utf-8"))
+check("в спецификации есть meta.title и views",
+      bool(spec.get("meta", {}).get("title")) and bool(spec.get("meta", {}).get("views")))
+check("quality_profile = showcase", spec["meta"].get("quality_profile") == "showcase")
+delivered_html = open(os.path.join(ROOT, "docs", "vector-health.architecture.html"),
+                      encoding="utf-8").read()
+check("заголовок из спецификации есть в доставленном HTML",
+      spec["meta"]["title"] in delivered_html)
+check("каждая подпись вида есть в HTML",
+      all(v["label"] in delivered_html for v in spec["meta"]["views"]))
+
+# установщик archify: версия пришпилена и раскладка пакета учтена
+installer = open(os.path.join(ROOT, "scripts", "install-archify.sh"), encoding="utf-8").read()
+check("версия archify пришпилена в установщике", "v2.16.0" in installer and "ARCHIFY_VERSION" in installer)
+check("установщик знает про подкаталог archify/", "archify/bin/archify.mjs" in installer)
+check("установщик проверяет себя (doctor)", "doctor" in installer)
+wf = open(os.path.join(ROOT, ".github", "workflows", "validate.yml"), encoding="utf-8").read()
+check("CI ставит archify, а не пропускает проверку",
+      "install-archify.sh" in wf and "проверка диаграммы пропущена" not in wf)
+check("CI проверяет воспроизводимость HTML", "check_diagram.py" in wf)
+
 print(f"\n{'=' * 50}")
 print(f"ИТОГО: {PASS} ok, {FAIL} FAIL")
 sys.exit(1 if FAIL else 0)

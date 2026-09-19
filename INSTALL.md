@@ -29,8 +29,17 @@ Vector Health — **библиотека медицинских и биомед�
 - **Для синхронизации с апстримами** — `gh` CLI (авторизованный) либо
   `GITHUB_TOKEN` в окружении: без токена GitHub отдаёт мало анонимных запросов
   и скрипт упадёт с 403.
-- **Для диаграммы** — Node 18+ и `archify` (необязательно: в CI проверка
-  диаграммы выполняется, если инструмент установлен, иначе шаг сообщает о пропуске).
+- **Для диаграммы** — Node 18+ и `archify` (Apache-независимый проект под MIT).
+  Пакет в npm не публикуется, ставится из репозитория по пришпиленному тегу:
+
+  ```bash
+  bash scripts/install-archify.sh archify     # по умолчанию v2.16.0
+  ARCHIFY_VERSION=v2.17.0 bash scripts/install-archify.sh archify   # другая версия
+  ```
+
+  Скрипт сам проверяет себя командой `doctor` и падает, если раскладка пакета
+  изменилась. В CI archify устанавливается всегда — проверка диаграммы больше не
+  пропускается.
 - **Для навыка `dicom-vlm-analysis`** — `pydicom` (рендер с window/level, чистый
   Python) и локальная [Ollama](https://ollama.com) с моделью `medgemma:4b`. Без
   Ollama навык бесполезен: он описывает снимок локальной моделью, а не облачной.
@@ -168,4 +177,9 @@ MIT репозитория покрывает **собственный вкла�
 - Документация — `README.md`, `NOTICE.md`, `INSTALL.md`, `AGENTS.md`, `docs/`;
   числа и оговорки проверяет `scripts/validate.py`, поэтому правьте документ и
   проверку вместе.
+- Диаграмма — `docs/vector-health.architecture.json` (спецификация). Правьте
+  спецификацию, затем пересоберите артефакт: `node archify/bin/archify.mjs deliver
+  architecture docs/vector-health.architecture.json docs/vector-health.architecture.html
+  --quality showcase`. CI проверяет, что HTML воспроизводится из спецификации
+  (`scripts/check_diagram.py`), поэтому правка одного файла без другого роняет сборку.
 - CI — `.github/workflows/validate.yml`.

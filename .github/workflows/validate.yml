@@ -9,12 +9,27 @@ jobs:
   repo:
     name: Валидация библиотеки и документации
     runs-on: ubuntu-latest
+    env:
+      # Версия archify пришпилена: проверка диаграммы должна быть воспроизводимой,
+      # а не зависеть от того, что сегодня в HEAD апстрима.
+      ARCHIFY_VERSION: v2.16.0
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # Ставится ДО валидатора: он проверяет, что спецификация диаграммы
+      # согласована с доставленным HTML, а HTML пересобирается ниже. Без
+      # установленного archify проверка диаграммы в валидаторе сообщает о
+      # неполноте, а не молчит.
+      - name: Установка archify (пришпиленная версия)
+        run: bash scripts/install-archify.sh archify
 
       - name: Валидация репозитория (числа, лицензии, ссылки, диаграмма)
         run: python3 scripts/validate.py
@@ -31,11 +46,18 @@ jobs:
       - name: Тесты скриптов
         run: python3 tests/test_scripts.py
 
-      - name: Проверка диаграммы (спецификация валидна, HTML воспроизводим)
+      # Две ступени для диаграммы: (1) спецификация проходит showcase-проверку,
+      # (2) доставленный HTML воспроизводится из спецификации — иначе «живая»
+      # диаграмма тихо расходится с тем, что лежит в docs/.
+      #
+      # Сравнение — через scripts/check_diagram.py, а не `cmp`: в артефакт
+      # вписывается версия рендерера (`archify X.Y.Z`), и локальная сборка
+      # отличается от CI ровно этой строкой. Побайтовое сравнение валило бы
+      # сборку при каждом обновлении archify, ничего не сообщая о содержимом.
+      - name: Доставленный HTML воспроизводится из спецификации
         run: |
-          if [ ! -d archify ]; then
-            echo "archify не установлен — проверка диаграммы пропущена (это не ошибка)"
-            exit 0
-          fi
-          node archify/bin/archify.mjs validate architecture \
-            docs/vector-health.architecture.json --quality showcase --json
+          node archify/bin/archify.mjs deliver architecture \
+            docs/vector-health.architecture.json /tmp/rebuilt.html \
+            --quality showcase --json
+          python3 scripts/check_diagram.py \
+            docs/vector-health.architecture.html /tmp/rebuilt.html
