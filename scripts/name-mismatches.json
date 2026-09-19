@@ -1,0 +1,351 @@
+{
+ "note": "Расхождения `name` во frontmatter и имени каталога — свойство апстримов, а не дефект сборки: переименование каталога сломало бы карту происхождения и синхронизацию. Валидатор сверяет число и состав с этим списком: новое расхождение означает, что апстрим переименовал навык, и это надо разобрать.",
+ "count": 69,
+ "mismatches": [
+  {
+   "skill": "3d-molecule-ray-tracer",
+   "name": "d-molecule-ray-tracer",
+   "dir": "3d-molecule-ray-tracer"
+  },
+  {
+   "skill": "Case-control-study-quality-assessment-nos",
+   "name": "case-control-study-quality-assessment-nos",
+   "dir": "Case-control-study-quality-assessment-nos"
+  },
+  {
+   "skill": "INPLASY-registration-helper",
+   "name": "inplasy-registration-helper",
+   "dir": "INPLASY-registration-helper"
+  },
+  {
+   "skill": "Lab-Prep-Calculations",
+   "name": "lab-prep-calculations",
+   "dir": "Lab-Prep-Calculations"
+  },
+  {
+   "skill": "LightGBM-analysis",
+   "name": "lightgbm-analysis",
+   "dir": "LightGBM-analysis"
+  },
+  {
+   "skill": "PPTX-Skill",
+   "name": "pptx-skill",
+   "dir": "PPTX-Skill"
+  },
+  {
+   "skill": "TorchDrug-English",
+   "name": "torchdrug-english",
+   "dir": "TorchDrug-English"
+  },
+  {
+   "skill": "XGBoost-analysis",
+   "name": "xgboost-analysis",
+   "dir": "XGBoost-analysis"
+  },
+  {
+   "skill": "antibody-design-agent/MAGE",
+   "name": "mage-antibody-generator",
+   "dir": "MAGE"
+  },
+  {
+   "skill": "bulk-combat-correction",
+   "name": "bulk-rna-seq-batch-correction-with-combat",
+   "dir": "bulk-combat-correction"
+  },
+  {
+   "skill": "bulk-deg-analysis",
+   "name": "bulk-rna-seq-differential-expression-with-omicverse",
+   "dir": "bulk-deg-analysis"
+  },
+  {
+   "skill": "bulk-deseq2-analysis",
+   "name": "bulk-rna-seq-deseq2-analysis-with-omicverse",
+   "dir": "bulk-deseq2-analysis"
+  },
+  {
+   "skill": "bulk-stringdb-ppi",
+   "name": "string-protein-interaction-analysis-with-omicverse",
+   "dir": "bulk-stringdb-ppi"
+  },
+  {
+   "skill": "bulk-to-single-deconvolution",
+   "name": "bulk-rna-seq-deconvolution-with-bulk2single",
+   "dir": "bulk-to-single-deconvolution"
+  },
+  {
+   "skill": "bulk-trajblend-interpolation",
+   "name": "bulktrajblend-trajectory-interpolation",
+   "dir": "bulk-trajblend-interpolation"
+  },
+  {
+   "skill": "bulk-wgcna-analysis",
+   "name": "bulk-wgcna-analysis-with-omicverse",
+   "dir": "bulk-wgcna-analysis"
+  },
+  {
+   "skill": "co2-tank-monitor",
+   "name": "co-tank-monitor",
+   "dir": "co2-tank-monitor"
+  },
+  {
+   "skill": "docx-official",
+   "name": "docx",
+   "dir": "docx-official"
+  },
+  {
+   "skill": "fastq-analysis",
+   "name": "fastq-analysis-pipeline",
+   "dir": "fastq-analysis"
+  },
+  {
+   "skill": "gokegg",
+   "name": "gokegg-analysis",
+   "dir": "gokegg"
+  },
+  {
+   "skill": "gsea-enrichment",
+   "name": "gsea-enrichment-analysis",
+   "dir": "gsea-enrichment"
+  },
+  {
+   "skill": "iso-13485-certification",
+   "name": "iso-certification",
+   "dir": "iso-13485-certification"
+  },
+  {
+   "skill": "meta-rob2-plot",
+   "name": "meta-rob-plot",
+   "dir": "meta-rob2-plot"
+  },
+  {
+   "skill": "neurokit2",
+   "name": "neurokit",
+   "dir": "neurokit2"
+  },
+  {
+   "skill": "paper-2-web",
+   "name": "paper-web",
+   "dir": "paper-2-web"
+  },
+  {
+   "skill": "pdf-anthropic",
+   "name": "pdf",
+   "dir": "pdf-anthropic"
+  },
+  {
+   "skill": "pptx-official",
+   "name": "pptx",
+   "dir": "pptx-official"
+  },
+  {
+   "skill": "pydeseq2",
+   "name": "pydeseq",
+   "dir": "pydeseq2"
+  },
+  {
+   "skill": "pymc",
+   "name": "pymc-bayesian-modeling",
+   "dir": "pymc"
+  },
+  {
+   "skill": "single-annotation",
+   "name": "single-cell-annotation-skills-with-omicverse",
+   "dir": "single-annotation"
+  },
+  {
+   "skill": "single-cellphone-db",
+   "name": "single-cell-cellphonedb-communication-mapping",
+   "dir": "single-cellphone-db"
+  },
+  {
+   "skill": "single-clustering",
+   "name": "single-cell-clustering-and-batch-correction-with-omicverse",
+   "dir": "single-clustering"
+  },
+  {
+   "skill": "single-downstream-analysis",
+   "name": "single-cell-downstream-analysis",
+   "dir": "single-downstream-analysis"
+  },
+  {
+   "skill": "single-multiomics",
+   "name": "single-cell-multi-omics-integration",
+   "dir": "single-multiomics"
+  },
+  {
+   "skill": "single-preprocessing",
+   "name": "single-cell-preprocessing-with-omicverse",
+   "dir": "single-preprocessing"
+  },
+  {
+   "skill": "single-to-spatial-mapping",
+   "name": "single2spatial-spatial-mapping",
+   "dir": "single-to-spatial-mapping"
+  },
+  {
+   "skill": "single-trajectory",
+   "name": "single-trajectory-analysis",
+   "dir": "single-trajectory"
+  },
+  {
+   "skill": "spatial-transcriptomics-analysis/STAgent",
+   "name": "spatial-transcriptomics-agent",
+   "dir": "STAgent"
+  },
+  {
+   "skill": "spatial-transcriptomics-analysis/SpatialAgent",
+   "name": "spatial-agent",
+   "dir": "SpatialAgent"
+  },
+  {
+   "skill": "spatial-transcriptomics-analysis/bioSkills/image-analysis",
+   "name": "bio-spatial-transcriptomics-image-analysis",
+   "dir": "image-analysis"
+  },
+  {
+   "skill": "spatial-transcriptomics-analysis/bioSkills/spatial-communication",
+   "name": "bio-spatial-transcriptomics-spatial-communication",
+   "dir": "spatial-communication"
+  },
+  {
+   "skill": "spatial-transcriptomics-analysis/bioSkills/spatial-data-io",
+   "name": "bio-spatial-transcriptomics-spatial-data-io",
+   "dir": "spatial-data-io"
+  },
+  {
+   "skill": "spatial-transcriptomics-analysis/bioSkills/spatial-deconvolution",
+   "name": "bio-spatial-transcriptomics-spatial-deconvolution",
+   "dir": "spatial-deconvolution"
+  },
+  {
+   "skill": "spatial-transcriptomics-analysis/bioSkills/spatial-domains",
+   "name": "bio-spatial-transcriptomics-spatial-domains",
+   "dir": "spatial-domains"
+  },
+  {
+   "skill": "spatial-transcriptomics-analysis/bioSkills/spatial-multiomics",
+   "name": "bio-spatial-transcriptomics-spatial-multiomics",
+   "dir": "spatial-multiomics"
+  },
+  {
+   "skill": "spatial-transcriptomics-analysis/bioSkills/spatial-neighbors",
+   "name": "bio-spatial-transcriptomics-spatial-neighbors",
+   "dir": "spatial-neighbors"
+  },
+  {
+   "skill": "spatial-transcriptomics-analysis/bioSkills/spatial-preprocessing",
+   "name": "bio-spatial-transcriptomics-spatial-preprocessing",
+   "dir": "spatial-preprocessing"
+  },
+  {
+   "skill": "spatial-transcriptomics-analysis/bioSkills/spatial-proteomics",
+   "name": "bio-spatial-transcriptomics-spatial-proteomics",
+   "dir": "spatial-proteomics"
+  },
+  {
+   "skill": "spatial-transcriptomics-analysis/bioSkills/spatial-statistics",
+   "name": "bio-spatial-transcriptomics-spatial-statistics",
+   "dir": "spatial-statistics"
+  },
+  {
+   "skill": "spatial-transcriptomics-analysis/bioSkills/spatial-visualization",
+   "name": "bio-spatial-transcriptomics-spatial-visualization",
+   "dir": "spatial-visualization"
+  },
+  {
+   "skill": "spatial-tutorials",
+   "name": "spatial-transcriptomics-tutorials-with-omicverse",
+   "dir": "spatial-tutorials"
+  },
+  {
+   "skill": "tcga-preprocessing",
+   "name": "tcga-bulk-data-preprocessing-with-omicverse",
+   "dir": "tcga-preprocessing"
+  },
+  {
+   "skill": "tooluniverse-protein-interactions",
+   "name": "protein-interaction-network-analysis",
+   "dir": "tooluniverse-protein-interactions"
+  },
+  {
+   "skill": "torch_geometric",
+   "name": "torch-geometric",
+   "dir": "torch_geometric"
+  },
+  {
+   "skill": "variant-interpretation-acmg/bioSkills/clinical-interpretation",
+   "name": "bio-variant-calling-clinical-interpretation",
+   "dir": "clinical-interpretation"
+  },
+  {
+   "skill": "variant-interpretation-acmg/bioSkills/consensus-sequences",
+   "name": "bio-consensus-sequences",
+   "dir": "consensus-sequences"
+  },
+  {
+   "skill": "variant-interpretation-acmg/bioSkills/deepvariant",
+   "name": "bio-variant-calling-deepvariant",
+   "dir": "deepvariant"
+  },
+  {
+   "skill": "variant-interpretation-acmg/bioSkills/filtering-best-practices",
+   "name": "bio-variant-calling-filtering-best-practices",
+   "dir": "filtering-best-practices"
+  },
+  {
+   "skill": "variant-interpretation-acmg/bioSkills/gatk-variant-calling",
+   "name": "bio-gatk-variant-calling",
+   "dir": "gatk-variant-calling"
+  },
+  {
+   "skill": "variant-interpretation-acmg/bioSkills/joint-calling",
+   "name": "bio-variant-calling-joint-calling",
+   "dir": "joint-calling"
+  },
+  {
+   "skill": "variant-interpretation-acmg/bioSkills/structural-variant-calling",
+   "name": "bio-variant-calling-structural-variant-calling",
+   "dir": "structural-variant-calling"
+  },
+  {
+   "skill": "variant-interpretation-acmg/bioSkills/variant-annotation",
+   "name": "bio-variant-annotation",
+   "dir": "variant-annotation"
+  },
+  {
+   "skill": "variant-interpretation-acmg/bioSkills/variant-calling",
+   "name": "bio-variant-calling",
+   "dir": "variant-calling"
+  },
+  {
+   "skill": "variant-interpretation-acmg/bioSkills/variant-normalization",
+   "name": "bio-variant-normalization",
+   "dir": "variant-normalization"
+  },
+  {
+   "skill": "variant-interpretation-acmg/bioSkills/vcf-basics",
+   "name": "bio-vcf-basics",
+   "dir": "vcf-basics"
+  },
+  {
+   "skill": "variant-interpretation-acmg/bioSkills/vcf-manipulation",
+   "name": "bio-vcf-manipulation",
+   "dir": "vcf-manipulation"
+  },
+  {
+   "skill": "variant-interpretation-acmg/bioSkills/vcf-statistics",
+   "name": "bio-vcf-statistics",
+   "dir": "vcf-statistics"
+  },
+  {
+   "skill": "variant-interpretation-acmg/varCADD",
+   "name": "varcadd-pathogenicity",
+   "dir": "varCADD"
+  },
+  {
+   "skill": "xlsx-official",
+   "name": "xlsx",
+   "dir": "xlsx-official"
+  }
+ ]
+}

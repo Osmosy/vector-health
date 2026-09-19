@@ -1,0 +1,10 @@
+# GitHub Pages (legacy/Jekyll). Нужен ровно для одного: шапка README — это
+# <div align="center"> с markdown внутри. Без parse_block_html kramdown
+# показывает такой блок сырым текстом (бейджи и заголовок видны как код).
+title: Vector Health
+description: Библиотека медицинских и биомедицинских навыков для AI-агентов — 1540 навыков из четырёх открытых коллекций плюс собственные
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  parse_block_html: true

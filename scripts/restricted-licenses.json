@@ -1,0 +1,1234 @@
+[
+ {
+  "skill": "spatial-epigenomics-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-restriction-sites",
+  "license_files": []
+ },
+ {
+  "skill": "claims-appeals",
+  "license_files": []
+ },
+ {
+  "skill": "bio-splicing-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "bio-comparative-genomics-synteny-analysis",
+  "license_files": []
+ },
+ {
+  "skill": "chromosomal-instability-agent",
+  "license_files": []
+ },
+ {
+  "skill": "chemistry-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-data-visualization-color-palettes",
+  "license_files": []
+ },
+ {
+  "skill": "bio-duplicate-handling",
+  "license_files": []
+ },
+ {
+  "skill": "bio-reporting-automated-qc-reports",
+  "license_files": []
+ },
+ {
+  "skill": "virtual-lab-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-batch-downloads",
+  "license_files": []
+ },
+ {
+  "skill": "trialgpt-matching",
+  "license_files": []
+ },
+ {
+  "skill": "mpn-research-assistant",
+  "license_files": []
+ },
+ {
+  "skill": "computational-pathology-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-genome-assembly-short-read-assembly",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-cnv-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "radiomics-pathomics-fusion-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-phasing-imputation-reference-panels",
+  "license_files": []
+ },
+ {
+  "skill": "bio-genome-assembly-scaffolding",
+  "license_files": []
+ },
+ {
+  "skill": "bio-epitranscriptomics-m6a-peak-calling",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-crispr-screen-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "tcr-repertoire-analysis-agent",
+  "license_files": []
+ },
+ {
+  "skill": "universal-single-cell-annotator",
+  "license_files": []
+ },
+ {
+  "skill": "bio-genome-intervals-coverage-analysis",
+  "license_files": []
+ },
+ {
+  "skill": "bio-machine-learning-atlas-mapping",
+  "license_files": []
+ },
+ {
+  "skill": "bio-experimental-design-sample-size",
+  "license_files": []
+ },
+ {
+  "skill": "tumor-mutational-burden-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-machine-learning-omics-classifiers",
+  "license_files": []
+ },
+ {
+  "skill": "bio-epitranscriptomics-modification-visualization",
+  "license_files": []
+ },
+ {
+  "skill": "bio-rna-quantification-count-matrix-qc",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-atacseq-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "bio-genome-assembly-hifi-assembly",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-imc-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "popeve-variant-predictor-agent",
+  "license_files": []
+ },
+ {
+  "skill": "cnv-caller-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-read-alignment-star-alignment",
+  "license_files": []
+ },
+ {
+  "skill": "cart-design-optimizer-agent",
+  "license_files": []
+ },
+ {
+  "skill": "ctdna-dynamics-mrd-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-microbiome-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "bio-data-visualization-volcano-customization",
+  "license_files": []
+ },
+ {
+  "skill": "chemical-property-lookup",
+  "license_files": []
+ },
+ {
+  "skill": "bio-epitranscriptomics-m6a-differential",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-tcr-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "knowledge-synthesis",
+  "license_files": []
+ },
+ {
+  "skill": "regulatory-drafting",
+  "license_files": []
+ },
+ {
+  "skill": "bio-data-visualization-interactive-visualization",
+  "license_files": []
+ },
+ {
+  "skill": "bio-geo-data",
+  "license_files": []
+ },
+ {
+  "skill": "autonomous-oncology-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-sequence-properties",
+  "license_files": []
+ },
+ {
+  "skill": "bio-expression-matrix-gene-id-mapping",
+  "license_files": []
+ },
+ {
+  "skill": "tcell-exhaustion-analysis-agent",
+  "license_files": []
+ },
+ {
+  "skill": "deep-visual-proteomics-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-clip-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "bio-primer-design-primer-basics",
+  "license_files": []
+ },
+ {
+  "skill": "bio-alignment-indexing",
+  "license_files": []
+ },
+ {
+  "skill": "wearable-analysis-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-rna-quantification-alignment-free-quant",
+  "license_files": []
+ },
+ {
+  "skill": "microbiome-cancer-agent",
+  "license_files": []
+ },
+ {
+  "skill": "crispr-guide-design",
+  "license_files": []
+ },
+ {
+  "skill": "bio-small-rna-seq-mirge3-analysis",
+  "license_files": []
+ },
+ {
+  "skill": "bio-reporting-figure-export",
+  "license_files": []
+ },
+ {
+  "skill": "ehr-fhir-integration",
+  "license_files": []
+ },
+ {
+  "skill": "bio-genome-assembly-long-read-assembly",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-multi-omics-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "cellagent-annotation",
+  "license_files": []
+ },
+ {
+  "skill": "bio-primer-design-primer-validation",
+  "license_files": []
+ },
+ {
+  "skill": "bio-comparative-genomics-ortholog-inference",
+  "license_files": []
+ },
+ {
+  "skill": "bio-machine-learning-model-validation",
+  "license_files": []
+ },
+ {
+  "skill": "bio-restriction-enzyme-selection",
+  "license_files": []
+ },
+ {
+  "skill": "immune-checkpoint-combination-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflow-management-snakemake-workflows",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-hic-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "prior-auth-coworker",
+  "license_files": []
+ },
+ {
+  "skill": "bio-data-visualization-multipanel-figures",
+  "license_files": []
+ },
+ {
+  "skill": "bio-read-alignment-bowtie2-alignment",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-biomarker-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "bio-uniprot-access",
+  "license_files": []
+ },
+ {
+  "skill": "tcr-pmhc-prediction-agent",
+  "license_files": []
+ },
+ {
+  "skill": "research-literature",
+  "license_files": []
+ },
+ {
+  "skill": "bio-small-rna-seq-mirdeep2-analysis",
+  "license_files": []
+ },
+ {
+  "skill": "agentd-drug-discovery",
+  "license_files": []
+ },
+ {
+  "skill": "kragen-knowledge-graph",
+  "license_files": []
+ },
+ {
+  "skill": "clinical-nlp-extractor",
+  "license_files": []
+ },
+ {
+  "skill": "bio-blast-searches",
+  "license_files": []
+ },
+ {
+  "skill": "bio-entrez-fetch",
+  "license_files": []
+ },
+ {
+  "skill": "bio-rna-quantification-tximport-workflow",
+  "license_files": []
+ },
+ {
+  "skill": "tme-immune-profiling-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-chipseq-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "bio-phasing-imputation-imputation-qc",
+  "license_files": []
+ },
+ {
+  "skill": "bio-phasing-imputation-genotype-imputation",
+  "license_files": []
+ },
+ {
+  "skill": "bio-experimental-design-batch-design",
+  "license_files": []
+ },
+ {
+  "skill": "bio-expression-matrix-sparse-handling",
+  "license_files": []
+ },
+ {
+  "skill": "protac-design-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-rna-quantification-featurecounts-counting",
+  "license_files": []
+ },
+ {
+  "skill": "organoid-drug-response-agent",
+  "license_files": []
+ },
+ {
+  "skill": "scfoundation-model-agent",
+  "license_files": []
+ },
+ {
+  "skill": "myeloma-mrd-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflow-management-nextflow-pipelines",
+  "license_files": []
+ },
+ {
+  "skill": "pharmacogenomics-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-sequence-slicing",
+  "license_files": []
+ },
+ {
+  "skill": "bio-clip-seq-binding-site-annotation",
+  "license_files": []
+ },
+ {
+  "skill": "tumor-clonal-evolution-agent",
+  "license_files": []
+ },
+ {
+  "skill": "cellfree-rna-agent",
+  "license_files": []
+ },
+ {
+  "skill": "chematagent-drug-discovery",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-gwas-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "bio-population-genetics-linkage-disequilibrium",
+  "license_files": []
+ },
+ {
+  "skill": "exosome-ev-analysis-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-phylo-modern-tree-inference",
+  "license_files": []
+ },
+ {
+  "skill": "bio-clip-seq-clip-motif-analysis",
+  "license_files": []
+ },
+ {
+  "skill": "bio-genome-assembly-contamination-detection",
+  "license_files": []
+ },
+ {
+  "skill": "time-resolved-cryoem-agent",
+  "license_files": []
+ },
+ {
+  "skill": "digital-twin-clinical-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-transcription-translation",
+  "license_files": []
+ },
+ {
+  "skill": "bio-data-visualization-circos-plots",
+  "license_files": []
+ },
+ {
+  "skill": "bio-alignment-sorting",
+  "license_files": []
+ },
+ {
+  "skill": "pdx-model-analysis-agent",
+  "license_files": []
+ },
+ {
+  "skill": "nicheformer-spatial-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-read-alignment-bwa-alignment",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-outbreak-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "tpd-ternary-complex-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-systems-biology-flux-balance-analysis",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-metagenomics-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-metabolomics-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "cryoem-ai-drug-design-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-genome-intervals-bed-file-basics",
+  "license_files": []
+ },
+ {
+  "skill": "bio-experimental-design-power-analysis",
+  "license_files": []
+ },
+ {
+  "skill": "multi-ancestry-prs-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-smrna-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "tumor-heterogeneity-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-phylo-tree-io",
+  "license_files": []
+ },
+ {
+  "skill": "biomaster-workflows",
+  "license_files": []
+ },
+ {
+  "skill": "bio-data-visualization-ggplot2-fundamentals",
+  "license_files": []
+ },
+ {
+  "skill": "multimodal-medical-imaging",
+  "license_files": []
+ },
+ {
+  "skill": "spatial-agent",
+  "license_files": []
+ },
+ {
+  "skill": "cancer-metabolism-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bioinformatics-singlecell",
+  "license_files": []
+ },
+ {
+  "skill": "bio-population-genetics-association-testing",
+  "license_files": []
+ },
+ {
+  "skill": "bio-bedgraph-handling",
+  "license_files": []
+ },
+ {
+  "skill": "protein-structure-prediction",
+  "license_files": []
+ },
+ {
+  "skill": "mrd-edge-detection-agent",
+  "license_files": []
+ },
+ {
+  "skill": "liquid-biopsy-analytics-agent",
+  "license_files": []
+ },
+ {
+  "skill": "rna-velocity-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-genome-assembly-assembly-qc",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-metabolic-modeling-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "radgpt-radiology-reporter",
+  "license_files": []
+ },
+ {
+  "skill": "bio-research-tools-biomarker-signature-studio",
+  "license_files": []
+ },
+ {
+  "skill": "bio-machine-learning-biomarker-discovery",
+  "license_files": []
+ },
+ {
+  "skill": "bio-systems-biology-metabolic-reconstruction",
+  "license_files": []
+ },
+ {
+  "skill": "bio-systems-biology-gene-essentiality",
+  "license_files": []
+ },
+ {
+  "skill": "antibody-design-agent",
+  "license_files": []
+ },
+ {
+  "skill": "antibody-design-agent/MAGE",
+  "license_files": []
+ },
+ {
+  "skill": "armored-cart-design-agent",
+  "license_files": []
+ },
+ {
+  "skill": "molecule-evolution-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-read-alignment-hisat2-alignment",
+  "license_files": []
+ },
+ {
+  "skill": "bio-epitranscriptomics-m6anet-analysis",
+  "license_files": []
+ },
+ {
+  "skill": "bayesian-optimizer",
+  "license_files": []
+ },
+ {
+  "skill": "crispr-offtarget-predictor",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-cytometry-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "bio-phylo-tree-manipulation",
+  "license_files": []
+ },
+ {
+  "skill": "scrna-qc",
+  "license_files": []
+ },
+ {
+  "skill": "fhir-development",
+  "license_files": []
+ },
+ {
+  "skill": "biomedical-data-analysis",
+  "license_files": []
+ },
+ {
+  "skill": "bio-alignment-files-bam-statistics",
+  "license_files": []
+ },
+ {
+  "skill": "bio-data-visualization-heatmaps-clustering",
+  "license_files": []
+ },
+ {
+  "skill": "bio-pileup-generation",
+  "license_files": []
+ },
+ {
+  "skill": "precision-oncology-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-local-blast",
+  "license_files": []
+ },
+ {
+  "skill": "biomni-general-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-clip-seq-clip-preprocessing",
+  "license_files": []
+ },
+ {
+  "skill": "bio-reporting-quarto-reports",
+  "license_files": []
+ },
+ {
+  "skill": "bio-epitranscriptomics-merip-preprocessing",
+  "license_files": []
+ },
+ {
+  "skill": "variant-interpretation-acmg",
+  "license_files": []
+ },
+ {
+  "skill": "variant-interpretation-acmg/bioSkills/structural-variant-calling",
+  "license_files": []
+ },
+ {
+  "skill": "variant-interpretation-acmg/bioSkills/filtering-best-practices",
+  "license_files": []
+ },
+ {
+  "skill": "variant-interpretation-acmg/bioSkills/gatk-variant-calling",
+  "license_files": []
+ },
+ {
+  "skill": "variant-interpretation-acmg/bioSkills/deepvariant",
+  "license_files": []
+ },
+ {
+  "skill": "variant-interpretation-acmg/bioSkills/vcf-manipulation",
+  "license_files": []
+ },
+ {
+  "skill": "variant-interpretation-acmg/bioSkills/variant-calling",
+  "license_files": []
+ },
+ {
+  "skill": "variant-interpretation-acmg/bioSkills/joint-calling",
+  "license_files": []
+ },
+ {
+  "skill": "variant-interpretation-acmg/bioSkills/vcf-statistics",
+  "license_files": []
+ },
+ {
+  "skill": "variant-interpretation-acmg/bioSkills/variant-normalization",
+  "license_files": []
+ },
+ {
+  "skill": "variant-interpretation-acmg/bioSkills/consensus-sequences",
+  "license_files": []
+ },
+ {
+  "skill": "variant-interpretation-acmg/bioSkills/variant-annotation",
+  "license_files": []
+ },
+ {
+  "skill": "variant-interpretation-acmg/bioSkills/vcf-basics",
+  "license_files": []
+ },
+ {
+  "skill": "variant-interpretation-acmg/bioSkills/clinical-interpretation",
+  "license_files": []
+ },
+ {
+  "skill": "variant-interpretation-acmg/varCADD",
+  "license_files": []
+ },
+ {
+  "skill": "bio-systems-biology-context-specific-models",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-merip-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflow-management-cwl-workflows",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-neoantigen-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "data-visualization-biomedical",
+  "license_files": []
+ },
+ {
+  "skill": "cellular-senescence-agent",
+  "license_files": []
+ },
+ {
+  "skill": "biomcp-server",
+  "license_files": []
+ },
+ {
+  "skill": "bio-genome-assembly-assembly-polishing",
+  "license_files": []
+ },
+ {
+  "skill": "chip-clonal-hematopoiesis-agent",
+  "license_files": []
+ },
+ {
+  "skill": "epigenomics-methylgpt-agent",
+  "license_files": []
+ },
+ {
+  "skill": "nk-cell-therapy-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-expression-to-pathways",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-methylation-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "molecular-glue-discovery-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-reverse-complement",
+  "license_files": []
+ },
+ {
+  "skill": "search-strategy",
+  "license_files": []
+ },
+ {
+  "skill": "bio-small-rna-seq-target-prediction",
+  "license_files": []
+ },
+ {
+  "skill": "compbioagent-explorer",
+  "license_files": []
+ },
+ {
+  "skill": "bio-population-genetics-population-structure",
+  "license_files": []
+ },
+ {
+  "skill": "opentrons-protocol-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-seq-objects",
+  "license_files": []
+ },
+ {
+  "skill": "bio-phylo-tree-visualization",
+  "license_files": []
+ },
+ {
+  "skill": "long-read-sequencing-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-proteomics-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "bio-comparative-genomics-hgt-detection",
+  "license_files": []
+ },
+ {
+  "skill": "spatial-transcriptomics-analysis",
+  "license_files": []
+ },
+ {
+  "skill": "spatial-transcriptomics-analysis/SpatialAgent",
+  "license_files": []
+ },
+ {
+  "skill": "spatial-transcriptomics-analysis/bioSkills/spatial-communication",
+  "license_files": []
+ },
+ {
+  "skill": "spatial-transcriptomics-analysis/bioSkills/spatial-deconvolution",
+  "license_files": []
+ },
+ {
+  "skill": "spatial-transcriptomics-analysis/bioSkills/spatial-domains",
+  "license_files": []
+ },
+ {
+  "skill": "spatial-transcriptomics-analysis/bioSkills/spatial-multiomics",
+  "license_files": []
+ },
+ {
+  "skill": "spatial-transcriptomics-analysis/bioSkills/spatial-neighbors",
+  "license_files": []
+ },
+ {
+  "skill": "spatial-transcriptomics-analysis/bioSkills/spatial-proteomics",
+  "license_files": []
+ },
+ {
+  "skill": "spatial-transcriptomics-analysis/bioSkills/spatial-statistics",
+  "license_files": []
+ },
+ {
+  "skill": "spatial-transcriptomics-analysis/bioSkills/spatial-preprocessing",
+  "license_files": []
+ },
+ {
+  "skill": "spatial-transcriptomics-analysis/bioSkills/spatial-visualization",
+  "license_files": []
+ },
+ {
+  "skill": "spatial-transcriptomics-analysis/bioSkills/spatial-data-io",
+  "license_files": []
+ },
+ {
+  "skill": "spatial-transcriptomics-analysis/bioSkills/image-analysis",
+  "license_files": []
+ },
+ {
+  "skill": "spatial-transcriptomics-analysis/STAgent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-phylo-distance-calculations",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflow-management-wdl-workflows",
+  "license_files": []
+ },
+ {
+  "skill": "deep-research-swarm",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-fastq-to-variants",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-crispr-editing-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "bio-entrez-search",
+  "license_files": []
+ },
+ {
+  "skill": "ngs-analysis",
+  "license_files": []
+ },
+ {
+  "skill": "cytokine-storm-analysis-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-experimental-design-multiple-testing",
+  "license_files": []
+ },
+ {
+  "skill": "bio-reporting-jupyter-reports",
+  "license_files": []
+ },
+ {
+  "skill": "bio-population-genetics-scikit-allel-analysis",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-somatic-variant-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "gene-panel-design-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-phasing-imputation-haplotype-phasing",
+  "license_files": []
+ },
+ {
+  "skill": "bio-sequence-similarity",
+  "license_files": []
+ },
+ {
+  "skill": "varcadd-pathogenicity",
+  "license_files": []
+ },
+ {
+  "skill": "simo-multiomics-integration-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-population-genetics-plink-basics",
+  "license_files": []
+ },
+ {
+  "skill": "bio-liquid-biopsy-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "bio-entrez-link",
+  "license_files": []
+ },
+ {
+  "skill": "bio-motif-search",
+  "license_files": []
+ },
+ {
+  "skill": "bio-genome-intervals-bigwig-tracks",
+  "license_files": []
+ },
+ {
+  "skill": "bio-expression-matrix-metadata-joins",
+  "license_files": []
+ },
+ {
+  "skill": "bio-reporting-rmarkdown-reports",
+  "license_files": []
+ },
+ {
+  "skill": "bio-expression-matrix-counts-ingest",
+  "license_files": []
+ },
+ {
+  "skill": "bio-restriction-fragment-analysis",
+  "license_files": []
+ },
+ {
+  "skill": "bio-genome-intervals-gtf-gff-handling",
+  "license_files": []
+ },
+ {
+  "skill": "mpn-progression-monitor-agent",
+  "license_files": []
+ },
+ {
+  "skill": "chatehr-clinician-assistant",
+  "license_files": []
+ },
+ {
+  "skill": "bio-systems-biology-model-curation",
+  "license_files": []
+ },
+ {
+  "skill": "aav-vector-design-agent",
+  "license_files": []
+ },
+ {
+  "skill": "prs-net-deep-learning-agent",
+  "license_files": []
+ },
+ {
+  "skill": "lab-results",
+  "license_files": []
+ },
+ {
+  "skill": "coagulation-thrombosis-agent",
+  "license_files": []
+ },
+ {
+  "skill": "data-visualization-expert",
+  "license_files": []
+ },
+ {
+  "skill": "hemoglobinopathy-analysis-agent",
+  "license_files": []
+ },
+ {
+  "skill": "hrd-analysis-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-genome-intervals-proximity-operations",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-spatial-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "scientific-manuscript",
+  "license_files": []
+ },
+ {
+  "skill": "bio-comparative-genomics-ancestral-reconstruction",
+  "license_files": []
+ },
+ {
+  "skill": "mage-antibody-generator",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-multiome-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "bio-reference-operations",
+  "license_files": []
+ },
+ {
+  "skill": "bio-restriction-mapping",
+  "license_files": []
+ },
+ {
+  "skill": "bio-machine-learning-prediction-explanation",
+  "license_files": []
+ },
+ {
+  "skill": "bio-alignment-validation",
+  "license_files": []
+ },
+ {
+  "skill": "bio-clip-seq-clip-peak-calling",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-longread-sv-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "bio-primer-design-qpcr-primers",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-genome-assembly-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "regulatory-drafter",
+  "license_files": []
+ },
+ {
+  "skill": "chemcrow-drug-discovery",
+  "license_files": []
+ },
+ {
+  "skill": "bio-data-visualization-upset-plots",
+  "license_files": []
+ },
+ {
+  "skill": "bio-data-visualization-genome-browser-tracks",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-scrnaseq-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-rnaseq-to-de",
+  "license_files": []
+ },
+ {
+  "skill": "bio-sra-data",
+  "license_files": []
+ },
+ {
+  "skill": "bio-data-visualization-genome-tracks",
+  "license_files": []
+ },
+ {
+  "skill": "spatial-transcriptomics-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bone-marrow-ai-agent",
+  "license_files": []
+ },
+ {
+  "skill": "clinical-note-summarization",
+  "license_files": []
+ },
+ {
+  "skill": "leads-literature-mining",
+  "license_files": []
+ },
+ {
+  "skill": "bio-sam-bam-basics",
+  "license_files": []
+ },
+ {
+  "skill": "bio-machine-learning-survival-analysis",
+  "license_files": []
+ },
+ {
+  "skill": "bio-codon-usage",
+  "license_files": []
+ },
+ {
+  "skill": "pan-cancer-multiomics-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-small-rna-seq-differential-mirna",
+  "license_files": []
+ },
+ {
+  "skill": "biomni-research-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-comparative-genomics-positive-selection",
+  "license_files": []
+ },
+ {
+  "skill": "bio-clip-seq-clip-alignment",
+  "license_files": []
+ },
+ {
+  "skill": "care-coordination",
+  "license_files": []
+ },
+ {
+  "skill": "bio-data-visualization-specialized-omics-plots",
+  "license_files": []
+ },
+ {
+  "skill": "bio-alignment-filtering",
+  "license_files": []
+ },
+ {
+  "skill": "bio-genome-assembly-metagenome-assembly",
+  "license_files": []
+ },
+ {
+  "skill": "bio-workflows-riboseq-pipeline",
+  "license_files": []
+ },
+ {
+  "skill": "bio-small-rna-seq-smrna-preprocessing",
+  "license_files": []
+ },
+ {
+  "skill": "biokernel",
+  "license_files": []
+ },
+ {
+  "skill": "trial-eligibility-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-genome-intervals-interval-arithmetic",
+  "license_files": []
+ },
+ {
+  "skill": "multimodal-radpath-fusion-agent",
+  "license_files": []
+ },
+ {
+  "skill": "bio-population-genetics-selection-statistics",
+  "license_files": []
+ }
+]

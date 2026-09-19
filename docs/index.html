@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vector Health — библиотека медицинских навыков для AI-агентов</title>
+<meta name="description" content="1540 медицинских и биомедицинских навыков из четырёх открытых коллекций плюс собственный пайплайн DICOM→VLM. Синхронизация с апстримами, каталог для поиска, учёт ограниченных лицензий.">
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --line: #26303d;
+    --fg: #e6edf3; --dim: #9aa7b4; --accent: #4f8ff7; --accent2: #7cc4ff;
+    --warn: #e5b567;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font: 16px/1.6 -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 56px 24px 80px; }
+  header { border-bottom: 1px solid var(--line); padding-bottom: 32px; margin-bottom: 40px; }
+  h1 { font-size: 2.1rem; margin: 0 0 12px; letter-spacing: -0.02em; }
+  .lede { color: var(--dim); font-size: 1.05rem; max-width: 62ch; margin: 0 0 24px; }
+  .stats { display: flex; flex-wrap: wrap; gap: 28px; margin: 28px 0 0; }
+  .stat b { display: block; font-size: 1.6rem; color: var(--accent2); line-height: 1.2; }
+  .stat span { color: var(--dim); font-size: 0.86rem; }
+  h2 { font-size: 1.25rem; margin: 44px 0 14px; }
+  h3 { font-size: 1rem; margin: 26px 0 8px; color: var(--accent2); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  p { margin: 0 0 14px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .card b { display: block; font-size: 1.35rem; color: var(--accent2); }
+  .card span { color: var(--dim); font-size: 0.9rem; }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0 20px; font-size: 0.95rem; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--dim); font-weight: 500; }
+  code {
+    background: #1f2632; padding: 1px 6px; border-radius: 5px;
+    font: 0.88em/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  pre {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 16px; overflow-x: auto;
+    font: 0.86em/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; color: #cbd6e2;
+  }
+  pre .ok { color: #6ed08a; }
+  pre .warn { color: var(--warn); }
+  .note { border-left: 3px solid var(--accent); padding: 2px 0 2px 16px; color: var(--dim); margin: 18px 0; }
+  .alert { border-left: 3px solid var(--warn); padding: 2px 0 2px 16px; margin: 18px 0; }
+  footer { margin-top: 56px; padding-top: 22px; border-top: 1px solid var(--line); color: var(--dim); font-size: 0.9rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Vector Health</h1>
+  <p class="lede">
+    Библиотека медицинских и биомедицинских навыков: <b>1540 навыков</b> из четырёх
+    открытых коллекций плюс два собственных. Единая структура
+    <code>skills/&lt;имя&gt;/SKILL.md</code>, каталог для поиска и карта
+    происхождения по каждому навыку.
+  </p>
+  <p class="lede">
+    Не программа и не медицинское изделие. Навыки описывают <b>методики</b> —
+    как считать мета-анализ, как читать DICOM локальной моделью, как оценить риск
+    смещения; клиническое решение остаётся за специалистом.
+  </p>
+  <div class="stats">
+    <div class="stat"><b>1540</b><span>навыков</span></div>
+    <div class="stat"><b>4</b><span>коллекции-источника</span></div>
+    <div class="stat"><b>28</b><span>вложенных навыков</span></div>
+    <div class="stat"><b>11</b><span>проверок CI</span></div>
+  </div>
+</header>
+
+<h2>Откуда навыки</h2>
+<table>
+  <tr><th>Коллекция</th><th>Навыков</th><th>Фокус</th><th>Лицензия</th></tr>
+  <tr><td>OpenClaw-Medical-Skills</td><td>777</td><td>биоинформатика, геномика, клинические БД, drug discovery</td><td>MIT (в README)</td></tr>
+  <tr><td>AIPOCH medical-research-skills</td><td>600</td><td>evidence, дизайн исследования, анализ, письмо</td><td>MIT</td></tr>
+  <tr><td>openmed</td><td>74</td><td>клинический NLP, FHIR, деидентификация, HIPAA</td><td>Apache-2.0</td></tr>
+  <tr><td>Aperivue medsci-skills</td><td>59</td><td>протоколы, статистика, мета-анализ, гранты</td><td>MIT</td></tr>
+  <tr><td>собственные</td><td>2</td><td>DICOM → локальная vision-модель; фибрилляция предсердий</td><td>MIT</td></tr>
+</table>
+
+<h2>Как это работает</h2>
+<pre>
+Четыре апстрима ──┐
+OpenClaw  777     │
+AIPOCH    600     ├─→ sync_upstreams.py ─→ skills/ (1540) ─→ агент читает по запросу
+openmed    74     │   идемпотентна:           │
+Aperivue   59     │   повторный запуск = 0    ├─→ build_index.py ─→ skills-index.json
+                  │                           │
+собственные 2 ────┘                           └─→ validate.py ─→ CI: числа, лицензии, ссылки
+</pre>
+
+<div class="grid">
+  <div class="card"><b>Идемпотентная синхронизация</b><span>Сравнение с HEAD апстрима: повторный запуск даёт нуль изменений — это и есть проверка, что синхронизация завершена.</span></div>
+  <div class="card"><b>Файлы-ссылки из форков</b><span>У части навыков <code>SKILL.md</code> из одного источника, а <code>references/</code> — из другого, более полного форка.</span></div>
+  <div class="card"><b>Битые ссылки под учётом</b><span>483 ссылки ведут на файлы, которых нет ни у одного источника (лежали в отрезанных <code>tests/</code>). Инвентарь с причиной по каждой.</span></div>
+</div>
+
+<h2>Быстрый старт</h2>
+<pre>
+git clone https://github.com/Osmosy/vector-health.git
+cd vector-health
+
+<span class="ok"># найти навык по каталогу</span>
+python3 -c "
+import json
+for s in json.load(open('skills-index.json'))['skills']:
+    if 'dicom' in s['name']: print(s['path'], '—', s['description'][:80])
+"
+
+<span class="ok"># прочитать методику и подключить к агенту</span>
+less skills/dicom-vlm-analysis/SKILL.md
+cp -r skills/dicom-vlm-analysis ~/.hermes/skills/
+
+<span class="ok"># проверить целостность</span>
+python3 scripts/validate.py
+</pre>
+
+<h2>Ограничения лицензий</h2>
+<p>
+  MIT репозитория покрывает <b>собственный вклад</b>. Внутри библиотеки есть
+  навыки, которые считать свободными нельзя, и это зафиксировано явно:
+</p>
+<table>
+  <tr><th>Что</th><th>Навыков</th><th>Следствие</th></tr>
+  <tr><td>Проприетарная шапка в тексте («All Rights Reserved», © MD BABU MIA — из апстрима OpenClaw)</td><td>308</td><td>считать MIT нельзя; текст запрещает копирование</td></tr>
+  <tr><td>Офисные навыки Anthropic (<code>xlsx</code>, <code>pdf</code>, <code>docx</code>, <code>pptx</code>)</td><td>8</td><td>нужен ваш договор с Anthropic</td></tr>
+  <tr><td><code>Non-Commercial</code></td><td>2</td><td>коммерческое использование запрещено</td></tr>
+</table>
+<div class="alert">
+  Это свойство источников, а не сборки: OpenClaw заявляет MIT в README, держа
+  проприетарную шапку в 280 своих навыках. Чужие лицензионные тексты мы не
+  переписываем — фиксируем факт, чтобы риск был виден до использования.
+</div>
+
+<h2>Документация</h2>
+<table>
+  <tr><th>Файл</th><th>Что внутри</th></tr>
+  <tr><td><a href="https://github.com/Osmosy/vector-health/blob/main/README.md">README.md</a></td><td>обзор, состав, ключевые решения и грабли</td></tr>
+  <tr><td><a href="https://github.com/Osmosy/vector-health/blob/main/INSTALL.md">INSTALL.md</a></td><td>установка, что чем закрывается, ограничения</td></tr>
+  <tr><td><a href="https://github.com/Osmosy/vector-health/blob/main/NOTICE.md">NOTICE.md</a></td><td>атрибуция, оговорки по лицензиям</td></tr>
+  <tr><td><a href="https://github.com/Osmosy/vector-health/blob/main/AGENTS.md">AGENTS.md</a></td><td>правила для AI-агентов в этом репозитории</td></tr>
+  <tr><td><a href="vector-health.architecture.html">Архитектура (live)</a></td><td>интерактивная диаграмма: сборка, поиск, контроль</td></tr>
+  <tr><td><a href="https://github.com/Osmosy/vector-health/blob/main/docs/broken-refs.md">docs/broken-refs.md</a></td><td>инвентарь битых ссылок с причиной по каждой</td></tr>
+</table>
+
+<footer>
+  Часть экосистемы <a href="https://github.com/Osmosy/vector-work">Vector</a>.
+  Собственный вклад — MIT (© 2026 Osmosy); вендоренные навыки сохраняют лицензии
+  источников.<br>
+  Навыки — методики для специалистов и исследователей, не замена врачебной
+  интерпретации.
+</footer>
+
+</div>
+</body>
+</html>

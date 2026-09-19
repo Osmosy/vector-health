@@ -177,6 +177,8 @@ def is_excluded(path: str) -> bool:
     low = "/" + path
     if any(part in low for part in EXCLUDE_PARTS) or path.endswith(EXCLUDE_SUFFIX):
         return True
+    if path.endswith(HEAVY_SUFFIX):
+        return True
     base = path.rsplit("/", 1)[-1]
     return any(marker in base for marker in EXCLUDE_MARKERS)
 
@@ -194,9 +196,14 @@ def rel_of(up_path: str, name: str) -> str:
 
 
 def skill_dir_of(path: str) -> str | None:
-    """Имя навыка для пути внутри апстрима: каталог, содержащий SKILL.md."""
-    if path.endswith("/SKILL.md"):
-        return path.rsplit("/SKILL.md", 1)[0].split("/")[-1]
+    """Имя навыка для пути внутри апстрима: каталог, содержащий SKILL.md.
+
+    Расширение бывает заглавным: OpenClaw держит один навык как `SKILL.MD`, и
+    сравнение по точной строке теряло его — навык попадал в «собственные».
+    """
+    low = path.lower()
+    if low.endswith("/skill.md"):
+        return path.rsplit("/", 1)[0].split("/")[-1]
     return None
 
 
@@ -206,16 +213,22 @@ def build_origin() -> dict:
                    if os.path.isfile(os.path.join(SKILLS, d, "SKILL.md"))]
     origin: dict[str, str] = {}
     sha_by_source: dict[str, dict[str, str]] = {}
+    # Два состояния апстрима: HEAD (что там сейчас) и дата сборки (что было
+    # взято вендорингом). HEAD первым: после синхронизации часть навыков ушла
+    # вперёд, и по одному устаревшему дереву они ошибочно числились бы «своими».
     for label, cfg in SOURCES.items():
-        ref = assembled_ref(cfg["repo"])
-        tree = blob_map(cfg["repo"], ref)
-        by_sha = {}
-        for path, sha in tree.items():
-            name = skill_dir_of(path)
-            if name:
-                by_sha.setdefault(sha, name)
+        by_sha: dict[str, str] = {}
+        for ref in (head_of(cfg["repo"]), assembled_ref(cfg["repo"])):
+            try:
+                tree = blob_map(cfg["repo"], ref)
+            except Exception:  # noqa: BLE001 — сеть: дерево просто не учитываем
+                continue
+            for path, sha in tree.items():
+                name = skill_dir_of(path)
+                if name:
+                    by_sha.setdefault(sha, name)
         sha_by_source[label] = by_sha
-        print(f"  {label:9} {ref[:7]}: навыков в дереве {len(by_sha)}")
+        print(f"  {label:9}: навыков в дереве {len(by_sha)}")
 
     for name in local_names:
         smd = os.path.join(SKILLS, name, "SKILL.md")

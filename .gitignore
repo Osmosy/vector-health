@@ -1,11 +1,25 @@
+# Python-кеш
 __pycache__/
 *.py[cod]
 *.pyo
-*.bak
-*.pre-polish*
-.DS_Store
-node_modules/
+
+# Виртуальные окружения
 .venv/
 venv/
+env/
+
+# Локальные артефакты
+*.bak
+*.pre-polish*
 .pytest_cache/
 .ipynb_checkpoints/
+
+# Служебное окружения
+.DS_Store
+node_modules/
+
+# Страховка: ключи и локальные конфиги не коммитить
+.env
+.env.*
+*.key
+*.pem

@@ -1,102 +1,206 @@
+<div align="center">
+
+<img src="assets/vector-logo.png" alt="Vector Health" width="200"/>
+
 # Vector Health
 
-![Vector Health](assets/vector-logo.png)
+[![Architecture: live](https://img.shields.io/badge/Architecture-live_diagram-4f8ff7.svg)](https://osmosy.github.io/vector-health/docs/vector-health.architecture.html)
 
-**Vector Health** — единая библиотека медицинских и биомедицинских навыков для AI-агентов
-(Hermes, OpenClaw, Claude Code, Codex и любой SKILL.md-совместимой платформы). Объединение
-четырёх открытых коллекций плюс собственный пайплайн DICOM→VLM, дедупликация по именам и
-единая структура `skills/<name>/SKILL.md`.
+**Библиотека медицинских и биомедицинских навыков для AI-агентов — 1540 навыков из четырёх открытых коллекций плюс собственный пайплайн DICOM→VLM**
 
-**1540 навыков** — в 1512 каталогах верхнего уровня и 28 вложенных (апстримы держат часть
-навыков внутри каталогов-контейнеров, например `variant-interpretation-acmg/bioSkills/…`) ·
-4 источника + 2 собственных · MIT + Apache-2.0
+[![Hermes Agent](https://img.shields.io/badge/Hermes-Agent-blue.svg)](https://github.com/NousResearch/hermes-agent)
+[![Ecosystem: Vector](https://img.shields.io/badge/Ecosystem-Vector-blue.svg)](https://osmosy.github.io/)
+[![Skills: 1540](https://img.shields.io/badge/Skills-1540-green.svg)](#состав)
+[![Sources: 4](https://img.shields.io/badge/Upstream_collections-4-blueviolet.svg)](NOTICE.md)
+[![Own skills: 2](https://img.shields.io/badge/Own_skills-2-orange.svg)](#собственные-навыки)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+**Документация:** [Установка](INSTALL.md) · [Архитектура (live)](https://osmosy.github.io/vector-health/docs/vector-health.architecture.html) · [Источники и лицензии](NOTICE.md) · [Ограниченные лицензии](NOTICE.md#ограниченные-лицензии-внутри-библиотеки--читать-до-использования) · [Битые ссылки](docs/broken-refs.md) · [Для агентов](AGENTS.md)
+
+</div>
 
 ---
 
-## Что внутри
+Библиотека медицинских и биомедицинских навыков: 1540 `SKILL.md` из четырёх
+открытых коллекций плюс два собственных навыка. Не программа, не сервис и **не
+медицинское изделие**: навыки описывают методики — как считать мета-анализ, как
+читать DICOM локальной моделью, как оценить риск смещения.
 
-| Источник | Уникальных навыков | Фокус | Лицензия |
+Единая структура `skills/<имя>/SKILL.md`, дедупликация по именам и карта
+происхождения по каждому навыку: видно, из какой коллекции он пришёл.
+
+## Состав
+
+| Источник | Навыков | Фокус | Лицензия |
 |---|---|---|---|
-| [OpenClaw-Medical-Skills](https://github.com/FreedomIntelligence/OpenClaw-Medical-Skills) | 777 | биоинформатика, геномика, клинические БД, drug discovery | MIT |
-| [medical-research-skills](https://github.com/aipoch/medical-research-skills) (AIPOCH) | 600 | исследовательский workflow: evidence, дизайн, анализ, письмо, аудит навыков | MIT |
+| [OpenClaw-Medical-Skills](https://github.com/FreedomIntelligence/OpenClaw-Medical-Skills) | 777 | биоинформатика, геномика, клинические БД, drug discovery | MIT (заявлена в README, файла нет) |
+| [medical-research-skills](https://github.com/aipoch/medical-research-skills) (AIPOCH) | 600 | evidence, дизайн исследования, анализ, письмо, аудит навыков | MIT |
 | [openmed](https://github.com/maziyarpanahi/openmed) | 74 | клинический NLP, FHIR, деидентификация, HIPAA, ICD-10 | Apache-2.0 |
 | [medsci-skills](https://github.com/Aperivue/medsci-skills) (Aperivue) | 59 | протоколы, статистика, мета-анализ, гранты, imaging | MIT |
-| собственные | 2 | DICOM → локальная vision-модель (medgemma); тактика при фибрилляции предсердий | MIT |
+| собственные | 2 | DICOM → локальная vision-модель; тактика при фибрилляции предсердий | MIT |
 
-**Домены**: клиника · геномика · биоинформатика (RNA-seq, scRNA-seq, GWAS, variant calling) ·
-drug discovery · медицинская визуализация (DICOM/радиомика) · FHIR/интероперабельность ·
-деидентификация и HIPAA · исследовательский дизайн · академическое письмо.
+**1540 навыков** — 1512 каталогов верхнего уровня и 28 вложенных (апстримы держат
+часть навыков внутри каталогов-контейнеров, например
+`variant-interpretation-acmg/bioSkills/…`). Каталог включает вложенные: у них
+отдельное поле `path`.
 
----
+**Домены**: клиника · геномика · биоинформатика (RNA-seq, scRNA-seq, GWAS, variant
+calling) · drug discovery · медицинская визуализация (DICOM/радиомика) ·
+FHIR/интероперабельность · деидентификация и HIPAA · исследовательский дизайн ·
+академическое письмо.
 
-## Структура
+## Как это работает
+
+```
+Четыре апстрима ──┐
+OpenClaw  777     │
+AIPOCH    600     ├─→ sync_upstreams.py ─→ skills/ (1540)  ─→ агент читает по запросу
+openmed    74     │   (идемпотентно:          │
+Aperivue   59     │    повторный запуск = 0)   ├─→ build_index.py ─→ skills-index.json
+                  │                           │                      (поиск без загрузки всего)
+собственные 2 ────┘                           └─→ validate.py ─→ CI: числа, лицензии, ссылки
+```
+
+Порядок работы с библиотекой:
+
+1. **Найти** навык по каталогу `skills-index.json` (имя, путь, описание) — не
+   грузить 1540 описаний в контекст.
+2. **Прочитать** `skills/<имя>/SKILL.md` и следовать методике.
+3. **Обновить** при необходимости: `python3 scripts/sync_upstreams.py`.
+4. **Проверить** перед коммитом: `python3 scripts/validate.py`.
+
+## Быстрый старт
+
+```bash
+git clone https://github.com/Osmosy/vector-health.git
+cd vector-health
+
+# найти навык по каталогу
+python3 -c "
+import json
+for s in json.load(open('skills-index.json'))['skills']:
+    if 'dicom' in s['name']: print(s['path'], '—', s['description'][:80])
+"
+
+# прочитать методику
+less skills/dicom-vlm-analysis/SKILL.md
+
+# подключить к своему агенту (Hermes)
+cp -r skills/dicom-vlm-analysis ~/.hermes/skills/
+
+# проверить целостность
+python3 scripts/validate.py
+```
+
+Ставить все 1540 сразу не нужно: каталог существует ровно затем, чтобы брать по
+надобности.
+
+## Собственные навыки
+
+- **`dicom-vlm-analysis`** — чтение DICOM/КТ локальной vision-моделью без облака:
+  `pydicom` (рендер с window/level) → PNG → Ollama `medgemma:4b`
+  (`/api/generate`, `images=[base64]`).
+- **`atrial-fibrillation-treatment`** — тактика при фибрилляции предсердий:
+  контроль ритма, катетерная аблация, антикоагуляция.
+
+Эти два навыка можно править напрямую — синхронизация их не трогает.
+
+## Структура репозитория
 
 ```
 vector-health/
-├── skills/               # 1540 навыков (1512 верхних каталогов + 28 вложенных)
-├── skills-index.json     # каталог: имя, путь, описание каждого навыка (для поиска)
-├── scripts/              # build_index.py, validate_skills.py, validate_readme.py,
-│                       #   sync_upstreams.py (синхронизация с апстримами),
-│                       #   broken_refs.py (инвентарь ссылок внутри навыков)
-├── docs/                 # broken-refs.md — инвентарь битых ссылок
-├── NOTICE.md             # источники, лицензии, синхронизация
-├── .github/workflows/    # CI: валидация frontmatter + скан секретов/PII на каждый push
-├── assets/               # логотип Vector
-├── README.md
-└── NOTICE.md             # атрибуция и лицензии источников
+├── skills/                    # 1540 навыков (1512 верхних + 28 вложенных)
+│   └── <имя>/SKILL.md         # + references/, scripts/, assets/ (если есть)
+├── skills-index.json          # каталог для поиска: имя, путь, описание
+├── scripts/
+│   ├── sync_upstreams.py      # синхронизация с четырьмя апстримами (идемпотентна)
+│   ├── build_index.py         # сборка каталога (рекурсивно, с вложенными)
+│   ├── validate.py            # валидатор репозитория: 11 проверок (спина CI)
+│   ├── broken_refs.py         # инвентарь ссылок внутри навыков
+│   ├── upstream-origin.json   # карта происхождения: навык → источник
+│   ├── name-mismatches.json   # учтённые расхождения name и каталога (69)
+│   └── restricted-licenses.json  # навыки с ограниченной лицензией (308)
+├── docs/
+│   ├── vector-health.architecture.{json,html}  # живая диаграмма
+│   └── broken-refs.md         # инвентарь битых ссылок с причиной
+├── tests/test_scripts.py      # проверки скриптов
+├── THIRD_PARTY_LICENSES/      # полные тексты лицензий источников
+├── .github/workflows/         # CI
+├── LICENSE                    # MIT (собственный вклад)
+├── NOTICE.md                  # атрибуция, оговорки по лицензиям
+├── INSTALL.md                 # установка для стороннего пользователя
+├── AGENTS.md                  # правила для AI-агентов в этом репозитории
+├── agent-description.md       # краткая машинная сводка
+├── _config.yml                # Jekyll: чтобы шапка README рендерилась
+└── README.md
 ```
 
-Каждый навык — самодостаточный `SKILL.md` с frontmatter (`name`, `description`, иногда
-`license`, `metadata`). Навыки сохраняют исходную структуру вспомогательных файлов.
+## Ключевые решения и грабли
 
----
+- **Идемпотентная синхронизация.** `sync_upstreams.py` сравнивает **локальный файл
+  с HEAD апстрима**, а не «базу с head». Второй вариант законно описывает дельту,
+  но каждый запуск печатает одно и то же — и проверить, применена ли она, нечем.
+  Сейчас повторный запуск даёт `обновить 0, добавить 0, удалить 0`.
+- **«Гибридные» навыки.** У части навыков `SKILL.md` пришёл из одного апстрима, а
+  его `references/` и `scripts/` существуют только в другом, более полном форке
+  (`gwas-database`, `pathml`, `pydicom`, `shap`, `hypothesis-generation`: SKILL.md
+  от AIPOCH, остальное — в форке OpenClaw). Синхронизация добирает такие файлы из
+  форка и никогда не подменяет владельческий `SKILL.md`.
+- **Две версии одного навыка в апстриме.** AIPOCH держит один и тот же навык в
+  нескольких категориях с **разным** содержимым. Версия выбирается по совпадению с
+  локальной, иначе файл подменяется содержимым чужой категории.
+- **Битые ссылки не «чистятся».** 485 битых ссылок: 2 — демо-датасеты по 4.9 МБ
+  (не тянем), 483 — файлы, которых нет ни у одного источника (у апстримов лежали в
+  отрезанных `tests/`/`evals/`). Правка чужого текста не сделала бы навык рабочим,
+  поэтому вместо неё — инвентарь с причиной: `docs/broken-refs.md`.
+- **Вложенные навыки в каталоге.** 28 навыков лежат внутри каталогов-контейнеров;
+  плоский обход `skills/` их терял — они были в дереве, но не находились поиском.
 
-## Как пользоваться
+## Экосистема Vector
 
-Навыки читаются **по запросу**, а не индексируются все сразу (1500 описаний в системном
-промпте — это лишний контекст). Рабочая модель:
+| Проект | Что |
+|---|---|
+| [vector-work](https://github.com/Osmosy/vector-work) | Хаб экосистемы |
+| [vector-legal](https://github.com/Osmosy/vector-legal) | Юридические навыки (170+) |
+| [vector-marketing](https://github.com/Osmosy/vector-marketing) | Маркетинговое агентство (19 агентов) |
+| [vector-shotcraft](https://github.com/Osmosy/vector-shotcraft) | Приёмы для продуктовых роликов |
+| [vector-prediction](https://github.com/Osmosy/vector-prediction) | Прогноз спроса |
+| **vector-health** | Медицинские навыки (этот репозиторий) |
 
-```
-# найти навык
-find skills -maxdepth 1 -type d -name '*<ключевое слово>*'
+## Журнал версий
 
-# прочитать и выполнить инструкции
-read_file skills/<name>/SKILL.md
-```
+| Дата | Изменение |
+|---|---|
+| 2026-08-16 | Сборка библиотеки: 1540 навыков из четырёх коллекций, каталог, CI |
+| 2026-08-16 | Добавлен собственный навык `atrial-fibrillation-treatment` |
+| 2026-09-19 | Синхронизация с апстримами: 113 файлов, новые навыки `ask-openmed`, `setup-openmed`, `skill-auditor` |
+| 2026-09-19 | Каталог включает 28 вложенных навыков (был плоский обход — часть была невидима поиску) |
+| 2026-09-19 | Докачка файлов-ссылок из форков (34 файла) + инвентарь битых ссылок |
+| 2026-09-19 | Зафиксированы ограниченные лицензии: 308 проприетарных шапок, 8 навыков Anthropic, 2 Non-Commercial |
+| 2026-09-19 | Оформление по стандарту экосистемы: LICENSE, INSTALL, AGENTS, `validate.py` (11 проверок), живая диаграмма, Pages |
 
-Установка в агент (опционально, выборочно):
+## Лицензии
 
-- **Hermes**: скопировать нужный каталог в `~/.hermes/skills/<category>/<name>/`.
-- **OpenClaw**: скопировать в `<workspace>/skills/` или `~/.openclaw/skills/`.
-- **Claude Code / Codex**: любая `skills/`-директория, подключённая к агенту.
+Собственный вклад (сборка, скрипты, документация, два навыка) — **MIT** (© 2026
+Osmosy). Вендоренные навыки сохраняют лицензии источников: MIT (OpenClaw,
+AIPOCH, Aperivue) и Apache-2.0 (openmed). Полные тексты —
+`THIRD_PARTY_LICENSES/`; сводка — `NOTICE.md`.
 
-### dicom-vlm-analysis
+**Ограничения внутри библиотеки — читать до использования.** Лицензия
+репозитория покрывает только собственный вклад. По факту дерева
+(`scripts/restricted-licenses.json`):
 
-Собственный навык: чтение DICOM/КТ локальной vision-моделью без облака.
-`pydicom` (рендер с window/level) → PNG → Ollama `medgemma:4b` (`/api/generate`, `images=[base64]`).
-Подробности и скрипты — в `skills/dicom-vlm-analysis/`.
+| Что | Навыков | Следствие |
+|---|---|---|
+| Проприетарная шапка в тексте навыка («proprietary and confidential… All Rights Reserved», © MD BABU MIA — из апстрима OpenClaw) | 308 | считать MIT нельзя; текст прямо запрещает копирование |
+| Офисные навыки Anthropic (`xlsx`, `pdf`, `docx`, `pptx` + `-official`) | 8 | «© 2025 Anthropic, PBC. All rights reserved»; нужен ваш договор с Anthropic |
+| `Non-Commercial` | 2 | коммерческое использование запрещено |
 
----
+Это свойство апстримов, а не сборки: OpenClaw заявляет MIT в README, держа
+проприетарную шапку в 280 своих навыках. Чужие лицензионные тексты мы не
+переписываем — фиксируем факт.
 
-## Ключевые принципы
-
-1. **Один каталог — один навык.** Единая структура `skills/<name>/SKILL.md` для всех источников.
-2. **Дедупликация по имени.** При совпадении имён приоритет отдаётся более курируемому
-   источнику: medsci-skills > openmed > AIPOCH > OpenClaw-Medical.
-3. **Без блоата.** Исключены vendored-репозитории (`repo/`), `node_modules`, файлы >5 МБ,
-   шаблоны-многотонники — только инструкции, ссылки и нужные скрипты/референсы.
-4. **On-demand.** Навыки не грузятся в контекст без необходимости.
-5. **Провенанс сохраняется.** NOTICE.md фиксирует источник и лицензию каждого набора.
-
----
-
-## Основание
-
-- Собрано для экосистемы **Vector** (github.com/Osmosy).
-- Источники (см. NOTICE.md): FreedomIntelligence/OpenClaw-Medical-Skills (MIT),
-  aipoch/medical-research-skills (MIT), maziyarpanahi/openmed (Apache-2.0),
-  Aperivue/medsci-skills (MIT).
-- Собственный вклад: `dicom-vlm-analysis` (MIT, Osmosy).
-
-> ⚠️ Медицинские навыки — инструменты для специалистов и исследователей, а не замена
-> врачебной интерпретации. Диагностические выводы остаются компетенцией квалифицированного врача.
+> **Ограничение.** Навыки — методики для специалистов и исследователей, не замена
+> врачебной интерпретации. Ни один вывод библиотеки не является диагнозом,
+> назначением или заключением: клиническое решение остаётся за квалифицированным
+> специалистом.

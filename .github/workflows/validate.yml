@@ -1,13 +1,13 @@
-name: validate-skills
+name: validate
 
 on:
-  push:
-    branches: [master, main]
   pull_request:
+  push:
     branches: [master, main]
 
 jobs:
-  validate:
+  repo:
+    name: Валидация библиотеки и документации
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,17 +16,26 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Validate skills (frontmatter + secret/PII scan)
-        run: python scripts/validate_skills.py
+      - name: Валидация репозитория (числа, лицензии, ссылки, диаграмма)
+        run: python3 scripts/validate.py
 
-      - name: Rebuild index (verify it is current)
+      - name: Проверка актуальности каталога навыков
         run: |
-          python scripts/build_index.py
-          git diff --exit-code skills-index.json || \
-            (echo "::error::skills-index.json устарел — перегенерируй scripts/build_index.py" && exit 1)
+          python3 scripts/build_index.py
+          git diff --exit-code skills-index.json \
+            || (echo "::error::skills-index.json устарел — пересобери scripts/build_index.py" && exit 1)
 
-      - name: Проверить, что README не расходится с деревом
-        run: python scripts/validate_readme.py
+      - name: Ссылки внутри навыков — у собственных битых быть не должно
+        run: python3 scripts/broken_refs.py --strict-own
 
-      - name: Ссылки внутри навыков — у собственных навыков битых быть не должно
-        run: python scripts/broken_refs.py --strict-own
+      - name: Тесты скриптов
+        run: python3 tests/test_scripts.py
+
+      - name: Проверка диаграммы (спецификация валидна, HTML воспроизводим)
+        run: |
+          if [ ! -d archify ]; then
+            echo "archify не установлен — проверка диаграммы пропущена (это не ошибка)"
+            exit 0
+          fi
+          node archify/bin/archify.mjs validate architecture \
+            docs/vector-health.architecture.json --quality showcase --json

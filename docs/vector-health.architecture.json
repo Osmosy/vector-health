@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Vector Health — библиотека медицинских навыков",
+    "output": "docs/vector-health.architecture.html",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "build",
+        "label": "Сборка: четыре источника в одну библиотеку",
+        "focus": ["openclaw", "aipoch", "openmed", "aperivue", "sync", "skills"],
+        "note": "Синхронизация сравнивает локальный файл с HEAD апстрима: повторный запуск без изменений даёт нуль."
+      },
+      {
+        "id": "find",
+        "label": "Поиск: каталог вместо загрузки всего",
+        "focus": ["skills", "index", "agent"],
+        "note": "1540 описаний в системном промпте — лишний контекст; каталог даёт имя, путь и описание по запросу."
+      },
+      {
+        "id": "control",
+        "label": "Контроль: что проверяет CI",
+        "focus": ["sync", "skills", "index", "validate", "ci"],
+        "note": "Валидатор сверяет числа, лицензии, ссылки и диаграмму с деревом: расхождение документа и факта валит сборку."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "openclaw",
+      "type": "external",
+      "label": "OpenClaw Medical",
+      "sublabel": "777 навыков",
+      "pos": [40, 60],
+      "size": [160, 64],
+      "tag": "MIT (README)"
+    },
+    {
+      "id": "aipoch",
+      "type": "external",
+      "label": "AIPOCH",
+      "sublabel": "600 навыков",
+      "pos": [40, 160],
+      "size": [160, 56],
+      "tag": "MIT"
+    },
+    {
+      "id": "openmed",
+      "type": "external",
+      "label": "openmed",
+      "sublabel": "74 навыка",
+      "pos": [40, 250],
+      "size": [160, 56],
+      "tag": "Apache-2.0"
+    },
+    {
+      "id": "aperivue",
+      "type": "external",
+      "label": "Aperivue",
+      "sublabel": "59 навыков",
+      "pos": [40, 340],
+      "size": [160, 56],
+      "tag": "MIT"
+    },
+    {
+      "id": "sync",
+      "type": "backend",
+      "label": "Синхронизация",
+      "sublabel": "идемпотентна",
+      "pos": [300, 170],
+      "size": [160, 64]
+    },
+    {
+      "id": "skills",
+      "type": "database",
+      "label": "Библиотека",
+      "sublabel": "1540 навыков",
+      "pos": [560, 170],
+      "size": [160, 64]
+    },
+    {
+      "id": "index",
+      "type": "frontend",
+      "label": "Каталог",
+      "sublabel": "имя, путь, описание",
+      "pos": [820, 80],
+      "size": [160, 64]
+    },
+    {
+      "id": "agent",
+      "type": "cloud",
+      "label": "Агент",
+      "sublabel": "читает по запросу",
+      "pos": [1080, 80],
+      "size": [150, 64]
+    },
+    {
+      "id": "validate",
+      "type": "security",
+      "label": "Валидатор",
+      "sublabel": "числа, лицензии, ссылки",
+      "pos": [820, 280],
+      "size": [160, 64]
+    },
+    {
+      "id": "ci",
+      "type": "external",
+      "label": "CI",
+      "sublabel": "на каждый push",
+      "pos": [1080, 280],
+      "size": [150, 56]
+    }
+  ],
+  "connections": [
+    { "id": "openclaw-sync", "from": "openclaw", "to": "sync", "label": "вендоринг" },
+    { "id": "aipoch-sync", "from": "aipoch", "to": "sync" },
+    { "id": "openmed-sync", "from": "openmed", "to": "sync" },
+    { "id": "aperivue-sync", "from": "aperivue", "to": "sync" },
+    { "id": "sync-skills", "from": "sync", "to": "skills", "label": "байт-в-байт", "variant": "emphasis" },
+    { "id": "skills-index", "from": "skills", "to": "index", "label": "сборка каталога" },
+    { "id": "index-agent", "from": "index", "to": "agent", "label": "навык выбран" },
+    { "id": "skills-validate", "from": "skills", "to": "validate", "label": "сверка" },
+    { "id": "validate-ci", "from": "validate", "to": "ci", "label": "красный при расхождении", "labelDy": -26 }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Источники",
+      "items": [
+        "четыре открытые коллекции",
+        "1510 вендоренных + 2 собственных",
+        "карта происхождения по blob SHA"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Синхронизация",
+      "items": [
+        "локальный файл против HEAD апстрима",
+        "повторный запуск даёт нуль",
+        "файлы-ссылки тянутся из форков"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Контроль",
+      "items": [
+        "числа в README против дерева",
+        "ограниченные лицензии под учётом",
+        "битые ссылки с причиной по каждой"
+      ]
+    }
+  ]
+}
