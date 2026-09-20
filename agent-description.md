@@ -39,7 +39,7 @@ openmed, Aperivue medsci-skills) плюс три собственных. Дед�
 | Навыки верхнего уровня | 1513 каталогов |
 | Вложенные навыки | 28 (внутри каталогов-контейнеров апстримов) |
 | Собственные навыки | 3 (`dicom-vlm-analysis`, `atrial-fibrillation-treatment`, `abdominal-ct-findings`) |
-| Скрипты | 14 (`scripts/`: 8 .py, 1 установщик, 5 JSON-манифеста) |
+| Скрипты | 16 (`scripts/`: 9 .py, 1 установщик, 6 JSON-манифеста) |
 | Тесты | 1 файл (`tests/test_scripts.py`, 187 проверок) |
 | Диаграмма | 1 живая (`docs/vector-health.architecture.html`) |
 

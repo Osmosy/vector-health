@@ -548,17 +548,22 @@ def check_duplicates(rep: Report) -> None:
 
 
 def check_clinical_claims(rep: Report) -> None:
-    """17. Клинический навык обязан нести оговорку и не выдавать неподтверждённое.
+    """Клинический навык: оговорка на месте, и ни один год испытания не выдуман.
 
     `atrial-fibrillation-treatment` — тактика лечения, а не справочник: он читается
-    как рекомендация. Два обязательных свойства: (а) оговорка «для специалиста, не
-    для самолечения» стоит в начале, а не в конце; (б) годы публикаций испытаний
-    не выдуманы — либо подтверждены (сверено с первоисточником), либо помечены
-    «к сверке». Непроверяемый год в клиническом тексте выглядит как доказательство,
-    которого автор не проверял.
+    как назначение. Два обязательных свойства: (а) оговорка «для специалиста, не для
+    самолечения» стоит в начале, а не в конце; (б) у каждого года рядом с названием
+    испытания есть PMID, и этот PMID сходится с `docs/trials-verified.json`.
 
-    Проверка нужна потому, что этот навык — единственный в библиотеке, который
-    предписывает действия, и ошибка в нём дороже всех остальных.
+    Проверка появилась потому, что первая версия навыка несла годы и цифры по памяти,
+    и они разошлись с первоисточником сразу в трёх местах: `EARLY-AF` стоял как 2022
+    (верно 2021, PMID 33197159), его цифры были приписаны соседней работе
+    (`STOP-AF First`), а страницы `EAST-AFNET 4` оканчивались 1313 вместо 1316.
+    Сверять по «выглядит правдоподобно» здесь нельзя: ошибка в годе читается как
+    ссылка на доказательство, которого не проверяли.
+
+    Сверка идёт по абзацу, а не по строке: перенос строки разрывает пару «испытание —
+    PMID», и построчная проверка ловила бы здоровый текст.
     """
     path = os.path.join(SKILLS, "atrial-fibrillation-treatment", "SKILL.md")
     if not os.path.isfile(path):
@@ -571,13 +576,109 @@ def check_clinical_claims(rep: Report) -> None:
             rep.fail("клиника", f"оговорка «{needle}» не найдена в начале навыка")
     if "## References" not in body:
         rep.fail("клиника", "нет раздела References со ссылками на рекомендации")
-    # раздел References не должен содержать годов, не помеченных как подтверждённые
-    refs = body.split("## References", 1)[1]
-    unconfirmed = re.findall(r"\*\*(EAST-AFNET 4|EARLY-AF|STOP-AF First|CASTLE-AF|CASTLE-HTx|ADVENT|AFFIRM)\*\*\s*—\s*(?:NEJM|JACC|Nature)\s*\d{4}", refs)
-    if unconfirmed:
-        rep.fail("клиника", f"неподтверждённые годы в References: {unconfirmed[:3]} — "
-                            f"сверь с первоисточником или пометь «к сверке»")
-    rep.note("клиника: оговорка на месте, годы испытаний либо подтверждены, либо помечены")
+
+    # сверенные данные — источник истины для годов и выходных данных
+    verified_path = os.path.join(ROOT, "docs", "trials-verified.json")
+    verified: dict = {}
+    if not os.path.isfile(verified_path):
+        rep.fail("клиника", "нет docs/trials-verified.json — не с чем сверять годы испытаний")
+    else:
+        try:
+            with open(verified_path, encoding="utf-8") as f:
+                verified = json.load(f)
+        except json.JSONDecodeError as e:
+            rep.fail("клиника", f"docs/trials-verified.json не читается: {e}")
+
+    names = list(verified.keys())
+    if not names:
+        rep.fail("клиника", "docs/trials-verified.json пуст")
+        return
+    flat = body.replace("\u2013", "-").replace("\u2014", "-")
+    lines = flat.splitlines()
+    groups: list[list[str]] = []
+    cur: list[str] = []
+    for line in lines:
+        if line.lstrip().startswith("|"):
+            cur.append(line)
+        elif cur:
+            groups.append(cur)
+            cur = []
+    if cur:
+        groups.append(cur)
+    # только таблицы испытаний: их заголовок называет колонку испытания. В таблице
+    # тактики («Ритм-контроль: метод по профилю») EAST-AFNET 4 и CASTLE-AF стоят
+    # ориентирами выбора метода, а не утверждением о выходных данных — требовать
+    # там PMID значит валить на здоровом тексте и приучить игнорировать проверку.
+    trial_rows = [(l, "Триал" in g[0]) for g in groups
+                  if "Триал" in g[0] or "Испытание" in g[0] for l in g]
+    ref_rows = [l for g in groups if "Испытание" in g[0] and "Триал" not in g[0] for l in g]
+    missing: list[str] = []
+    mismatched: list[str] = []
+
+    # (а) строки таблиц — там стоит утверждение, проверяем строго.
+    # Таблица испытаний (ключ «Триал») несёт и цифры первичной точки; таблица
+    # References (ключ «Испытание») — только выходные данные.
+    for row, has_numbers in trial_rows:
+        for name in names:
+            if name not in row:
+                continue
+            v = verified[name]
+            if v["pmid"] not in row:
+                missing.append(f"{name} в таблице без PMID")
+                continue
+            if v["year"] not in row:
+                mismatched.append(f"{name}: год в таблице не {v['year']}")
+            vol_issue = f"{v['vol']}({v['issue']})"
+            if vol_issue not in row:
+                mismatched.append(f"{name}: нет тома {vol_issue}")
+            pages = str(v["pages"]).replace("-", "-")
+            if pages not in row:
+                mismatched.append(f"{name}: нет страниц {pages}")
+            if has_numbers:
+                # цифры первичной точки: именно этот класс ошибки нашёл аудит —
+                # числа EARLY-AF (42.9% / 67.8%) стояли в строке STOP-AF First,
+                # у которого 74.6% / 45.0%, и таблица выглядела правдоподобно.
+                tokens = [x for x in re.findall(r"\d+(?:[.,]\d+)?%?", v.get("result", ""))
+                          if len(x) >= 3 or x.endswith("%")]
+                if tokens and not any(x in row for x in tokens):
+                    mismatched.append(f"{name}: в строке таблицы нет ни одной цифры "
+                                      f"из сверенных ({', '.join(tokens[:3])})")
+    for row in ref_rows:
+        for name in names:
+            if name not in row:
+                continue
+            v = verified[name]
+            if v["pmid"] not in row:
+                missing.append(f"{name} в References без PMID")
+            elif v["year"] not in row:
+                mismatched.append(f"{name}: год в References не {v['year']}")
+
+    # (б) проза: ловим форму «Испытание (год)» — именно так выглядел дефект
+    # «EARLY-AF (2022)». Оборот «был указан как 2022» про прошлую ошибку — не форма
+    # утверждения о годе, и валить на нём здоровый текст значит приучить игнорировать
+    # проверку.
+    prose = [l for l in flat.splitlines() if not l.lstrip().startswith("|")]
+    for line in prose:
+        for name in names:
+            if name not in line:
+                continue
+            for m in re.finditer(re.escape(name) + r"[^\n]{0,4}\((\d{4})\)", line):
+                if verified[name]["pmid"] not in line:
+                    missing.append(f"{name} ({m.group(1)}) в тексте без PMID")
+                elif verified[name]["year"] != m.group(1):
+                    mismatched.append(f"{name}: год в тексте {m.group(1)}, "
+                                      f"сверено {verified[name]['year']}")
+
+    missing = list(dict.fromkeys(missing))
+    mismatched = list(dict.fromkeys(mismatched))
+    if missing:
+        rep.fail("клиника", f"год испытания без PMID: {missing[:3]} — сверь по "
+                            f"первоисточнику и укажи PMID")
+    if mismatched:
+        rep.fail("клиника", f"выходные данные расходятся с docs/trials-verified.json: "
+                            f"{mismatched[:3]}")
+    rep.note(f"клиника: оговорка на месте, {len(names)} испытаний сходятся с "
+             f"docs/trials-verified.json (PMID, год, выходные данные)")
 
 
 def check_restricted_docs(rep: Report) -> None:
@@ -692,6 +793,68 @@ def check_diagram_numbers(rep: Report) -> None:
     if str(total) not in spec_text:
         rep.fail("диаграмма", f"спецификация не называет итоговое число навыков ({total})")
     rep.note(f"диаграмма: числа согласованы с деревом ({total})")
+
+
+def check_service_artifacts(rep: Report) -> None:
+    """Служебные артефакты апстримов: в дереве только те, на которые ссылаются.
+
+    NOTICE обещал, что отчёты прогонов, аудиты и служебные changelog'и при сборке
+    отрезаны, — а по факту их было 1248 (18.7 МБ): правила синхронизации применялись
+    только к приёму новых файлов, и всё, что попало в сборку раньше, оставалось
+    навсегда. Проверка держит дерево в том состоянии, которое описано в NOTICE.
+
+    Исключение — файлы, на которые ссылается материал навыка: они сохраняются
+    (правило вместо списка, см. scripts/service_artifacts.py).
+    """
+    gen = os.path.join(ROOT, "scripts", "service_artifacts.py")
+    if not os.path.isfile(gen):
+        rep.fail("артефакты", "нет scripts/service_artifacts.py — инвентарь служебных файлов")
+        return
+    proc = subprocess.run([sys.executable, "-B", gen, "--json"],
+                          cwd=ROOT, capture_output=True, text=True)
+    if proc.returncode != 0:
+        rep.fail("артефакты", f"service_artifacts.py не отработал: {(proc.stderr or '')[:150]}")
+        return
+    try:
+        data = json.loads(proc.stdout)
+    except json.JSONDecodeError as e:
+        rep.fail("артефакты", f"service_artifacts.py вернул не JSON: {e}")
+        return
+
+    free = [i for i in data["items"] if not i["referenced"]]
+    if free:
+        rep.fail("артефакты", f"в skills/ остались служебные файлы, на которые никто не "
+                              f"ссылается: {len(free)}, напр. "
+                              f"{free[0]['skill']}/{free[0]['rel']} — "
+                              f"убери: python3 scripts/sync_upstreams.py --prune")
+    # каталог из правил исключения без файлов — след уборки, а не материал
+    empties = []
+    for root, dirs, _files in os.walk(SKILLS, topdown=False):
+        for d in dirs:
+            path = os.path.join(root, d)
+            if d in ("tests", "test_data", "evals", "fixtures") and os.path.isdir(path) \
+                    and not any(os.scandir(path)):
+                empties.append(os.path.relpath(path, SKILLS).replace(os.sep, "/"))
+    if empties:
+        rep.fail("артефакты", f"опустевшие служебные каталоги: {empties[:3]} — "
+                              f"убери: python3 scripts/sync_upstreams.py --prune")
+    # allowlist: у каждой записи обязана быть причина
+    kept_path = os.path.join(ROOT, "scripts", "kept-service-files.json")
+    kept = []
+    if os.path.isfile(kept_path):
+        with open(kept_path, encoding="utf-8") as f:
+            kept = json.load(f).get("kept", [])
+        for item in kept:
+            if not item.get("reason"):
+                rep.fail("артефакты", f"kept-service-files.json: у {item.get('skill')}/"
+                                      f"{item.get('rel')} нет причины — allowlist без причины "
+                                      f"превращается в свалку")
+            full = os.path.join(SKILLS, item.get("skill", ""), item.get("rel", ""))
+            if not os.path.isfile(full):
+                rep.fail("артефакты", f"kept-service-files.json: {item.get('skill')}/"
+                                      f"{item.get('rel')} в дереве нет — обнови список")
+    rep.note(f"артефакты: служебных файлов в дереве {data['count']}, все на месте "
+             f"(по ссылкам), исключений в allowlist {len(kept)}")
 
 
 def check_sibling_copies(rep: Report) -> None:
@@ -1174,6 +1337,7 @@ def main() -> int:
     check_broken_refs_report(rep)
     check_sibling_copies(rep)
     check_readme_prose(rep)
+    check_service_artifacts(rep)
     check_diagram_numbers(rep)
     check_secrets(rep)
     check_cjk(rep)

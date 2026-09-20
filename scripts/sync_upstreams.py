@@ -529,16 +529,112 @@ def apply(plan_data: dict) -> tuple[int, int]:
     return written, skipped
 
 
+KEPT = os.path.join(ROOT, "scripts", "kept-service-files.json")
+
+
+def _prune_allowlist() -> set[tuple[str, str]]:
+    """Файлы, которые правила исключают, но которые сохранены по причине.
+
+    Два источника: явный список `kept-service-files.json` (там причина обязательна)
+    и правило для каталогов `tests/` — файл сохраняется, если его имя или путь
+    встречается в материале навыка (SKILL.md и справочных каталогах). Правило вместо
+    списка: таких файлов 147, и перечислить их поимённо значит завести список,
+    который разъедется при первом же обновлении апстрима.
+    """
+    kept: set[tuple[str, str]] = set()
+    if os.path.isfile(KEPT):
+        try:
+            with open(KEPT, encoding="utf-8") as f:
+                for item in json.load(f).get("kept", []):
+                    kept.add((item["skill"], item["rel"]))
+        except (OSError, json.JSONDecodeError, KeyError):
+            pass
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import service_artifacts as sa  # noqa: PLC0415 — нужен только здесь
+    for item in sa.collect()["items"]:
+        if item["referenced"]:
+            kept.add((item["skill"], item["rel"]))
+    return kept
+
+
+PRUNE_DIR_NAMES = ("tests", "test_data", "evals", "eval", "fixtures", "challenges",
+                    "lint_challenge", "analysis_run_challenge", "_challenge")
+
+
+def prune_empty_dirs(apply: bool) -> int:
+    """Убрать опустевшие служебные каталоги.
+
+    После удаления файлов остаются пустые `tests/`, `evals/`, `fixtures/`: 67 штук.
+    Каталог без файлов — след уборки, а не материал навыка, и в дереве он читается
+    как «здесь что-то было» (плюс мешает проверке «нет каталогов tests/»).
+    """
+    removed = 0
+    # снизу вверх: сначала вложенные, потом родитель
+    for root, dirs, _files in os.walk(os.path.join(SKILLS), topdown=False):
+        for d in dirs:
+            path = os.path.join(root, d)
+            if not os.path.isdir(path):
+                continue
+            if not any(os.scandir(path)) and d in PRUNE_DIR_NAMES:
+                if apply:
+                    os.rmdir(path)
+                removed += 1
+    return removed
+
+
+def prune_files(apply: bool) -> tuple[int, int, list[tuple[str, str]]]:
+    """Удалить служебные артефакты, на которые НЕ ссылается материал навыка.
+
+    Правила синхронизации применялись только к приёму файлов: то, что успело
+    попасть в сборку до их появления, оставалось в дереве навсегда — 1248 файлов,
+    18.7 МБ. Возвращает (сколько удалено, сколько оставлено по allowlist, пробу).
+    """
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import service_artifacts as sa  # noqa: PLC0415
+    kept = _prune_allowlist()
+    removed, skipped, sample = 0, 0, []
+    for item in sa.collect()["items"]:
+        key = (item["skill"], item["rel"])
+        if key in kept:
+            skipped += 1
+            continue
+        full = os.path.join(SKILLS, item["skill"], item["rel"])
+        if not os.path.isfile(full):
+            continue
+        sample.append(key)
+        if apply:
+            os.remove(full)
+        removed += 1
+    return removed, skipped, sample[:10]
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Синхронизация vector-health с апстримами")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--only", help="OpenClaw|aipoch|Aperivue|openmed")
     ap.add_argument("--build-origin", action="store_true", help="пересобрать карту происхождения")
+    ap.add_argument("--prune", action="store_true",
+                    help="удалить служебные артефакты, на которые не ссылается навык "
+                         "(с учётом scripts/kept-service-files.json)")
     args = ap.parse_args()
 
     if args.build_origin:
         build_origin()
         return 0
+
+    if args.prune:
+        n, kept_n, sample = prune_files(apply=not args.dry_run)
+        dirs_n = prune_empty_dirs(apply=not args.dry_run)
+        verb = "удалено бы" if args.dry_run else "удалено"
+        dverb = "убрано бы" if args.dry_run else "убрано"
+        print(f"служебные артефакты: {verb} {n} | сохранено по allowlist: {kept_n}")
+        print(f"опустевших каталогов {dverb}: {dirs_n}")
+        for skill, rel in sample:
+            print(f"   {skill}/{rel}")
+        if args.dry_run:
+            print("(dry-run: файлы не изменялись)")
+        return 0
+
     origin = load_origin()
 
     labels = [args.only] if args.only else sorted(SOURCES)
