@@ -956,18 +956,31 @@ def check_notice_artifacts_numbers(rep: Report) -> None:
         rep.fail("NOTICE", "нет NOTICE.md")
         return
     body = open(notice_path, encoding="utf-8").read()
-    # факт по дереву
+    # Факт считается по ТОМУ, ЧТО ПОПАДЁТ В КЛОН, то есть по git, а не по диску.
+    # Пустой каталог git не хранит: локально дерево давало 45 каталогов tests/,
+    # в CI — 44, и числа NOTICE расходились там, где расхождения по существу нет.
+    # Первая версия проверки считала каталоги «с файлами» — вышло 24 против 44:
+    # файл может лежать и во вложенном каталоге (`tests/data/`), тогда верхний
+    # `tests/` в этот счёт не попадал.
+    ls = subprocess.run(["git", "ls-files", "skills"], cwd=ROOT,
+                        capture_output=True, text=True)
+    if ls.returncode != 0:
+        rep.fail("NOTICE", "git недоступен — числа tests/ сверить не с чем")
+        return
     files = 0
     dirs: set[str] = set()
-    for root, dirnames, filenames in os.walk(SKILLS):
-        dirnames[:] = [d for d in dirnames if d != "__pycache__"]
-        if os.path.basename(root) == "tests":
-            dirs.add(root)
-        if "/tests/" in root.replace(os.sep, "/") + "/":
-            files += len(filenames)
+    for path in ls.stdout.splitlines():
+        posix = "/" + path.replace(os.sep, "/")
+        if "/tests/" not in posix:
+            continue
+        files += 1
+        # каталог tests/ для этого файла: первый сегмент пути, заканчивающийся на /tests
+        head = path.split("/tests/")[0]
+        dirs.add(head + "/tests")
     if not files:
         rep.fail("NOTICE", "в дереве не найдено файлов под tests/ — проверь раскладку")
         return
+
     m = re.search(r"осталось \*\*(\d+)\*\* в (\d+) каталогах", body)
     if not m:
         rep.fail("NOTICE", "в разделе «Чего в репозитории нет» пропало число файлов "
@@ -976,7 +989,7 @@ def check_notice_artifacts_numbers(rep: Report) -> None:
     if int(m.group(1)) != files or int(m.group(2)) != len(dirs):
         rep.fail("NOTICE", f"числа tests/ разошлись: в NOTICE {m.group(1)} файлов в "
                            f"{m.group(2)} каталогах, в дереве {files} в {len(dirs)}")
-    rep.note(f"NOTICE: числа раздела «Чего нет» сверены с деревом "
+    rep.note(f"NOTICE: числа раздела «Чего нет» сверены с деревом и git "
              f"({files} файлов tests/ в {len(dirs)} каталогах)")
 
 

@@ -1,17 +1,17 @@
 # Что проверить повторно (для внешней проверки)
 
-Коммит: `d5d893f`. Хеши ниже — sha256 файлов в этом коммите: если присланный архив совпадает по ним, значит он не из кеша.
+Коммит: `5c7df9f`. Хеши ниже — sha256 файлов в этом коммите: если присланный архив совпадает по ним, значит он не из кеша.
 
 ## Файлы
 
 | Файл | Байт | sha256 |
 |---|---|---|
 | `README.md` | 24639 | `f3fc4cac56c30f2e…` |
-| `NOTICE.md` | 12969 | `8436f188c65130f3…` |
+| `NOTICE.md` | 12969 | `c31aec9b18fc65fb…` |
 | `AGENTS.md` | 8242 | `22119dc7706ded39…` |
 | `INSTALL.md` | 14146 | `f0d544d48ddecf03…` |
 | `agent-description.md` | 6089 | `725bf05400bcd029…` |
-| `scripts/validate.py` | 115983 | `fdecaa5050c423ed…` |
+| `scripts/validate.py` | 117038 | `742d079b879ab4db…` |
 | `scripts/build_stats.py` | 14620 | `4ef77790eac1f37d…` |
 | `scripts/stats.json` | 13872 | `3672008368af09ec…` |
 | `scripts/broken_refs.py` | 44492 | `b30078f825f34722…` |
@@ -21,7 +21,7 @@
 | `docs/tree-digest.json` | 513768 | `561883127f02be4d…` |
 | `docs/trials-verified.json` | 4828 | `e2d97fbf98b97664…` |
 | `tests/test_scripts.py` | 63471 | `a05f6b02e996ab44…` |
-| `tests/mutation_check.py` | 11739 | `74c194e9169ba22e…` |
+| `tests/mutation_check.py` | 12660 | `bc5730d8cc8f00b2…` |
 | `tests/run_offline.py` | 2826 | `0650da41909a0490…` |
 | `skills/atrial-fibrillation-treatment/SKILL.md` | 13021 | `a3369865c38266d0…` |
 | `.github/workflows/validate.yml` | 6452 | `61c687a459727279…` |

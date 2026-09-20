@@ -553,18 +553,48 @@ PRUNE_DIR_NAMES = excl.SERVICE_DIRS
 def prune_empty_dirs(apply: bool) -> int:
     """Убрать опустевшие служебные каталоги.
 
-    После удаления файлов остаются пустые `tests/`, `evals/`, `fixtures/`: 67 штук.
-    Каталог без файлов — след уборки, а не материал навыка, и в дереве он читается
-    как «здесь что-то было» (плюс мешает проверке «нет каталогов tests/»).
+    После удаления файлов остаются каталоги-следы: `tests/`, `evals/`, `fixtures/`.
+    Каталог без файлов — след уборки, а не материал навыка.
+
+    Обход ОДИН, снизу вверх, и внутри найденного служебного каталога убирается всё
+    опустевшее дерево. Однопроходный вариант оставлял цепочки: у `self-review`
+    появился `tests/fixtures/<много пустых>` — файлов нет нигде, но верхний `tests/`
+    не пуст (в нём `fixtures/`), поэтому он не удалялся, а git такую пустую
+    структуру не отслеживает. Итог: локально 45 каталогов `tests/`, в CI 44, и
+    проверка числа расходилась.
+
+    Повторять обход до неподвижной точки нельзя: это O(n²) по дереву в 100k файлов
+    и минуты времени (проверено — прогон не укладывался в таймаут).
     """
     removed = 0
-    # снизу вверх: сначала вложенные, потом родитель
+
+    def drop_empty(path: str) -> int:
+        """Убрать поддерево, в котором нет ни одного файла. Возвращает счёт."""
+        count = 0
+        for root, dirs, files in os.walk(path, topdown=False):
+            if files:
+                continue
+            for d in dirs:
+                sub = os.path.join(root, d)
+                if os.path.isdir(sub) and not any(os.scandir(sub)):
+                    if apply:
+                        os.rmdir(sub)
+                    count += 1
+            if not any(os.scandir(root)) and root != path:
+                if apply:
+                    os.rmdir(root)
+                count += 1
+        return count
+
     for root, dirs, _files in os.walk(os.path.join(SKILLS), topdown=False):
         for d in dirs:
+            if d not in PRUNE_DIR_NAMES:
+                continue
             path = os.path.join(root, d)
             if not os.path.isdir(path):
                 continue
-            if not any(os.scandir(path)) and d in PRUNE_DIR_NAMES:
+            removed += drop_empty(path)
+            if os.path.isdir(path) and not any(os.scandir(path)):
                 if apply:
                     os.rmdir(path)
                 removed += 1
