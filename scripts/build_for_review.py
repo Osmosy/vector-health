@@ -140,8 +140,16 @@ def main() -> int:
                              if not l.startswith("Коммит: "))
         stored = out.read_text(encoding="utf-8") if out.is_file() else ""
         if stable(stored) != stable(text):
+            # Показываем, ЧТО разошлось: без этого сообщение «файл разошёлся» в CI
+            # не даёт понять причину, и разбор начинается с угадывания.
+            import difflib
+            diff = list(difflib.unified_diff(stable(stored).splitlines(),
+                                             stable(text).splitlines(),
+                                             "в файле", "в дереве", lineterm="", n=0))
             print("ОШИБКА: docs/for-review.md разошёлся с деревом — пересобери "
                   "python3 scripts/build_for_review.py", file=sys.stderr)
+            for line in diff[:20]:
+                print(f"  {line}", file=sys.stderr)
             return 1
         print("docs/for-review.md совпадает с деревом (--check)")
         return 0
