@@ -23,6 +23,7 @@
 import argparse
 import json
 import os
+import pathlib
 import posixpath
 import re
 import subprocess
@@ -155,6 +156,12 @@ def scan() -> list[tuple[str, str]]:
             if any(os.path.exists(os.path.join(ROOT, c))
                    for c in refs_mod.repo_root_candidates(raw)):
                 continue
+            # Ссылка на СВОЙ файл, записанная с обёрткой в начале пути: имя чужого
+            # навыка как префикс, `Skills/<их-раскладка>/…`, переменная SKILL_DIR.
+            # Файл при этом лежит внутри навыка и находится — ссылка живая.
+            if any(os.path.exists(os.path.join(root, c))
+                   for c in refs_mod.strip_leading_dirs(raw)[1:]):
+                continue
             broken.append((rel_skill, rel, raw))
     return broken
 
@@ -246,10 +253,75 @@ def resolve_external(project_url: str, ref: str, subdir: str) -> tuple[str, str]
     return ("нет", "")
 
 
+_SIBLING_INDEX: dict[str, list[str]] | None = None
+
+
+def sibling_index() -> dict[str, list[str]]:
+    """Относительный путь внутри навыка → какие навыки его содержат.
+
+    Нужен для ссылок, ведущих на общий шаблон апстрима: у AIPOCH один и тот же
+    `references/guide.md` скопирован во множество навыков, и навык, который на него
+    ссылается, может не иметь своей копии. Файл при этом есть в библиотеке —
+    у соседа, и он ТОТ ЖЕ (сверено по blob SHA в апстриме у 12 из 13 проверенных).
+    Строится один раз: поиск по 1541 навыку на каждую ссылку превратил бы прогон
+    в десятки минут.
+    """
+    global _SIBLING_INDEX
+    if _SIBLING_INDEX is None:
+        idx: dict[str, list[str]] = {}
+        for root, dirs, files in os.walk(SKILLS):
+            dirs[:] = [d for d in dirs if d != "__pycache__"]
+            if "SKILL.md" not in files:
+                continue
+            rel_skill = os.path.relpath(root, SKILLS).replace(os.sep, "/")
+            for sub, subdirs, subfiles in os.walk(root):
+                subdirs[:] = [d for d in subdirs if d != "__pycache__"]
+                for fn in subfiles:
+                    rel = os.path.relpath(os.path.join(sub, fn), root).replace(os.sep, "/")
+                    idx.setdefault(rel, []).append(rel_skill)
+        _SIBLING_INDEX = idx
+    return _SIBLING_INDEX
+
+
+def same_name_elsewhere(skill_dir: str, ref: str) -> str | None:
+    """Файл с таким ИМЕНЕМ есть в навыке, но по ДРУГОМУ пути.
+
+    Ссылка не сработает, однако файл у читателя перед глазами — это не «файла нет»,
+    а расхождение пути. Типичный случай: апстрим держит данные в
+    `tests/expected_output/data/x.rds`, а текст ссылается на `data/x.rds`;
+    результат тот же файл, что лежит рядом.
+    """
+    base = ref.split("/")[-1]
+    if not base or len(base) < 4:
+        return None
+    for path in pathlib.Path(skill_dir).rglob(base):
+        if path.is_file():
+            return str(path.relative_to(skill_dir))
+    return None
+
+
+def upstream_skill_is_thin(name: str, label: str, trees) -> bool:
+    """В апстриме каталог навыка есть, но подкаталогов в нём нет.
+
+    Значит ссылка ведёт на `references/`, `scripts/`, `data/` — каталог, который
+    апстрим НЕ опубликовал (у него лежит только SKILL.md и служебные файлы).
+    Это не «файл потеряли при сборке», а «файла в источнике не было».
+    """
+    paths = trees.get(label) or {}
+    suffix = f"/{name}/SKILL.md"
+    d = next((posixpath.dirname(p) for p in paths
+              if p.endswith(suffix) or p == f"{name}/SKILL.md"), None)
+    if not d:
+        return False
+    inside = [p[len(d) + 1:] for p in paths if p.startswith(d + "/")]
+    return len([f for f in inside if "/" in f]) == 0
+
+
 def classify(broken, trees):
     buckets: dict[str, list[tuple[str, str, str]]] = {
         "placeholder": [], "recoverable": [], "heavy": [], "repo_level": [],
-        "external": [], "inherited": []}
+        "external": [], "path_mismatch": [], "sibling": [], "unpublished": [],
+        "inherited": []}
     origin = load_origin()
     for rel_skill, ref, _raw in broken:
         name = rel_skill.rsplit("/", 1)[-1]
@@ -295,6 +367,24 @@ def classify(broken, trees):
                 if size is not None:
                     found = (label, cand, size)
         if not found:
+            # Файл с таким именем есть в самом навыке, но по другому пути
+            skill_dir = os.path.join(SKILLS, rel_skill)
+            other = same_name_elsewhere(skill_dir, ref) if os.path.isdir(skill_dir) else None
+            if other:
+                buckets["path_mismatch"].append((rel_skill, ref, other))
+                continue
+            # Файл лежит в ДРУГОМ навыке библиотеки под тем же относительным путём —
+            # общий шаблон апстрима, скопированный в соседа (сверено по blob SHA).
+            if not ref.startswith("../"):
+                owners = [o for o in sibling_index().get(ref, []) if o != rel_skill]
+                if owners:
+                    buckets["sibling"].append((rel_skill, ref, owners[0]))
+                    continue
+            # В апстриме навык без подкаталогов — значит он их не публиковал
+            label = origin.get(rel_skill) or origin.get(rel_skill.split("/")[0])
+            if label and upstream_skill_is_thin(name, label, trees):
+                buckets["unpublished"].append((rel_skill, ref, label))
+                continue
             buckets["inherited"].append((rel_skill, ref, ""))
         elif found[1].endswith(HEAVY_SUFFIX) or found[2] > HEAVY_MAX:
             buckets["heavy"].append((rel_skill, ref, found[0]))
@@ -335,10 +425,22 @@ CATEGORIES = (
     ("repo_level", "В корне источника", "Файл в корне репозитория-источника (вне каталога навыка)",
      "файл ЕСТЬ в репозитории-источнике, но вне каталога навыка (`scripts/`, `examples/`, "
      "`docs/`) — ссылка писалась под их раскладку, где навыки лежат глубже"),
+    ("path_mismatch", "Путь разошёлся", "Путь разошёлся (файл в навыке есть)",
+     "файл с таким именем есть в самом навыке, но по другому пути — ссылка не сработает, "
+     "однако файл у читателя перед глазами (типично: данные лежат в `tests/expected_output/`)"),
+    ("sibling", "Есть у соседнего навыка", "Файл есть у соседнего навыка библиотеки",
+     "ссылка ведёт на общий файл апстрима, скопированный в другой навык (тот же файл "
+     "по blob SHA) — у этого навыка своей копии нет"),
+    ("unpublished", "Апстрим не публиковал", "Апстрим не публиковал каталог",
+     "каталог навыка в источнике есть, но подкаталогов в нём нет: `references/`, `scripts/`, "
+     "`data/` апстрим не выкладывал — файла не было и в момент сборки"),
     ("heavy", "Тяжёлые данные", "Тяжёлые данные (не тянем)",
      "файл есть, но это демо-датасет на мегабайты — сознательно не тянем"),
-    ("inherited", "Унаследованное", "Унаследованное (дефект источника)",
-     "файла нет ни у одного источника — дефект апстрима"),
+    ("inherited", "Унаследованное", "Унаследованное (файла нет в источнике)",
+     "файла нет ни в источнике, ни у соседнего навыка: апстрим его не выложил. Часть "
+     "таких ссылок описывает РЕЗУЛЬТАТ работы навыка (выходные файлы `data/*.vcf.gz`), "
+     "и требовать их не нужно — но отличить это автоматически нельзя: признак только "
+     "в тексте, поэтому файлы остаются здесь, а не выдаются за «создаётся при работе»"),
 )
 
 

@@ -1,6 +1,6 @@
 {
   "project": "vector-health",
-  "generated": "2026-09-19",
+  "generated": "2026-09-20",
   "total": 1541,
   "note": "path — каталог навыка относительно skills/. Вложенные навыки (контейнеры вроде spatial-transcriptomics-analysis) включены.",
   "skills": [

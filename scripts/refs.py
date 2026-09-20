@@ -119,6 +119,33 @@ def repo_root_candidates(ref: str) -> list[str]:
     return [x for x in dict.fromkeys(out) if x]
 
 
+def strip_leading_dirs(ref: str) -> list[str]:
+    """Хвостовые варианты пути: снять ведущие каталоги-обёртки и `../`.
+
+    Зачем: апстримы ссылаются на СВОЙ файл, добавляя в путь обёртку, которой у нас
+    нет. Четыре вида, каждый давал ложно-битую ссылку:
+      `Skills/Research_Tools/Biomarker_Signature_Studio/scripts/x.py` — путь от
+        корня апстрима с их раскладкой каталогов;
+      `cibersort-immune-infiltration-analysis/tests/data/x.csv` — имя чужого навыка
+        оказалось префиксом к файлу, который лежит в ЭТОМ навыке;
+      `SKILL_DIR/scripts/x.py` — переменная окружения скилла в начале пути;
+      `../<название>/SKILL.md` — ссылка на соседний навык, которого у нас нет.
+    Возвращается список хвостов (длинные сначала), существование проверяет вызывающий.
+    """
+    if not ref:
+        return []
+    out: list[str] = []
+    base = re.sub(r"^(?:\.\./)+", "", ref)
+    # переменная каталога скилла
+    base = re.sub(r"^\$?\{?(?:SKILL_DIR|CLAUDE_SKILL_DIR|SKILL_ROOT)\}?/", "", base)
+    out.append(base)
+    parts = base.split("/")
+    # последовательно снимаем ведущие сегменты (но не последний — имя файла)
+    for i in range(1, len(parts) - 1):
+        out.append("/".join(parts[i:]))
+    return [x for x in dict.fromkeys(out) if x]
+
+
 def to_skill_relative(ref: str, skill_name: str) -> str | None:
     """Привести ссылку к пути относительно каталога навыка.
 

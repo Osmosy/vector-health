@@ -481,9 +481,9 @@ check("abdominal-ct-findings проверяется как собственны�
 check("в классификаторе есть категория repo_level",
       "repo_level" in br2.classify([], {}) or True)
 buckets2 = br2.classify([("meta-analysis", "../../scripts/prism...placeholder", "")], {})
-check("classify возвращает шесть корзин",
-      set(br2.classify([], {})) == {"placeholder", "recoverable", "heavy", "repo_level",
-                                    "external", "inherited"},
+check("classify возвращает все корзины (без пропусков)",
+      {"placeholder", "recoverable", "heavy", "repo_level", "external",
+       "inherited"} <= set(br2.classify([], {})),
       str(sorted(br2.classify([], {}))))
 
 rep = open(os.path.join(ROOT, "docs", "broken-refs.md"), encoding="utf-8").read()
@@ -510,8 +510,10 @@ readme_txt = open(os.path.join(ROOT, "README.md"), encoding="utf-8").read()
 check("README называет число битых ссылок",
       bool(re.search(rf"(?<![\d.]){rep_broken}(?![\d.])\s+битых", readme_txt)))
 check("README разбирает категорию «в корне источника»",
-      "в его корне" in readme_txt and "плоские" in readme_txt,
-      "нет разбора категории в README")
+      "в корне репозитория-источника" in readme_txt, "нет разбора категории в README")
+check("README разбирает новые категории (сосед, не публиковал, путь разошёлся)",
+      all(k in readme_txt for k in ("соседн", "не выкладывал", "другому пути")),
+      "нет разбора новых категорий в README")
 cats2 = dict(re.findall(r"^\| ([^|]+?) \| (\d+) \|", rep_txt, re.M))
 check("в отчёте пять категорий", {"Пример пути в коде", "Восстановимо", "Тяжёлые данные",
                                   "В корне источника", "Унаследованное"} <= set(cats2), str(list(cats2)))
@@ -568,6 +570,65 @@ check("у ссылок omicverse есть URL проекта",
 check("внешние ссылки размечены состоянием (совпадает/переехал)",
       "путь совпадает" in sec_ext or "переехал" in sec_ext)
 check("в отчёте есть вид «каталог запуска»", "каталог запуска" in sec_ext)
+
+print("\n=== 20. Разбор унаследованного остатка по проверяемым признакам ===")
+# 394 «унаследованных» были одной кучей с одним ярлыком. Разбор показал, что причина
+# не одна: файл есть у соседа по библиотеке, апстрим не публиковал каталог, путь
+# разошёлся. Каждый признак проверяется фактом, а не догадкой.
+check("classify возвращает девять корзин",
+      set(br2.classify([], {})) == {"placeholder", "recoverable", "external", "repo_level",
+                                    "path_mismatch", "sibling", "unpublished", "heavy", "inherited"},
+      str(sorted(br2.classify([], {}))))
+check("strip_leading_dirs снимает переменную SKILL_DIR (первым же вариантом)",
+      refs_mod2.strip_leading_dirs("SKILL_DIR/scripts/b.py")[0] == "scripts/b.py",
+      str(refs_mod2.strip_leading_dirs("SKILL_DIR/scripts/b.py")))
+check("strip_leading_dirs снимает имя навыка-префикс",
+      "tests/data/e.csv" in refs_mod2.strip_leading_dirs(
+          "cibersort-immune-infiltration-analysis/tests/data/e.csv"),
+      str(refs_mod2.strip_leading_dirs("cibersort-immune-infiltration-analysis/tests/data/e.csv")))
+check("strip_leading_dirs снимает ../",
+      refs_mod2.strip_leading_dirs("../foo/SKILL.md")[0] == "foo/SKILL.md",
+      str(refs_mod2.strip_leading_dirs("../foo/SKILL.md")))
+check("strip_leading_dirs не трогает обычный путь",
+      refs_mod2.strip_leading_dirs("references/a.md") == ["references/a.md"])
+check("same_name_elsewhere находит файл навыка по имени",
+      br2.same_name_elsewhere(os.path.join(SKILLS, "nomogram-construction"),
+                              "data/Nomogram_list.qs") == "tests/expected_output/data/Nomogram_list.qs")
+check("same_name_elsewhere не срабатывает на отсутствующем файле",
+      br2.same_name_elsewhere(os.path.join(SKILLS, "nomogram-construction"),
+                              "data/no-such-file-xyz.qs") is None)
+# индекс соседей: путь, который есть у нескольких навыков
+idx = br2.sibling_index()
+multi = [k for k, v in idx.items() if len(v) >= 2 and k.endswith(".md")]
+check("индекс соседей видит общие файлы апстрима", len(multi) > 0, f"общих путей: {len(multi)}")
+# Классификация конкретной ссылки: без работающего индекса она уедет в «унаследованное»
+# (проверено мутацией: отключение ветки sibling давало 276 вместо 227)
+buckets2 = br2.classify(
+    [("analyze-stats", "scripts/check_reverse_coding.py", "../../scripts/check_reverse_coding.py")],
+    {})
+check("ссылка в соседний навык классифицируется как sibling",
+      len(buckets2["sibling"]) == 1 and not buckets2["inherited"], str({k: len(v) for k, v in buckets2.items()}))
+# path_mismatch: файл есть в навыке, но по другому пути (данные в tests/expected_output/)
+buckets3 = br2.classify([("nomogram-construction", "data/Nomogram_list.qs", "data/Nomogram_list.qs")], {})
+check("ссылка на файл навыка по другому пути → path_mismatch",
+      len(buckets3["path_mismatch"]) == 1 and not buckets3["inherited"],
+      str({k: len(v) for k, v in buckets3.items()}))
+check("path_mismatch указывает фактический путь файла",
+      buckets3["path_mismatch"] and "tests/expected_output" in buckets3["path_mismatch"][0][2],
+      str(buckets3["path_mismatch"][:1]))
+check("sibling не ловит ссылки с ../ (они про корень источника)",
+      len(br2.classify([("x", "../../../scripts/y.py", "../../../scripts/y.py")], {})["sibling"]) == 0)
+
+# категории отчёта: имена берутся из CATEGORIES, числа сходятся с числом битых
+check("CATEGORIES — источник имён для отчёта", len(br2.CATEGORIES) == 9, str(len(br2.CATEGORIES)))
+check("все категории названы в отчёте",
+      all(f"| {short} |" in rep_txt for _k, short, _t, _m in br2.CATEGORIES))
+check("секция «Есть у соседнего навыка» есть",
+      "## Файл есть у соседнего навыка библиотеки" in rep_txt)
+check("секция «Апстрим не публиковал» есть", "## Апстрим не публиковал каталог" in rep_txt)
+check("секция «Путь разошёлся» есть", "## Путь разошёлся (файл в навыке есть)" in rep_txt)
+check("унаследованное объясняет выходные файлы, а не выдаёт их за живые",
+      "выходные файлы" in rep_txt or "результат работы" in rep_txt)
 
 print(f"\n{'=' * 50}")
 print(f"ИТОГО: {PASS} ok, {FAIL} FAIL")
