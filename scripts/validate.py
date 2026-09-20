@@ -911,6 +911,39 @@ def check_doc_counts_dynamic(rep: Report) -> None:
              f"состав scripts/ — {stats['scripts']['total']} файлов")
 
 
+def check_trials_no_copyright_text(rep: Report) -> None:
+    """В docs/trials-verified.json — только метаданные, без чужих аннотаций.
+
+    Файл хранил семь фрагментов аннотаций NEJM по 900 символов. Это чужой
+    охраняемый текст в MIT-репозитории, который ещё и публикуется на Pages: для
+    сверки года, тома, страниц и PMID он не нужен вовсе. Цифра первичной точки
+    хранится в поле `result` — собственная формулировка со ссылкой на PMID.
+    """
+    path = os.path.join(ROOT, "docs", "trials-verified.json")
+    if not os.path.isfile(path):
+        rep.fail("испытания", "нет docs/trials-verified.json")
+        return
+    try:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+    except json.JSONDecodeError as e:
+        rep.fail("испытания", f"docs/trials-verified.json не читается: {e}")
+        return
+    long_fields = []
+    for name, rec in data.items():
+        for key, value in rec.items():
+            if isinstance(value, str) and len(value) > 300:
+                long_fields.append(f"{name}.{key} ({len(value)} символов)")
+        if "abstract" in rec:
+            long_fields.append(f"{name}.abstract — чужой текст аннотации")
+    if long_fields:
+        rep.fail("испытания", f"в trials-verified.json чужой или слишком длинный текст: "
+                              f"{long_fields[:3]} — оставь метаданные и свою формулировку "
+                              f"результата со ссылкой на PMID")
+    rep.note(f"испытания: {len(data)} записей, только метаданные и своя формулировка "
+             f"результата")
+
+
 def check_notice_structure(rep: Report) -> None:
     """Структура NOTICE: обязательные разделы на месте, включая строку для авторов.
 
@@ -1002,6 +1035,87 @@ def check_broken_ref_categories(rep: Report) -> None:
     if problems:
         rep.fail("ссылки", f"категории битых ссылок разошлись: {problems[:3]}")
     rep.note(f"ссылки: {len(rows)} категорий, сумма {total} сходится с отчётом и README")
+
+
+def check_exclusions_single_source(rep: Report) -> None:
+    """Правила исключения — в одном модуле, и счёт синхронизации сходится с инвентарём.
+
+    Две копии правил разошлись: синхронизация помечала 173 файла, инвентарь видел
+    149 — расхождение в 24 файла, включая служебные внутри `references/`,
+    `scripts/`, `database/`. Валидатор о нём не знал, а маркер `_coverage` и часть
+    `/docs/` задевали рабочий материал (`check_artifact_coverage.py`,
+    `ppt-master/scripts/docs/*.md`), который синхронизация не обновила бы никогда.
+    """
+    ex_path = os.path.join(ROOT, "scripts", "exclusions.py")
+    if not os.path.isfile(ex_path):
+        rep.fail("исключения", "нет scripts/exclusions.py — единого определения правил")
+        return
+    # копий констант быть не должно
+    copies = []
+    for rel in ("scripts/sync_upstreams.py", "scripts/service_artifacts.py",
+                "scripts/broken_refs.py", "scripts/validate.py"):
+        path = os.path.join(ROOT, rel)
+        if not os.path.isfile(path):
+            continue
+        body = open(path, encoding="utf-8").read()
+        # Копия правил — это ОБЪЯВЛЕНИЕ констант правил в любом месте файла и с
+        # любым отступом: мутация, вставившая объявление в середину блока, проходила
+        # мимо якоря `^`. Функции с именами classify/is_excluded копией не считаются:
+        # в `broken_refs.py` `classify` классифицирует ССЫЛКИ, а `is_excluded` в
+        # `sync_upstreams.py` — законная обёртка над общим модулем. Проверять надо
+        # правила, а не имена функций.
+        if re.search(r"\bEXCLUDE_(PARTS|SUFFIX|MARKERS)\s*=", body):
+            if rel != "scripts/exclusions.py":
+                copies.append(rel)
+    if copies:
+        rep.fail("исключения", f"копии правил исключения в {copies} — определение должно "
+                               f"быть одно (scripts/exclusions.py)")
+
+    # счёт синхронизации и инвентаря обязан совпадать
+    code = (
+        "import sys, os; sys.path.insert(0,'scripts');"
+        "import sync_upstreams as su, service_artifacts as sa;"
+        "m=set();"
+        "[m.add(os.path.relpath(os.path.join(r,f),'skills').replace(os.sep,'/'))"
+        " for r,d,fs in os.walk('skills') for f in fs"
+        " if su.is_excluded(os.path.relpath(os.path.join(r,f),'skills').replace(os.sep,'/'))];"
+        "i={x['skill']+'/'+x['rel'] for x in sa.collect()['items']};"
+        "print(len(m), len(i), len(m^i))"
+    )
+    proc = subprocess.run([sys.executable, "-B", "-c", code], cwd=ROOT,
+                          capture_output=True, text=True)
+    if proc.returncode != 0:
+        rep.fail("исключения", f"не удалось сверить счёт: {(proc.stderr or '')[:150]}")
+        return
+    try:
+        n_sync, n_inv, diff = (int(x) for x in proc.stdout.split()[:3])
+    except ValueError:
+        rep.fail("исключения", f"неожиданный вывод сверки: {proc.stdout[:100]}")
+        return
+    if diff:
+        rep.fail("исключения", f"счёт синхронизации ({n_sync}) и инвентаря ({n_inv}) "
+                               f"расходится на {diff} файлов")
+    # рабочие файлы не должны считаться служебными
+    work = ("scripts/check_artifact_coverage.py", "scripts/scan_glyph_coverage.py",
+            "scripts/docs/guide.md", "docs/broken-refs.md")
+    # Модуль читается как ИСХОДНИК и выполняется отдельным процессом: importlib
+    # кэшировал бы версию из текущего процесса, и правка exclusions.py в дереве
+    # проверку бы не изменила (мутация «вернуть маркер _coverage» проходила).
+    probe = (
+        "import sys; sys.path.insert(0,'scripts'); import exclusions as ex;"
+        "print([p for p in " + repr(work) + " if ex.classify(p)])"
+    )
+    pr = subprocess.run([sys.executable, "-B", "-c", probe], cwd=ROOT,
+                        capture_output=True, text=True)
+    try:
+        wrongly = eval(pr.stdout.strip() or "[]")
+    except (SyntaxError, ValueError):
+        wrongly = []
+    if wrongly:
+        rep.fail("исключения", f"рабочий материал помечен служебным: {wrongly} — "
+                              f"синхронизация такие файлы не обновит")
+    rep.note(f"исключения: одно определение, счёт синхронизации и инвентаря совпадает "
+             f"({n_sync}), рабочие файлы не помечены")
 
 
 def check_service_artifacts(rep: Report) -> None:
@@ -1563,7 +1677,9 @@ CHECKS = (
     check_restricted, check_links, check_short_docs, check_assets, check_skill_refs,
     check_diagram, check_duplicates, check_clinical_claims, check_restricted_docs,
     check_broken_refs_report, check_sibling_copies, check_readme_prose, check_origin_map,
-    check_notice_structure, check_broken_ref_categories, check_doc_counts_dynamic, check_service_artifacts,
+    check_exclusions_single_source,
+    check_notice_structure, check_trials_no_copyright_text, check_broken_ref_categories,
+    check_doc_counts_dynamic, check_service_artifacts,
     check_diagram_numbers,
     check_secrets, check_cjk, check_language_layers, check_taxonomy_completeness,
 )

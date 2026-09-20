@@ -5,6 +5,7 @@
 каждая мутация — то, что аудит назвал дефектом: вернуть служебный файл, снять
 причину с allowlist, подменить год испытания, разойтись числом проверок.
 """
+import json
 import os
 import shutil
 import subprocess
@@ -48,19 +49,45 @@ CASES = [
     ("M11: лишний JSON в scripts/ (состав разошёлся с документами)",
      [("scripts/x-probe.json", "", "")]),
     ("M12: число проверок в AGENTS разошлось со stats.json",
-     [("AGENTS.md", "`python3 scripts/validate.py` (27 проверок",
+     # число берём из stats.json, иначе якорь устаревает с каждой новой проверкой
+     [("AGENTS.md", f"`python3 scripts/validate.py` ({json.load(open(os.path.join(ROOT, 'scripts', 'stats.json'), encoding='utf-8'))['validate_checks']} проверок",
        "`python3 scripts/validate.py` (21 проверка")]),
     ("M13: категория битых ссылок подменена в README",
      [("README.md", "внешний ресурс 81", "внешний ресурс 12")]),
     ("M14: «18 органов» вернулись в NOTICE",
      [("NOTICE.md", "18 анатомических структур", "18 органов")]),
+    # Этап 2: правила исключения. Копия правил в любом скрипте — расхождение
+    # на 24 файла, которое никто не видел.
+    ("M16: служебный файл во вложенном каталоге навыка (references/)",
+     [("skills/gsea/references/x_audit_result.json", "", "")]),
+    ("M17: тяжёлые данные в database/ навыка без упоминания в тексте",
+     [("skills/tf-target-gene-regulatory-network/database/probe.rds", "", "")]),
+    ("M18: копия правил исключения вернулась в sync_upstreams.py",
+     [("scripts/sync_upstreams.py", "HEAVY_SUFFIX = (",
+       "EXCLUDE_MARKERS = (\"probe\",)\nHEAVY_SUFFIX = (")]),
+    ("M19: рабочий скрипт помечен служебным (маркер _coverage вернулся)",
+     [("scripts/exclusions.py", 'COVERAGE_NAMES = ("coverage.json"',
+       'EXCLUDE_MARKERS = ("_coverage",)\nCOVERAGE_NAMES = ("coverage.json"')]),
+    # Этап 4: числа и защита от чужого текста
+    ("M20: чужой текст аннотации вернулся в trials-verified.json",
+     [("docs/trials-verified.json", '"verified_via"',
+       '"abstract": "Background Despite improvements in the management of atrial '
+       'fibrillation, patients with this condition remain at increased risk for '
+       'cardiovascular complications. It is unclear whether early rhythm-control '
+       'therapy can reduce this risk. Methods In this international, '
+       'investigator-initiated, parallel-group, open, blinded-outcome-assessment '
+       'trial, we randomly assigned patients who had early atrial fibrillation", '
+       '"verified_via"')]),
+    ("M21: for-review.md разошёлся с деревом",
+     [("docs/for-review.md", "## Ключевые числа", "## Другой раздел")],
+     [["scripts/build_for_review.py", "--check"]]),
     ("M15: запись удалена из карты происхождения",
      [("scripts/upstream-origin.json", '"aav-vector-design-agent": "OpenClaw"',
        '"aav-vector-design-agent": "own"')]),
 ]
 
 
-def run_case(name, edits):
+def run_case(name, edits, extra=None):
     tmp = tempfile.mkdtemp(prefix="vhmut_")
     try:
         for item in os.listdir(ROOT):
@@ -87,8 +114,16 @@ def run_case(name, edits):
                 return f"{name}: ЯКОРЬ НЕ НАЙДЕН ({rel}: {old[:40]})"
             with open(p, "w", encoding="utf-8") as f:
                 f.write(t.replace(old, new, 1))
-        r = subprocess.run([sys.executable, "-B", "scripts/validate.py"],
-                           cwd=tmp, capture_output=True, text=True)
+        # Мутация может проверяться не только валидатором: у чисел и документов
+        # для внешней проверки свои проверки с флагом --check (они не дублируют
+        # валидатор, а отвечают за воспроизводимость файла).
+        cmd = extra or ["scripts/validate.py"]
+        results = []
+        for c in ([cmd] if isinstance(cmd, list) and cmd and isinstance(cmd[0], str)
+                  else cmd):
+            results.append(subprocess.run([sys.executable, "-B"] + c,
+                                          cwd=tmp, capture_output=True, text=True))
+        r = results[0]
         out = r.stdout or r.stderr
         first = [l.strip() for l in out.splitlines() if l.strip().startswith("[")
                  or "ПРОВАЛ" in l or "ОШИБКА" in l]
@@ -100,7 +135,9 @@ def run_case(name, edits):
 
 def main():
     bad = 0
-    for name, edits in CASES:
+    for case in CASES:
+        name, edits = case[0], case[1]
+        extra = case[2] if len(case) > 2 else None
         res = run_case(name, edits)
         if "ПРОПУЩЕНО" in res or "ЯКОРЬ" in res:
             bad += 1

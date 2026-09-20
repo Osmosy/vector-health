@@ -58,24 +58,13 @@ SOURCES = {
     "openmed": {"repo": "maziyarpanahi/openmed", "roots": ["skills"]},
 }
 
-# Отрезанные при сборке каталоги и тяжёлые форматы: не тянем их обратно.
-EXCLUDE_PARTS = ("/evals/", "/eval/", "/fixtures/", "/repo/", "/node_modules/", "/.git/",
-                 "/tests/", "/test_data/", "/.github/", "/docs/", "/challenges/",
-                 "/lint_challenge/", "/analysis_run_challenge/", "/_challenge/")
-EXCLUDE_SUFFIX = (".npy", ".xlsx", ".parquet", ".h5ad", ".rds", ".bam", ".zip", ".whl")
-# Тяжёлые архивы: файл есть в апстриме и на него ссылается SKILL.md, но это
-# демо-данные на мегабайты (выгрузки 23andMe по 4.9 МБ), а не материал навыка.
-# Держать их в библиотеке навыков — удвоить репозиторий ради одного примера.
 HEAVY_SUFFIX = (".gz", ".tgz", ".bz2", ".xz", ".tar", ".7z")
 HEAVY_MAX = 1_500_000  # байт: крупнее — демо-датасет, а не материал навыка
-# Служебные артефакты апстримов: отчёты прогонов, аудиты, changelog'и. При сборке
-# они не вендорились; тянуть их обратно — удвоить библиотеку мусором.
-EXCLUDE_MARKERS = ("_audit_result", "audit_result", "eval_report", "POLISH_CHANGELOG",
-                   "CHANGELOG", "_coverage", "coverage.json", "conftest.py")
 # Разбор ссылок на файлы — общий модуль (scripts/refs.py): синхронизация,
 # инвентарь и валидатор должны отвечать на вопрос «какие файлы нужны навыку»
 # одинаково, иначе один тянет одно, а другой ругает.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import exclusions as excl  # noqa: E402 — общие правила исключения
 import refs as refs_mod  # noqa: E402
 
 REF_RE = refs_mod.REF_RE
@@ -88,24 +77,11 @@ MAX_FILE = 5 * 1024 * 1024
 _HEADS_CACHE: tuple[dict[str, dict[str, str]], dict[str, int]] | None = None
 
 
-def token() -> str:
-    """Токен для API. Приоритет — gh CLI: он обновляется сам, а GITHUB_TOKEN
-    в ~/.hermes/.env истекает и молча даёт 401."""
-    try:
-        out = subprocess.run(["gh", "auth", "token"], capture_output=True, text=True)
-        if out.returncode == 0 and out.stdout.strip():
-            return out.stdout.strip()
-    except FileNotFoundError:
-        pass
-    env_path = os.path.expanduser("~/.hermes/.env")
-    if os.path.isfile(env_path):
-        for line in open(env_path, encoding="utf-8"):
-            if line.startswith("GITHUB_TOKEN="):
-                return line.split("=", 1)[1].strip().strip('"').strip("'")
-    return ""
-
-
-API_TOKEN = token()
+# Токен — общий с остальными скриптами: окружение (GITHUB_TOKEN, GH_TOKEN), затем
+# gh auth token, затем ~/.hermes/.env. Здесь была СВОЯ функция, читавшая только gh
+# и файл, — INSTALL обещал переменную окружения, и обещание не выполнялось: в CI
+# запросы шли анонимно и упирались в лимит 60 запросов в час.
+API_TOKEN = refs_mod.github_token()
 
 
 def api(url: str, tries: int = 4):
@@ -178,13 +154,19 @@ def assembled_ref(repo: str) -> str:
 
 
 def is_excluded(path: str) -> bool:
-    low = "/" + path
-    if any(part in low for part in EXCLUDE_PARTS) or path.endswith(EXCLUDE_SUFFIX):
-        return True
+    """Служебный ли файл. Единственное определение — scripts/exclusions.classify.
+
+    Здесь была СВОЯ копия правил, и она разошлась с инвентарём: синхронизация
+    помечала 173 файла, инвентарь видел 149, а маркер `_coverage` и часть `/docs/`
+    задевали рабочие скрипты и документы навыков (`check_artifact_coverage.py`,
+    `ppt-master/scripts/docs/*.md`), которые вызываются из SKILL.md — синхронизация
+    такие файлы никогда не обновила бы. Правило теперь одно, тяжёлые архивы
+    (`.gz`) остаются отдельным случаем: файл есть и на него ссылаются, но это
+    демо-данные на мегабайты.
+    """
     if path.endswith(HEAVY_SUFFIX):
         return True
-    base = path.rsplit("/", 1)[-1]
-    return any(marker in base for marker in EXCLUDE_MARKERS)
+    return excl.classify(path) is not None
 
 
 def rel_of(up_path: str, name: str) -> str:
@@ -565,8 +547,7 @@ def _prune_allowlist() -> set[tuple[str, str]]:
     return kept
 
 
-PRUNE_DIR_NAMES = ("tests", "test_data", "evals", "eval", "fixtures", "challenges",
-                    "lint_challenge", "analysis_run_challenge", "_challenge")
+PRUNE_DIR_NAMES = excl.SERVICE_DIRS
 
 
 def prune_empty_dirs(apply: bool) -> int:

@@ -44,5 +44,17 @@ sys.argv = ["tests/test_scripts.py"] + [x for x in sys.argv[1:] if x.startswith(
 os.environ.pop("GITHUB_TOKEN", None)
 os.environ.pop("GH_TOKEN", None)
 
+# Подпроцессы наследуют окружение, но блокировка сокетов действует только в ЭТОМ
+# процессе: `broken_refs.py`, запущенный тестом, ходил в сеть, и шаг «без сети» в CI
+# проходил, ничего не проверяя. Поэтому подпроцессам передаётся:
+#   VH_OFFLINE=1 — не обращаться к сети вовсе;
+#   VH_UPSTREAM_TREES — снимок деревьев апстримов (те же данные, что у тестов).
+# Плюс настоящая проверка изоляции делается снаружи (bwrap --unshare-net или
+# docker --network none): см. docs/offline.md.
+FIXTURE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures",
+                       "upstream-trees.json.gz")
+os.environ["VH_OFFLINE"] = "1"
+os.environ["VH_UPSTREAM_TREES"] = FIXTURE
+
 runpy.run_path(os.path.join(os.path.dirname(os.path.abspath(__file__)),
                             "test_scripts.py"), run_name="__main__")

@@ -13,11 +13,12 @@
    "Journal Article"
   ],
   "title": "Early Rhythm-Control Therapy in Patients with Atrial Fibrillation.",
-  "abstract": " Background Despite improvements in the management of atrial fibrillation, patients with this condition remain at increased risk for cardiovascular complications. It is unclear whether early rhythm-control therapy can reduce this risk. Methods In this international, investigator-initiated, parallel-group, open, blinded-outcome-assessment trial, we randomly assigned patients who had early atrial fibrillation (diagnosed ≤1 year before enrollment) and cardiovascular conditions to receive either early rhythm control or usual care. Early rhythm control included treatment with antiarrhythmic drugs or atrial fibrillation ablation after randomization. Usual care limited rhythm control to the management of atrial fibrillation-related symptoms. The first primary outcome was a composite of death from cardiovascular causes, stroke, or hospitalization with worsening of heart failure or acute coronary",
   "vol": "383",
   "issue": "14",
   "pages": "1305-1316",
-  "result": "3.9 vs 5.0 события на 100 пациенто-лет, HR 0.79"
+  "result": "3.9 vs 5.0 события на 100 пациенто-лет, HR 0.79",
+  "verified_via": "Europe PMC, запись по PMID (метаданные и цифра первичной точки)",
+  "result_source": "https://pubmed.ncbi.nlm.nih.gov/32865375/"
  },
  "EARLY-AF": {
   "pmid": "33197159",
@@ -33,11 +34,12 @@
    "Journal Article"
   ],
   "title": "Cryoablation or Drug Therapy for Initial Treatment of Atrial Fibrillation.",
-  "abstract": " Background Guidelines recommend a trial of one or more antiarrhythmic drugs before catheter ablation is considered in patients with atrial fibrillation. However, first-line ablation may be more effective in maintaining sinus rhythm. Methods We randomly assigned 303 patients with symptomatic, paroxysmal, untreated atrial fibrillation to undergo catheter ablation with a cryothermy balloon or to receive antiarrhythmic drug therapy for initial rhythm control. All the patients received an implantable cardiac monitoring device to detect atrial tachyarrhythmia. The follow-up period was 12 months. The primary end point was the first documented recurrence of any atrial tachyarrhythmia (atrial fibrillation, atrial flutter, or atrial tachycardia) between 91 and 365 days after catheter ablation or the initiation of an antiarrhythmic drug. The secondary end points included freedom from symptomatic a",
   "vol": "384",
   "issue": "4",
   "pages": "305-315",
-  "result": "42.9% vs 67.8% рецидив"
+  "result": "42.9% vs 67.8% рецидив",
+  "verified_via": "Europe PMC, запись по PMID (метаданные и цифра первичной точки)",
+  "result_source": "https://pubmed.ncbi.nlm.nih.gov/33197159/"
  },
  "STOP-AF First": {
   "pmid": "33197158",
@@ -52,11 +54,12 @@
    "Journal Article"
   ],
   "title": "Cryoballoon Ablation as Initial Therapy for Atrial Fibrillation.",
-  "abstract": " Background In patients with symptomatic paroxysmal atrial fibrillation that has not responded to medication, catheter ablation is more effective than antiarrhythmic drug therapy for maintaining sinus rhythm. However, the safety and efficacy of cryoballoon ablation as initial first-line therapy have not been established. Methods We performed a multicenter trial in which patients 18 to 80 years of age who had paroxysmal atrial fibrillation for which they had not previously received rhythm-control therapy were randomly assigned (1:1) to receive treatment with antiarrhythmic drugs (class I or III agents) or pulmonary vein isolation with a cryoballoon. Arrhythmia monitoring included 12-lead electrocardiography conducted at baseline and at 1, 3, 6, and 12 months; patient-activated telephone monitoring conducted weekly and when symptoms were present during months 3 through 12; and 24-hour ambu",
   "vol": "384",
   "issue": "4",
   "pages": "316-324",
-  "result": "74.6% vs 45.0% успех"
+  "result": "74.6% vs 45.0% успех",
+  "verified_via": "Europe PMC, запись по PMID (метаданные и цифра первичной точки)",
+  "result_source": "https://pubmed.ncbi.nlm.nih.gov/33197158/"
  },
  "CASTLE-AF": {
   "pmid": "29385358",
@@ -72,11 +75,12 @@
    "Journal Article"
   ],
   "title": "Catheter Ablation for Atrial Fibrillation with Heart Failure.",
-  "abstract": " Background Mortality and morbidity are higher among patients with atrial fibrillation and heart failure than among those with heart failure alone. Catheter ablation for atrial fibrillation has been proposed as a means of improving outcomes among patients with heart failure who are otherwise receiving appropriate treatment. Methods We randomly assigned patients with symptomatic paroxysmal or persistent atrial fibrillation who did not have a response to antiarrhythmic drugs, had unacceptable side effects, or were unwilling to take these drugs to undergo either catheter ablation (179 patients) or medical therapy (rate or rhythm control) (184 patients) for atrial fibrillation in addition to guidelines-based therapy for heart failure. All the patients had New York Heart Association class II, III, or IV heart failure, a left ventricular ejection fraction of 35% or less, and an implanted defib",
   "vol": "378",
   "issue": "5",
   "pages": "417-427",
-  "result": "28.5% vs 44.6% событий, HR 0.62"
+  "result": "28.5% vs 44.6% событий, HR 0.62",
+  "verified_via": "Europe PMC, запись по PMID (метаданные и цифра первичной точки)",
+  "result_source": "https://pubmed.ncbi.nlm.nih.gov/29385358/"
  },
  "CASTLE-HTx": {
   "pmid": "37634135",
@@ -91,11 +95,12 @@
    "Journal Article"
   ],
   "title": "Catheter Ablation in End-Stage Heart Failure with Atrial Fibrillation.",
-  "abstract": " Background The role of catheter ablation in patients with symptomatic atrial fibrillation and end-stage heart failure is unknown. Methods We conducted a single-center, open-label trial in Germany that involved patients with symptomatic atrial fibrillation and end-stage heart failure who were referred for heart transplantation evaluation. Patients were assigned to receive catheter ablation and guideline-directed medical therapy or medical therapy alone. The primary end point was a composite of death from any cause, implantation of a left ventricular assist device, or urgent heart transplantation. Results A total of 97 patients were assigned to the ablation group and 97 to the medical-therapy group. The trial was stopped for efficacy by the data and safety monitoring board 1 year after randomization was completed. Catheter ablation was performed in 81 of 97 patients (84%) in the ablation ",
   "vol": "389",
   "issue": "15",
   "pages": "1380-1389",
-  "result": "8% vs 30% событий, HR 0.24"
+  "result": "8% vs 30% событий, HR 0.24",
+  "verified_via": "Europe PMC, запись по PMID (метаданные и цифра первичной точки)",
+  "result_source": "https://pubmed.ncbi.nlm.nih.gov/37634135/"
  },
  "ADVENT": {
   "pmid": "37634148",
@@ -109,11 +114,12 @@
    "Journal Article"
   ],
   "title": "Pulsed Field or Conventional Thermal Ablation for Paroxysmal Atrial Fibrillation.",
-  "abstract": " Background Catheter-based pulmonary vein isolation is an effective treatment for paroxysmal atrial fibrillation. Pulsed field ablation, which delivers microsecond high-voltage electrical fields, may limit damage to tissues outside the myocardium. The efficacy and safety of pulsed field ablation as compared with conventional thermal ablation are not known. Methods In this randomized, single-blind, noninferiority trial, we assigned patients with drug-refractory paroxysmal atrial fibrillation in a 1:1 ratio to undergo pulsed field ablation or conventional radiofrequency or cryoballoon ablation. The primary efficacy end point was freedom from a composite of initial procedural failure, documented atrial tachyarrhythmia after a 3-month blanking period, antiarrhythmic drug use, cardioversion, or repeat ablation. The primary safety end point included acute and chronic device- and procedure-rela",
   "vol": "389",
   "issue": "18",
   "pages": "1660-1671",
-  "result": "73.3% vs 71.3%, noninferiority"
+  "result": "73.3% vs 71.3%, noninferiority",
+  "verified_via": "Europe PMC, запись по PMID (метаданные и цифра первичной точки)",
+  "result_source": "https://pubmed.ncbi.nlm.nih.gov/37634148/"
  },
  "AFFIRM": {
   "pmid": "12466506",
@@ -131,10 +137,11 @@
    "Journal Article"
   ],
   "title": "A comparison of rate control and rhythm control in patients with atrial fibrillation.",
-  "abstract": " Background There are two approaches to the treatment of atrial fibrillation: one is cardioversion and treatment with antiarrhythmic drugs to maintain sinus rhythm, and the other is the use of rate-controlling drugs, allowing atrial fibrillation to persist. In both approaches, the use of anticoagulant drugs is recommended. Methods We conducted a randomized, multicenter comparison of these two treatment strategies in patients with atrial fibrillation and a high risk of stroke or death. The primary end point was overall mortality. Results A total of 4060 patients (mean [+/-SD] age, 69.7+/-9.0 years) were enrolled in the study; 70.8 percent had a history of hypertension, and 38.2 percent had coronary artery disease. Of the 3311 patients with echocardiograms, the left atrium was enlarged in 64.7 percent and left ventricular function was depressed in 26.0 percent. There were 356 deaths among ",
   "vol": "347",
   "issue": "23",
   "pages": "1825-1833",
-  "result": "смертность без разницы (4060 пациентов)"
+  "result": "смертность без разницы (4060 пациентов)",
+  "verified_via": "Europe PMC, запись по PMID (метаданные и цифра первичной точки)",
+  "result_source": "https://pubmed.ncbi.nlm.nih.gov/12466506/"
  }
 }

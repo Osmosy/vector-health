@@ -124,6 +124,30 @@ def upstream_blobs() -> dict[str, dict[str, tuple[str, int]]]:
     out: dict[str, dict[str, int]] = {}
     global MISSING_SOURCES
     MISSING_SOURCES = []
+
+    # Источник деревьев можно задать фикстурой (VH_UPSTREAM_TREES) — так работают
+    # тесты и офлайн-прогон. Без этого тест «без сети» проверял не то: тесты
+    # блокировали сеть в СВОЁМ процессе, а этот скрипт запускается подпроцессом и
+    # спокойно ходил в API, поэтому шаг «без сети» в CI проходил, ничего не доказывая.
+    fixture = os.environ.get("VH_UPSTREAM_TREES", "")
+    if fixture and os.path.isfile(fixture):
+        import gzip
+        opener = gzip.open if fixture.endswith(".gz") else open
+        with opener(fixture, "rt", encoding="utf-8") as f:
+            data = json.load(f)
+        trees = data.get("trees", {})
+        for label in SOURCES:
+            out[label] = {p: (("", 0) if isinstance(v, str) else v)
+                          for p, v in (trees.get(label) or {}).items()}
+        return out
+
+    if os.environ.get("VH_OFFLINE"):
+        # Явный офлайн: в сеть не идём вообще, помечаем все источники недоступными
+        for label in SOURCES:
+            out[label] = {}
+            MISSING_SOURCES.append(label)
+        return out
+
     for label, repo in SOURCES.items():
         try:
             tree = api(f"https://api.github.com/repos/{repo}/git/trees/HEAD?recursive=1")
@@ -573,6 +597,15 @@ def main() -> int:
     args = ap.parse_args()
 
     broken = scan()
+
+    # Проверка собственных навыков НЕ зависит от апстримов и делается ПЕРВОЙ.
+    # Раньше порядок был обратный: без деревьев функция завершалась с кодом 2 ещё до
+    # разбора собственных, поэтому `--strict-own` в окружении без сети не проверял
+    # ничего — а ему для этой проверки сеть не нужна вовсе.
+    own_broken = [(s, r) for s, r, _ in classify(broken, {})["recoverable"]
+                  + classify(broken, {})["repo_level"] + classify(broken, {})["heavy"]
+                  + classify(broken, {})["inherited"] if s in OWN_SKILLS]
+
     if args.offline:
         # Без сети отчёт писался деградировавшими числами: «унаследовано 227» -> 311,
         # «в корне источника» и «тяжёлые» -> 0, и валидатор такое пропускал, потому что
@@ -586,6 +619,8 @@ def main() -> int:
 
     trees = upstream_blobs()
     buckets = classify(broken, trees)
+    own_broken = [(s, r) for s, r, _ in buckets["recoverable"] + buckets["repo_level"]
+                  + buckets["heavy"] + buckets["inherited"] if s in OWN_SKILLS]
 
     total_refs = 0
     for root, dirs, files in os.walk(SKILLS):
@@ -608,8 +643,25 @@ def main() -> int:
         print("отчёт НЕ перезаписан: без дерева часть категорий посчиталась бы нулём "
               "(«в корне источника», «тяжёлые»), и «унаследовано» выросло бы за счёт "
               "разобранного — числа в README разошлись бы с деревом.", file=sys.stderr)
-        if args.no_report:
-            return 2
+        # Код выхода определяется проверкой собственных навыков, а не сетью:
+        # отсутствие дерева апстрима — это предупреждение, а не провал проверки,
+        # которую можно было сделать без сети.
+        if args.strict_own:
+            # Проверка собственных навыков сделана и её результат известен — сеть
+            # для неё не нужна. Код выхода определяется ЕЮ: отсутствие дерева
+            # апстрима — предупреждение о неполноте отчёта, а не провал проверки,
+            # которую можно было выполнить. Раньше здесь стоял безусловный exit 2,
+            # и в окружении без сети `--strict-own` не проверял ничего.
+            if own_broken:
+                print(f"\nБИТЫЕ ССЫЛКИ У СОБСТВЕННЫХ НАВЫКОВ: {len(own_broken)}")
+                for s, r in own_broken:
+                    print(f"  - {s}: {r}")
+                return 1
+            print(f"\nOK: у собственных навыков битых ссылок нет "
+                  f"({', '.join(sorted(OWN_SKILLS))}).")
+            print("(отчёт не перезаписан: дерево апстрима не получено — часть "
+                  "категорий посчиталась бы нулём)", file=sys.stderr)
+            return 0
         return 2
     if not args.no_report:
         write_report(buckets, total_ok, load_origin())

@@ -780,6 +780,43 @@ check("почти-дубль torch зафиксирован списком",
           "name-duplicates.json"), encoding="utf-8")).get("near_duplicates", []), ensure_ascii=False))
 check("README объясняет почти-дубли", "Почти-дубли" in readme_p)
 
+print("\n=== Офлайн-контракт: подпроцессы не ходят в сеть ===")
+# Заявление «тесты проходят без сети» проверяемо только в окружении без сети
+# (bwrap --unshare-net / docker --network none) — это делается в CI отдельным
+# шагом. Здесь проверяется КОНТРАКТ: скрипты уважают VH_OFFLINE и берут деревья из
+# фикстуры, а не из API. Без этого подпроцесс молча шёл в сеть, и шаг «без сети»
+# проходил, ничего не доказывая.
+fixture = os.path.join(ROOT, "tests", "fixtures", "upstream-trees.json.gz")
+check("снимок деревьев апстримов лежит в репозитории", os.path.isfile(fixture),
+      "нет tests/fixtures/upstream-trees.json.gz")
+env_off = {**os.environ, "VH_OFFLINE": "1", "VH_UPSTREAM_TREES": fixture}
+r_off = subprocess.run([sys.executable, "-B", "scripts/broken_refs.py",
+                        "--strict-own", "--no-report"],
+                       cwd=ROOT, capture_output=True, text=True, env=env_off)
+check("--strict-own в офлайне: код выхода 0, а не 2", r_off.returncode == 0,
+      f"exit={r_off.returncode}")
+check("--strict-own в офлайне проверяет собственные навыки",
+      "у собственных навыков битых ссылок нет" in (r_off.stdout or ""),
+      (r_off.stdout or "")[-200:])
+r_fix = subprocess.run([sys.executable, "-B", "scripts/broken_refs.py", "--no-report"],
+                       cwd=ROOT, capture_output=True, text=True,
+                       env={**os.environ, "VH_OFFLINE": "1", "VH_UPSTREAM_TREES": fixture})
+check("числа классификации из фикстуры совпадают с сетевым прогоном",
+      "унаследовано: 227" in (r_fix.stdout or "") and "в корне источника: 9" in (r_fix.stdout or ""),
+      (r_fix.stdout or "")[-300:])
+# VH_UPSTREAM_TREES убираем явно: run_offline.py выставляет её всем подпроцессам,
+# и «офлайн без фикстуры» иначе получает фикстуру по наследству — проверка
+# проверяла бы не то, что называет.
+env_no_fixture = {k: v for k, v in os.environ.items() if k != "VH_UPSTREAM_TREES"}
+env_no_fixture["VH_OFFLINE"] = "1"
+r_no = subprocess.run([sys.executable, "-B", "scripts/broken_refs.py", "--no-report"],
+                      cwd=ROOT, capture_output=True, text=True, env=env_no_fixture)
+check("VH_OFFLINE без фикстуры: отчёт не перезаписывается (код 2)",
+      r_no.returncode == 2, f"exit={r_no.returncode}")
+check("run_offline.py передаёт подпроцессам VH_OFFLINE и фикстуру",
+      "VH_OFFLINE" in open(os.path.join(ROOT, "tests", "run_offline.py"),
+                           encoding="utf-8").read())
+
 print(f"\n{'=' * 50}")
 if NETWORK:
     print("\n(сетевые проверки включены: --network)")

@@ -95,7 +95,7 @@ cp -r skills/dicom-vlm-analysis ~/.hermes/skills/
 ### 3. Проверить целостность (если правите)
 
 ```bash
-python3 scripts/validate.py            # всё: 27 проверок — числа, лицензии, ссылки, диаграмма
+python3 scripts/validate.py            # всё: 29 проверок — числа, лицензии, ссылки, диаграмма
 python3 scripts/build_stats.py         # пересобрать единый источник чисел (stats.json)
 python3 scripts/plant_sibling_files.py --apply   # разложить копии общих файлов апстрима
 python3 scripts/broken_refs.py         # ссылки внутри навыков (инвентарь)

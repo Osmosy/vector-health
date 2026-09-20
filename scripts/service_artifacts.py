@@ -29,16 +29,17 @@ SKILLS = os.path.join(ROOT, "skills")
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import refs as refs_mod  # noqa: E402
 
-# Правила совпадают с scripts/sync_upstreams.py — иначе инвентарь и синхронизация
-# отвечали бы на вопрос «что лишнее» по-разному
-EXCLUDE_PARTS = ("/evals/", "/eval/", "/fixtures/", "/repo/", "/node_modules/", "/.git/",
-                 "/tests/", "/test_data/", "/.github/", "/challenges/",
-                 "/lint_challenge/", "/analysis_run_challenge/", "/_challenge/")
-EXCLUDE_SUFFIX = (".npy", ".xlsx", ".parquet", ".h5ad", ".rds", ".bam", ".zip", ".whl")
-EXCLUDE_MARKERS = ("_audit_result", "audit_result", "eval_report", "POLISH_CHANGELOG",
-                   "CHANGELOG", "_coverage", "coverage.json", "conftest.py")
-# `/docs/` из правил синхронизации здесь НЕ берём: у навыка могут быть свои
-# `docs/` с материалом. Отсутствие в инвентаре — решение, а не забывчивость.
+# Правила берутся из общего модуля: единственная копия определения служебного
+# артефакта. Раньше здесь были свои копии констант, и они разошлись с
+# синхронизацией на 24 файла (синхронизация помечала 173, инвентарь видел 149):
+# обход ограничивался корнем навыка и именованными служебными каталогами, а
+# служебный файл лежит и в `references/`, и в `scripts/`, и в `database/`.
+import exclusions as excl  # noqa: E402
+# Тяжёлые архивы: то же правило, что в синхронизации
+HEAVY_SUFFIX = (".gz", ".tgz", ".bz2", ".xz", ".tar", ".7z")
+# Каталоги-результаты прогонов: внутри них файлы сохраняются только через
+# allowlist с причиной, даже если имя файла упомянуто в тексте навыка.
+RESULT_DIR_RE = __import__("re").compile(r"/tests/(?:audit|verify|output|case|run|legacy)[^/]*/")
 
 
 REFERENCE_DIRS = ("references", "docs", "assets", "prompts", "examples")
@@ -75,59 +76,97 @@ def owner_files(skill_dir: str) -> str:
 
 
 def referenced(text: str, rel_to_skill: str) -> bool:
-    """Ссылается ли текст навыка на файл (по имени и по пути)."""
-    base = os.path.basename(rel_to_skill)
-    if base in text:
+    """Ссылается ли текст навыка на файл — по ПУТИ, а не по одному имени.
+
+    Правило по имени было слишком широким и сохраняло результаты прогонов: у
+    `tf-target-gene-regulatory-network` так остались 18 файлов в каталогах
+    `tests/audit_v2_case_*/` (`tf_network.xlsx`, `tf.Rdata`, `session_info.txt`) —
+    потому что имя выходного файла упомянуто в `SKILL.md`, а сами каталоги
+    `audit_*`/`verify_*` — это следы прогонов, а не материал.
+
+    Теперь так:
+    - путь (с `tests/`) встречается в тексте — файл материал, сохраняется;
+    - файл лежит в каталоге-результате (`audit_*`, `verify_*`, `output_*`,
+      `case_*`, `run_*`) — сохраняется только через allowlist с причиной;
+    - иначе — по имени, но лишь для `tests/data/` и `tests/expected_output/`:
+      там лежат входные данные, и на них ссылаются именно по имени файла.
+    """
+    rel = rel_to_skill.replace(os.sep, "/")
+    if rel in text:
         return True
-    return rel_to_skill.replace(os.sep, "/") in text
+    if RESULT_DIR_RE.search(rel):
+        return False          # только allowlist
+    base = os.path.basename(rel)
+    if not base:
+        return False
+    if "/tests/data/" in "/" + rel or "/tests/expected_output/" in "/" + rel:
+        return base in text
+    return base in text
 
 
 def collect() -> dict:
-    items = []
+    """Все файлы под skills/, которые правила считают служебными.
+
+    Обход РЕКУРСИВНЫЙ по каждому навыку: служебный файл лежит не только в корне,
+    но и в `references/`, `scripts/`, `database/`, `assets/`. Пока обход
+    ограничивался корнем и именованными служебными каталогами, инвентарь не видел
+    24 файла из 173, которые помечает синхронизация, — в том числе
+    `gsea/assets/ssGSEA.rds` и `*_audit_result.json` в `references/`.
+
+    Вложенный навык (каталог со своим `SKILL.md`) относится к самому себе, а не к
+    контейнеру: у него свои правила и свой материал.
+    """
+    items: list[dict] = []
+    # Каталоги навыков: и верхние, и вложенные (со своим SKILL.md)
+    skill_dirs: list[str] = []
     for root, dirs, files in os.walk(SKILLS):
         dirs[:] = [d for d in dirs if d != "__pycache__"]
-        if "SKILL.md" not in files and "SKILL.MD" not in files:
-            continue
-        rel_skill = os.path.relpath(root, SKILLS).replace(os.sep, "/")
-        text = owner_files(root)
-        for f in files:
-            full = os.path.join(root, f)
-            rel_in_skill = os.path.relpath(full, root).replace(os.sep, "/")
-            posix = "/" + rel_in_skill
-            kind = None
-            if any(m in f for m in EXCLUDE_MARKERS):
-                kind = "служебный артефакт по имени"
-            elif f.endswith(EXCLUDE_SUFFIX):
-                kind = "исключённое расширение"
-            elif any(p in posix for p in ("/evals/", "/eval/", "/fixtures/", "/test_data/")):
-                kind = "тестовый каталог (evals/fixtures)"
-            if kind:
+        if "SKILL.md" in files or "SKILL.MD" in files:
+            skill_dirs.append(root)
+    skill_set = set(skill_dirs)
+
+    def nearest_skill(path: str) -> str:
+        """Ближайший каталог навыка для файла (вложенный выигрывает у контейнера)."""
+        cur = path
+        while len(cur) > len(SKILLS):
+            if cur in skill_set:
+                return cur
+            cur = os.path.dirname(cur)
+        return path
+
+    for skill_root in skill_dirs:
+        rel_skill = os.path.relpath(skill_root, SKILLS).replace(os.sep, "/")
+        text = owner_files(skill_root)
+        for base, dirs, files in os.walk(skill_root):
+            dirs[:] = [d for d in dirs if d != "__pycache__"]
+            # не заходим во вложенный навык дважды: он обойдётся сам
+            dirs[:] = [d for d in dirs
+                       if os.path.join(base, d) not in skill_set
+                       and nearest_skill(os.path.join(base, d)) == skill_root]
+            for f in files:
+                full = os.path.join(base, f)
+                if nearest_skill(base) != skill_root:
+                    continue
+                rel_in_skill = os.path.relpath(full, skill_root).replace(os.sep, "/")
+                kind = excl.classify(rel_in_skill)
+                if not kind:
+                    # Тяжёлые архивы синхронизация тоже не тянет (HEAVY_SUFFIX):
+                    # файл в апстриме есть и на него ссылаются, но это демо-данные
+                    # на мегабайты. В инвентаре они видны с отдельным видом, иначе
+                    # счёт синхронизации и инвентаря расходится на 2 файла.
+                    if rel_in_skill.endswith(HEAVY_SUFFIX):
+                        kind = "тяжёлый архив"
+                    else:
+                        continue
                 items.append({"skill": rel_skill, "rel": rel_in_skill, "kind": kind,
                               "bytes": os.path.getsize(full) if os.path.isfile(full) else 0,
                               "referenced": referenced(text, rel_in_skill)})
-        # Каталоги из правил исключения — отдельным проходом: файл внутри них может
-        # не подпадать ни под маркер имени, ни под расширение, но сам каталог в
-        # правилах есть. Первая версия обходила только `tests`/`test_data`, поэтому
-        # пять каталогов `evals/` в инвентарь не попадали, а `--prune` их не удалял.
-        for d in list(dirs):
-            if d in ("tests", "test_data", "evals", "eval", "fixtures", "challenges",
-                     "lint_challenge", "analysis_run_challenge", "_challenge"):
-                for base, subdirs, subfiles in os.walk(os.path.join(root, d)):
-                    subdirs[:] = [x for x in subdirs if x != "__pycache__"]
-                    for f in subfiles:
-                        full = os.path.join(base, f)
-                        rel_in_skill = os.path.relpath(full, root).replace(os.sep, "/")
-                        items.append({"skill": rel_skill, "rel": rel_in_skill,
-                                      "kind": f"каталог {d}/",
-                                      "bytes": os.path.getsize(full),
-                                      "referenced": referenced(text, rel_in_skill)})
     # дедупликация: файл мог попасть и по имени, и по каталогу
     uniq: dict[tuple[str, str], dict] = {}
     for it in items:
         uniq.setdefault((it["skill"], it["rel"]), it)
     rows = sorted(uniq.values(), key=lambda x: (x["skill"], x["rel"]))
-
-    by_kind = collections.Counter(r["kind"] for r in rows)
+    by_kind: collections.Counter = collections.Counter(r["kind"] for r in rows)
     by_source: collections.Counter = collections.Counter()
     try:
         with open(os.path.join(ROOT, "scripts", "upstream-origin.json"), encoding="utf-8") as f:

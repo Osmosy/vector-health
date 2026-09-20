@@ -11,6 +11,7 @@
 """
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import os
@@ -42,12 +43,26 @@ def sha256(path: pathlib.Path) -> str:
 
 
 def head_commit() -> str:
+    """Короткий хеш HEAD. Без git — ошибка, а не загадочный «коммит ?».
+
+    Файл для внешней проверки утверждает «вот что лежит в коммите таком-то». Если
+    git недоступен, хеша нет, и подставить вместо него «?» значит выдать документ,
+    по которому нельзя сверить архив.
+    """
     out = subprocess.run(["git", "rev-parse", "--short=7", "HEAD"], cwd=ROOT,
                          capture_output=True, text=True)
-    return out.stdout.strip() or "?"
+    commit = out.stdout.strip()
+    if out.returncode != 0 or not commit:
+        raise SystemExit("ОШИБКА: git недоступен — не могу указать коммит для "
+                         "docs/for-review.md (этот файл сверяется с архивом по хешу)")
+    return commit
 
 
 def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--check", action="store_true",
+                    help="не писать: падать, если файл на диске разошёлся")
+    args = ap.parse_args()
     stats = json.loads((ROOT / "scripts" / "stats.json").read_text(encoding="utf-8"))
     nd = json.loads((ROOT / "scripts" / "name-duplicates.json").read_text(encoding="utf-8"))
     sc, tf, S = stats["scripts"], stats["tests"], stats["restricted"]
@@ -111,7 +126,18 @@ def main() -> int:
         "",
     ]
     out = ROOT / "docs" / "for-review.md"
-    out.write_text("\n".join(lines), encoding="utf-8")
+    text = "\n".join(lines)
+    if args.check:
+        # Раньше аргументы не разбирались вовсе: `--check` молча перезаписывал файл.
+        # Проверка, которая вместо проверки пишет, бесполезна в CI.
+        stored = out.read_text(encoding="utf-8") if out.is_file() else ""
+        if stored != text:
+            print("ОШИБКА: docs/for-review.md разошёлся с деревом — пересобери "
+                  "python3 scripts/build_for_review.py", file=sys.stderr)
+            return 1
+        print("docs/for-review.md совпадает с деревом (--check)")
+        return 0
+    out.write_text(text, encoding="utf-8")
     print(f"docs/for-review.md пересобран: {len(KEY_FILES)} файлов, коммит {head_commit()}")
     return 0
 
