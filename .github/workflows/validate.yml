@@ -50,8 +50,13 @@ jobs:
           git diff --exit-code skills-index.json \
             || (echo "::error::skills-index.json устарел — пересобери scripts/build_index.py" && exit 1)
 
+      # --no-report обязателен: без него шаг пересобирает docs/broken-refs.md, и его
+      # хеш расходится с записанным в docs/for-review.md (49863 против 49764) —
+      # проверка «for-review собран из дерева» падала на следующем шаге. Отчёт в
+      # репозитории — закоммиченный артефакт; пересобирать его в CI и сравнивать
+      # хеши с ним же бессмысленно.
       - name: Ссылки внутри навыков — у собственных битых быть не должно
-        run: python3 scripts/broken_refs.py --strict-own
+        run: python3 scripts/broken_refs.py --strict-own --no-report
 
       # Тесты идут БЕЗ сети: деревья апстримов берутся из снимка
       # tests/fixtures/upstream-trees.json.gz. Раньше они падали в API GitHub, и в
