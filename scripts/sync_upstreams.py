@@ -213,8 +213,16 @@ def skill_dir_of(path: str) -> str | None:
 
 def build_origin() -> dict:
     """Карта «локальный навык → источник» по blob SHA на дату сборки."""
-    local_names = [d for d in sorted(os.listdir(SKILLS))
-                   if os.path.isfile(os.path.join(SKILLS, d, "SKILL.md"))]
+    # Все каталоги с SKILL.md, включая ВЛОЖЕННЫЕ. Раньше брались только верхние:
+    # в карте не было 26 навыков внутри каталогов-контейнеров (variant-interpretation-acmg/
+    # bioSkills/*, spatial-transcriptomics-analysis/SpatialAgent и др.), и проверка
+    # «каждый навык из skills-index.json есть в карте происхождения» не сходилась.
+    found: list[str] = []
+    for dirpath, dirnames, filenames in os.walk(SKILLS):
+        dirnames[:] = [d for d in dirnames if d != "__pycache__"]
+        if "SKILL.md" in filenames or "SKILL.MD" in filenames:
+            found.append(os.path.relpath(dirpath, SKILLS).replace(os.sep, "/"))
+    local_names = sorted(found)
     origin: dict[str, str] = {}
     sha_by_source: dict[str, dict[str, str]] = {}
     # Два состояния апстрима: HEAD (что там сейчас) и дата сборки (что было

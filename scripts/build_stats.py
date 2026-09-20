@@ -154,6 +154,36 @@ def build() -> dict:
 
     restricted_by_kind, restricted_lists = restricted_counts()
 
+    # Уникальные навыки с ограничениями и пересечения между видами. Сумма видов
+    # (319) уникальным навыкам не равна и вводила в заблуждение: два «Non-Commercial»
+    # навыка — это ОДИН навык varCADD в двух местах (одинаковый blob sha), и он же
+    # несёт проприетарную шапку. Документ, складывающий 308 + 9 + 2, обещает 319
+    # ограниченных навыков, которых в дереве нет.
+    _sets = {k: set(v) for k, v in restricted_lists.items()}
+    _unique: set[str] = set().union(*_sets.values()) if _sets else set()
+    overlaps = []
+    _keys = sorted(_sets)
+    for i, a in enumerate(_keys):
+        for b in _keys[i + 1:]:
+            inter = sorted(_sets[a] & _sets[b])
+            if inter:
+                overlaps.append({"kinds": [a, b], "skills": inter,
+                                 "note": "сумма видов считает такой навык дважды"})
+    # varCADD: два пути, один навык — показываем это явно, а не только числом
+    nc_dupes = []
+    if len(_sets.get("non_commercial", ())) == 2:
+        import hashlib
+        shas = {}
+        for name in _sets["non_commercial"]:
+            f = SKILLS / name / "SKILL.md"
+            if f.is_file():
+                shas.setdefault(hashlib.sha256(f.read_bytes()).hexdigest(), []).append(name)
+        for sha, names in shas.items():
+            if len(names) == 2:
+                nc_dupes.append({"sha256": sha, "paths": sorted(names),
+                                 "note": "один навык в двух местах: «два NC-навыка» — "
+                                         "это он же, а не два разных"})
+
     return {
         "generated_from": "дерево skills/ + scripts/upstream-origin.json + scripts/restricted-licenses.json",
         "generated_by": "scripts/build_stats.py — файл не править руками",
@@ -166,6 +196,9 @@ def build() -> dict:
         "own": own,
         "restricted": restricted_by_kind,
         "restricted_skills": restricted_lists,
+        "restricted_unique": len(_unique),
+        "restricted_overlaps": overlaps,
+        "non_commercial_same_skill": nc_dupes,
         "restricted_by_source": restricted_by_source(restricted_lists, origin),
         "scripts": scripts_counts(),
     }

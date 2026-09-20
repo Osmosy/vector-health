@@ -356,6 +356,30 @@
    "variant-interpretation-acmg/varCADD"
   ]
  },
+ "restricted_unique": 317,
+ "restricted_overlaps": [
+  {
+   "kinds": [
+    "non_commercial",
+    "proprietary_hat"
+   ],
+   "skills": [
+    "varcadd-pathogenicity",
+    "variant-interpretation-acmg/varCADD"
+   ],
+   "note": "сумма видов считает такой навык дважды"
+  }
+ ],
+ "non_commercial_same_skill": [
+  {
+   "sha256": "97cb5a3af11dd565b741d245f8bd0735a5c4152117248d97de5e804d67259c5a",
+   "paths": [
+    "varcadd-pathogenicity",
+    "variant-interpretation-acmg/varCADD"
+   ],
+   "note": "один навык в двух местах: «два NC-навыка» — это он же, а не два разных"
+  }
+ ],
  "restricted_by_source": {
   "proprietary_hat": {
    "OpenClaw": 308

@@ -238,7 +238,8 @@ Apache-2.0, а **веса модели — CC BY-NC-SA 4.0** (некоммерч
 |---|---|---|
 | Проприетарная шапка в тексте навыка («proprietary and confidential… All Rights Reserved», © MD BABU MIA — из апстрима OpenClaw) | 308 | считать MIT нельзя; текст прямо запрещает копирование |
 | Офисные навыки Anthropic | 9 (`xlsx`, `xlsx-official`, `pdf`, `pdf-anthropic`, `docx`, `docx-official`, `pptx`, `pptx-official`, `PPTX-Skill`) | «© 2025 Anthropic, PBC. All rights reserved»; нужен ваш договор с Anthropic |
-| `Non-Commercial` | 2 | коммерческое использование запрещено |
+| `Non-Commercial` | 2 | коммерческое использование запрещено. Это **один навык в двух местах** — `varcadd-pathogenicity` и `variant-interpretation-acmg/varCADD` (одинаковый sha); он же входит в первое ограничение списка |
+| **Итого уникальных навыков с ограничениями** | **317** | сумма по видам (308 + 9 + 2) даёт 319: **два «Non-Commercial» — это один навык** `varCADD` в двух местах (один sha), и он же попадает в проприетарные шапки |
 
 Это свойство апстримов, а не сборки: OpenClaw заявляет MIT в README, держа
 проприетарную шапку во ВСЕХ 308 своих навыках (280 верхних + 28 вложенных). Чужие лицензионные тексты мы не

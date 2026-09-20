@@ -39,7 +39,15 @@
    ],
    "reason": "два каталога с одним name в frontmatter и одинаковыми вспомогательными файлами; SKILL.md различаются только шапкой (у одного нет license/metadata). Обе версии существуют ОТДЕЛЬНО в апстриме OpenClaw — это его дефект, не нашей сборки; удаление сломало бы синхронизацию (файл вернётся).",
    "same_files": 6
+  },
+  {
+   "dirs": [
+    "bio-variant-calling-deepvariant",
+    "variant-interpretation-acmg/bioSkills/deepvariant"
+   ],
+   "reason": "один и тот же навык deepvariant в двух местах, и это юридически значимо: у вложенной копии (variant-interpretation-acmg/bioSkills/deepvariant) в тексте проприетарная шапка, у верхней (bio-variant-calling-deepvariant) её нет. Обе версии есть в апстриме OpenClaw отдельно, удаление одной сломало бы синхронизацию. Текст не переписываем — фиксируем как ограничение лицензии у вложенной копии.",
+   "same_files": 0
   }
  ],
- "near_count": 1
+ "near_count": 2
 }

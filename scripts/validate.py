@@ -716,6 +716,28 @@ def check_restricted_docs(rep: Report) -> None:
     }
     docs = ("README.md", "NOTICE.md", "AGENTS.md", "INSTALL.md",
             "agent-description.md", os.path.join("docs", "index.html"))
+
+    # Итоговая строка обязана называть уникальное число: «сумма видов» (319) без
+    # него читается как ответ на вопрос «сколько навыков ограничено». Два
+    # «Non-Commercial» — это один навык varCADD в двух местах, и он же входит в 308.
+    stats_path = os.path.join(ROOT, "scripts", "stats.json")
+    if os.path.isfile(stats_path):
+        with open(stats_path, encoding="utf-8") as f:
+            unique = json.load(f).get("restricted_unique")
+        if unique:
+            for doc in docs:
+                path = os.path.join(ROOT, doc)
+                if not os.path.isfile(path):
+                    continue
+                # «317.» в конце предложения — не десятичная дробь: запрет на точку
+                # после числа (нужный для «0.317» и «317.5») делался слишком широким
+                # и валил здоровый текст.
+                if not re.search(rf"(?<![\d.]){unique}(?!\d)(?!\.\d)",
+                                 open(path, encoding="utf-8").read()):
+                    rep.fail("лицензии", f"{doc}: нет числа уникальных ограниченных навыков "
+                                         f"({unique}) — сумма видов ({sum(restricted.values())}) "
+                                         f"завышает счёт")
+
     for kind, count in restricted.items():
         markers = KIND_MARKERS.get(kind, (kind.replace("_", " "),))
         for doc in docs:
@@ -738,10 +760,19 @@ def check_restricted_docs(rep: Report) -> None:
                     continue
                 if re.match(r"\|\s*\d{4}-\d{2}-\d{2}\s*\|", stripped):
                     continue  # строка журнала изменений
+                # Строка-итог («Итого уникальных навыков с ограничениями») — не
+                # утверждение о числе одного вида: она складывает виды и объясняет,
+                # почему сумма завышена. Проверяется отдельно, по restricted_unique;
+                # требовать в ней 308 значит запрещать сам разбор.
+                # Вторая колонка берётся через split, а не по индексу: html-строки
+                # `<tr>` разделителя `|` не содержат, и `[1]` на них падало.
+                cells = [c for c in stripped.split("|") if c.strip()]
+                if cells and "итого" in cells[0].lower():
+                    continue
                 rows += 1
                 plain = re.sub(r"[*_`]+", "", line)
                 plain = re.sub(r"</?[a-z][^>]*>", " ", plain)
-                if not re.search(rf"(?<![\d.]){count}(?![\d.])", plain):
+                if not re.search(rf"(?<![\d.]){count}(?!\d)(?!\.\d)", plain):
                     rep.fail("лицензии", f"{doc}:{num}: в строке про «{kind}» нет числа "
                                          f"{count} — документ разошёлся с деревом")
             if not rows:
@@ -793,6 +824,39 @@ def check_diagram_numbers(rep: Report) -> None:
     if str(total) not in spec_text:
         rep.fail("диаграмма", f"спецификация не называет итоговое число навыков ({total})")
     rep.note(f"диаграмма: числа согласованы с деревом ({total})")
+
+
+def check_origin_map(rep: Report) -> None:
+    """Каждый навык из каталога имеет источник в карте происхождения.
+
+    Карта строилась по ВЕРХНИМ каталогам (`os.listdir`), поэтому 26 навыков внутри
+    контейнеров (`variant-interpretation-acmg/bioSkills/*`, `SpatialAgent`, `MAGE`,
+    `varCADD`) в неё не попадали — а README обещал источник «по каждому навыку».
+    Вложенный навык наследует источник контейнера, но лучше иметь запись на каждый:
+    иначе вопрос «откуда это взялось» по вложенному навыку остаётся без ответа.
+    """
+    index_path = os.path.join(ROOT, "skills-index.json")
+    origin_path = os.path.join(ROOT, "scripts", "upstream-origin.json")
+    for path in (index_path, origin_path):
+        if not os.path.isfile(path):
+            rep.fail("происхождение", f"нет {os.path.relpath(path, ROOT)}")
+            return
+    with open(index_path, encoding="utf-8") as f:
+        index = json.load(f)
+    with open(origin_path, encoding="utf-8") as f:
+        origin = json.load(f)["origin"]
+    paths = [s["path"] for s in index["skills"]]
+    missing = [p for p in paths if p not in origin]
+    if missing:
+        rep.fail("происхождение", f"навыков нет в карте происхождения: {len(missing)}, "
+                                  f"напр. {missing[:3]} — пересобери: "
+                                  f"python3 scripts/sync_upstreams.py --build-origin")
+    unknown = [p for p, v in origin.items() if v not in ("own", "OpenClaw", "aipoch",
+                                                         "Aperivue", "openmed")]
+    if unknown:
+        rep.fail("происхождение", f"в карте источники вне списка: {sorted(set(unknown))[:3]}")
+    rep.note(f"происхождение: {len(paths)} навыков, у всех есть источник "
+             f"({len(origin)} записей в карте)")
 
 
 def check_broken_ref_categories(rep: Report) -> None:
@@ -1384,6 +1448,7 @@ def main() -> int:
     check_broken_refs_report(rep)
     check_sibling_copies(rep)
     check_readme_prose(rep)
+    check_origin_map(rep)
     check_broken_ref_categories(rep)
     check_service_artifacts(rep)
     check_diagram_numbers(rep)
