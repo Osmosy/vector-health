@@ -112,8 +112,16 @@ def api(url: str, tries: int = 4):
     return {}
 
 
-def upstream_blobs() -> dict[str, dict[str, int]]:
-    """{источник: {путь: размер}} по HEAD каждого апстрима."""
+def upstream_blobs() -> dict[str, dict[str, tuple[str, int]]]:
+    """{источник: {путь: (blob sha, размер)}} по HEAD каждого апстрима.
+
+    Нужны ОБА поля, и sha — не украшение. Раньше здесь был только размер, и в
+    классификации «общий файл / чужой» версии считались ПО РАЗМЕРУ: разные файлы
+    одного размера выглядели одной версией, из-за чего 3 ссылки на
+    `references/audit-reference.md` (63 копии, 60 разных sha) попали в «общий файл»
+    и разошлись с планом раскладки, который считает по sha. Одинаковый размер не
+    значит один файл — сравнивать надо содержимое.
+    """
     out: dict[str, dict[str, int]] = {}
     for label, repo in SOURCES.items():
         try:
@@ -122,7 +130,7 @@ def upstream_blobs() -> dict[str, dict[str, int]]:
             print(f"  ! {label}: дерево не получено ({e})", file=sys.stderr)
             out[label] = {}
             continue
-        out[label] = {x["path"]: x.get("size", 0)
+        out[label] = {x["path"]: (x.get("sha", ""), x.get("size", 0))
                       for x in tree.get("tree", []) if x.get("type") == "blob"}
     return out
 
@@ -347,9 +355,9 @@ def classify(broken, trees):
         # нормализуем её до пути относительно навыка, прежде чем считать битой.
         found = None
         for label, paths in trees.items():
-            for up, size in paths.items():
+            for up, meta in paths.items():
                 if up.endswith(f"/{name}/{ref}") or up == f"{name}/{ref}":
-                    found = (label, up, size)
+                    found = (label, up, meta)
                     break
             if found:
                 break
@@ -364,9 +372,9 @@ def classify(broken, trees):
             up_dir = upstream_dir_of(name, label, trees) if label else None
             if up_dir and ref.startswith(("../", "./")):
                 cand = posixpath.normpath(posixpath.join(up_dir, ref))
-                size = (trees.get(label) or {}).get(cand)
-                if size is not None:
-                    found = (label, cand, size)
+                meta = (trees.get(label) or {}).get(cand)
+                if meta is not None:
+                    found = (label, cand, meta)
         if not found:
             # Файл с таким именем есть в самом навыке, но по другому пути
             skill_dir = os.path.join(SKILLS, rel_skill)
@@ -394,7 +402,8 @@ def classify(broken, trees):
                     # (б) общий файл: одну версию делят три и более навыков апстрима
                     paths = trees.get(o_label) or {}
                     same = [p for p in paths if p.endswith("/" + ref)]
-                    versions = collections.Counter(paths[p] for p in same)
+                    # версия = содержимое (sha), а не размер
+                    versions = collections.Counter(paths[p][0] for p in same)
                     if same and versions.most_common(1)[0][1] >= 3:
                         buckets["sibling"].append((rel_skill, ref, owners[0]))
                         continue
@@ -407,7 +416,7 @@ def classify(broken, trees):
                 buckets["unpublished"].append((rel_skill, ref, label))
                 continue
             buckets["inherited"].append((rel_skill, ref, ""))
-        elif found[1].endswith(HEAVY_SUFFIX) or found[2] > HEAVY_MAX:
+        elif found[1].endswith(HEAVY_SUFFIX) or found[2][1] > HEAVY_MAX:
             buckets["heavy"].append((rel_skill, ref, found[0]))
         else:
             # «в корне источника» = цель лежит вне каталога навыка

@@ -642,7 +642,12 @@ check("sibling не ловит ссылки с ../ (они про корень �
 check("CATEGORIES — источник имён для отчёта", len(br2.CATEGORIES) == 11, str(len(br2.CATEGORIES)))
 check("все категории названы в отчёте",
       all(f"| {short} |" in rep_txt for _k, short, _t, _m in br2.CATEGORIES))
-check("секция «Общий файл апстрима» есть", "## Общий файл апстрима" in rep_txt)
+# Категория «Общий файл апстрима» пуста: все 5 общих файлов уже разложены копиями,
+# и такие ссылки перестали быть битыми. Пустые категории в отчёте не печатаются —
+# проверяем не секцию, а что сама категория существует в сводке и объяснена.
+check("категория «Общий файл апстрима» есть в сводке", "| Общий файл апстрима |" in rep_txt)
+check("CATEGORIES объясняет, как закрывается общая ссылка",
+      any(k == "sibling" and "plant_sibling_files" in m for k, _s, _t, m in br2.CATEGORIES))
 check("секция «Файл чужого навыка» есть", "## Файл принадлежит другому навыку" in rep_txt)
 check("секция «Апстрим не публиковал» есть", "## Апстрим не публиковал каталог" in rep_txt)
 check("секция «Путь разошёлся» есть", "## Путь разошёлся (файл в навыке есть)" in rep_txt)
@@ -676,6 +681,16 @@ check("общий файл распознан (>=3 копии одной вер�
 check("уникальный файл владельца НЕ считается общим (разные версии)",
       not plant.is_shared_template("references/uniq.md", "aipoch", trees_fake),
       str(plant.is_shared_template("references/uniq.md", "aipoch", trees_fake)))
+# версия файла определяется содержимым (sha), а не размером: разные файлы одного
+# размера давали ложное «общий» (так 3 ссылки разошлись с планом раскладки)
+same_size_fake = {"aipoch": {
+    "skills/a/references/x.md": "s1",
+    "skills/b/references/x.md": "s2",
+    "skills/c/references/x.md": "s3",
+}}
+check("файлы одного размера, но разных sha — НЕ общий",
+      not plant.is_shared_template("references/x.md", "aipoch", same_size_fake),
+      "размер принят за версию")
 check("отсутствующий в апстриме файл не считается общим",
       not plant.is_shared_template("references/nope.md", "aipoch", trees_fake))
 # пустой план не должен обнулять манифест

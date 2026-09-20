@@ -12,8 +12,8 @@
 | В корне источника | 9 | файл ЕСТЬ в репозитории-источнике, но вне каталога навыка (`scripts/`, `examples/`, `docs/`) — ссылка писалась под их раскладку, где навыки лежат глубже |
 | Путь разошёлся | 11 | файл с таким именем есть в самом навыке, но по другому пути — ссылка не сработает, однако файл у читателя перед глазами (типично: данные лежат в `tests/expected_output/`) |
 | Своя версия в апстриме | 0 | у навыка в апстриме ЕСТЬ файл по этому пути, но он не попал в сборку — свой контент навыка, копия из соседа подошла бы неверно |
-| Общий файл апстрима | 3 | ссылку можно закрыть копией: файл размножен по навыкам апстрима и одинаков у них, `scripts/plant_sibling_files.py` кладёт копию рядом |
-| Файл чужого навыка | 72 | у навыка в апстриме своего файла нет, а найденный — уникальный контент чужого навыка (у `guide.md` — 17 копий и 17 разных версий); копировать его нельзя, текст ссылается на файл соседа |
+| Общий файл апстрима | 0 | ссылку можно закрыть копией: файл размножен по навыкам апстрима и одинаков у них, `scripts/plant_sibling_files.py` кладёт копию рядом |
+| Файл чужого навыка | 75 | у навыка в апстриме своего файла нет, а найденный — уникальный контент чужого навыка (у `guide.md` — 17 копий и 17 разных версий); копировать его нельзя, текст ссылается на файл соседа |
 | Апстрим не публиковал | 73 | каталог навыка в источнике есть, но подкаталогов в нём нет: `references/`, `scripts/`, `data/` апстрим не выкладывал — файла не было и в момент сборки |
 | Тяжёлые данные | 2 | файл есть, но это демо-датасет на мегабайты — сознательно не тянем |
 | Унаследованное | 227 | файла нет ни в источнике, ни у соседнего навыка: апстрим его не выложил. Часть таких ссылок описывает РЕЗУЛЬТАТ работы навыка (выходные файлы `data/*.vcf.gz`), и требовать их не нужно — но отличить это автоматически нельзя: признак только в тексте, поэтому файлы остаются здесь, а не выдаются за «создаётся при работе» |
@@ -157,14 +157,6 @@
 | `tooluniverse-drug-repurposing` | `../tooluniverse-sdk/SKILL.md` | SKILL.md |
 | `univariate-multivariable-cox-regression` | `data/analysis_data.rds` | tests/expected_output/data/analysis_data.rds |
 
-## Общий файл апстрима (одну версию делят ≥3 навыка)
-
-| Навык | Файл | Источник |
-|---|---|---|
-| `citation-chasing-mapping` | `references/audit-reference.md` | nih-biosketch-builder |
-| `irb-application-assistant` | `references/audit-reference.md` | nih-biosketch-builder |
-| `sample-size-power-calculator` | `references/audit-reference.md` | nih-biosketch-builder |
-
 ## Файл принадлежит другому навыку
 
 | Навык | Файл | Источник |
@@ -179,6 +171,7 @@
 | `buffer-calculator` | `references/troubleshooting.md` | pca-dimensionality-reduction |
 | `calc-sample-size` | `references/templates/sample_size.R` | analyze-stats |
 | `check-reporting` | `references/analysis_guides/burden_decomposition_forecasting.md` | analyze-stats |
+| `citation-chasing-mapping` | `references/audit-reference.md` | nih-biosketch-builder |
 | `citation-chasing-mapping` | `references/guide.md` | meeting-assistant |
 | `citation-chasing-mapping` | `scripts/main.py` | hipaa-compliance-auditor |
 | `citation-formatter` | `references/guide.md` | meeting-assistant |
@@ -201,6 +194,7 @@
 | `humanize` | `scripts/check_paren_spans.py` | self-review |
 | `humanize` | `scripts/check_rhetorical_density.py` | self-review |
 | `hypothesis-generation` | `scripts/generate_schematic.py` | scientific-schematics |
+| `irb-application-assistant` | `references/audit-reference.md` | nih-biosketch-builder |
 | `irb-application-assistant` | `references/guide.md` | meeting-assistant |
 | `irb-application-assistant` | `scripts/main.py` | hipaa-compliance-auditor |
 | `key-takeaways` | `references/guide.md` | meeting-assistant |
@@ -228,6 +222,7 @@
 | `revise` | `references/ai_patterns.md` | humanize |
 | `revise` | `references/section_guides/step7_1_classical_qc.md` | write-paper |
 | `revise` | `scripts/check_wordcount_cap.py` | sync-submission |
+| `sample-size-power-calculator` | `references/audit-reference.md` | nih-biosketch-builder |
 | `sample-size-power-calculator` | `scripts/main.py` | hipaa-compliance-auditor |
 | `scientific-critical-thinking` | `scripts/generate_schematic.py` | scientific-schematics |
 | `scientific-slides` | `scripts/generate_schematic.py` | scientific-schematics |
