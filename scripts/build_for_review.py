@@ -130,8 +130,16 @@ def main() -> int:
     if args.check:
         # Раньше аргументы не разбирались вовсе: `--check` молча перезаписывал файл.
         # Проверка, которая вместо проверки пишет, бесполезна в CI.
+        #
+        # Строка «Коммит: …» из сравнения ИСКЛЮЧАЕТСЯ. Файл называет коммит, на
+        # котором собран, а коммит меняет HEAD — то есть сразу после коммита файл
+        # оказывался «устаревшим» по собственной же строке, и проверка падала всегда.
+        # Всё остальное (хеши файлов, числа из stats.json) сверяется строго.
+        def stable(x: str) -> str:
+            return "\n".join(l for l in x.splitlines()
+                             if not l.startswith("Коммит: "))
         stored = out.read_text(encoding="utf-8") if out.is_file() else ""
-        if stored != text:
+        if stable(stored) != stable(text):
             print("ОШИБКА: docs/for-review.md разошёлся с деревом — пересобери "
                   "python3 scripts/build_for_review.py", file=sys.stderr)
             return 1
