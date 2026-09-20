@@ -813,6 +813,36 @@ r_no = subprocess.run([sys.executable, "-B", "scripts/broken_refs.py", "--no-rep
                       cwd=ROOT, capture_output=True, text=True, env=env_no_fixture)
 check("VH_OFFLINE без фикстуры: отчёт не перезаписывается (код 2)",
       r_no.returncode == 2, f"exit={r_no.returncode}")
+# Карточка Vector Health живёт в ДРУГОМ репозитории (vector-hub), поэтому валидатор
+# её не видит: расхождение «1508 скиллов» продержалось до внешнего аудита. Сверка
+# вынесена в scripts/build_hub_card.py --check; здесь проверяется, что она ловит
+# расхождение и не трогает файл в режиме --check.
+tmp_hub = tempfile.mkdtemp()
+try:
+    card = os.path.join(tmp_hub, "index.html")
+    good = open(os.path.join(tmp_hub, "x"), "w", encoding="utf-8") if False else None
+    # берём настоящую карточку из репозитория сайта, если он рядом; иначе — синтетика
+    src_card = os.path.expanduser("~/projects/vector-hub/index.html")
+    if os.path.isfile(src_card):
+        shutil.copy2(src_card, card)
+        r_card_ok = subprocess.run([sys.executable, "-B", "scripts/build_hub_card.py",
+                                    "--check", card], cwd=ROOT, capture_output=True, text=True)
+        check("карточка сайта совпадает со stats.json", r_card_ok.returncode == 0,
+              (r_card_ok.stdout or r_card_ok.stderr or "")[-200:])
+    # разошедшаяся карточка обязана ронять --check
+    body = ('<a class="proj" href="https://github.com/Osmosy/vector-health">\n'
+            '  <div class="proj-name">Vector Health</div>\n'
+            '  <div class="proj-desc">1508 скиллов из 4 открытых источников</div>\n</a>')
+    open(card, "w", encoding="utf-8").write(body)
+    r_card_bad = subprocess.run([sys.executable, "-B", "scripts/build_hub_card.py",
+                                 "--check", card], cwd=ROOT, capture_output=True, text=True)
+    check("разошедшаяся карточка сайта → ошибка", r_card_bad.returncode == 1,
+          f"exit={r_card_bad.returncode}")
+    check("--check не переписывает карточку",
+          open(card, encoding="utf-8").read() == body)
+finally:
+    shutil.rmtree(tmp_hub, ignore_errors=True)
+
 check("run_offline.py передаёт подпроцессам VH_OFFLINE и фикстуру",
       "VH_OFFLINE" in open(os.path.join(ROOT, "tests", "run_offline.py"),
                            encoding="utf-8").read())

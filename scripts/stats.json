@@ -394,12 +394,12 @@
  },
  "scripts": {
   "py": 13,
-  "sh": 1,
+  "sh": 2,
   "js": 0,
   "json": 7,
-  "total": 21
+  "total": 22
  },
- "validate_checks": 29,
+ "validate_checks": 30,
  "tests": {
   "files": 3,
   "names": [

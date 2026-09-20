@@ -23,3 +23,7 @@ node_modules/
 .env.*
 *.key
 *.pem
+
+# Временные каталоги мутационных проверок (tests/mutation_check.py)
+.vhmut_*/
+.vhmut_*

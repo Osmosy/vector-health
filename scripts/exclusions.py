@@ -34,10 +34,13 @@ EXCLUDE_SUFFIX = (".npy", ".xlsx", ".parquet", ".h5ad", ".rds", ".bam", ".zip", 
 # Служебные артефакты по имени файла.
 EXCLUDE_MARKERS = (
     "_audit_result", "audit_result", "eval_report", "POLISH_CHANGELOG",
-    "CHANGELOG", "_coverage", "conftest.py",
+    "CHANGELOG", "conftest.py",
 )
-# Точные имена вместо широкого `_coverage`: широкий маркер задевал рабочие скрипты
-# (`check_artifact_coverage.py`, `scan_glyph_coverage.py`).
+# Покрытие — только ТОЧНЫМИ именами, и в списке маркеров его нет вовсе: широкий
+# `_coverage` задевал рабочие скрипты (`check_artifact_coverage.py`,
+# `scan_glyph_coverage.py`), которые вызываются из SKILL.md и синхронизация их
+# никогда не обновила бы. Пока маркер оставался в списке с пропуском в коде,
+# вернуть ошибку было нельзя — проверка на неё не падала.
 COVERAGE_NAMES = ("coverage.json", ".coverage", "coverage.xml", "coverage.lcov")
 
 # Каталоги, которые считаются служебными целиком (нужны и для уборки пустых).
@@ -78,9 +81,10 @@ def classify(path: str, *, is_repo_root_doc: bool = False) -> str | None:
         return "исключённое расширение"
     for marker in EXCLUDE_MARKERS:
         if marker in name:
-            # `_coverage` как маркер больше не используется (см. COVERAGE_NAMES)
-            if marker == "_coverage":
-                continue
+            # Специального пропуска `_coverage` здесь НЕТ намеренно: пока он был,
+            # добавление этого маркера в список ничего не меняло, и проверка
+            # «рабочий скрипт не помечен служебным» не ловила возврат ошибки.
+            # Широкий маркер исключён из списка (см. COVERAGE_NAMES), а не обойдён.
             return "служебный артефакт по имени"
     return None
 

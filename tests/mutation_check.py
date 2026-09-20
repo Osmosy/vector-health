@@ -88,17 +88,37 @@ CASES = [
 
 
 def run_case(name, edits, extra=None):
-    tmp = tempfile.mkdtemp(prefix="vhmut_")
+    # Каталог для мутации — ВНУТРИ репозитория: копия .git через жёсткие ссылки
+    # работает только в пределах одной файловой системы, а /tmp на другой, и без
+    # .git проверки вида `build_for_review.py --check` падают по причине «нет git»,
+    # то есть мутация «поймана» по неверной причине.
+    tmp = tempfile.mkdtemp(prefix=".vhmut_", dir=ROOT)
     try:
         for item in os.listdir(ROOT):
             if item in (".git", "__pycache__"):
                 continue
+            # .git копируется отдельно ниже: без него проверки вида
+            # `build_for_review.py --check` падают по причине «нет git», а не
+            # потому что мутация поймана — провал был бы ложным.
             src = os.path.join(ROOT, item)
             dst = os.path.join(tmp, item)
             if os.path.isdir(src):
                 shutil.copytree(src, dst, ignore=shutil.ignore_patterns("__pycache__", ".git"))
             else:
                 shutil.copy2(src, dst)
+        # git-каталог нужен проверкам, которые называют коммит. Копируем его
+        # ЖЁСТКИМИ ссылками: полная копия .git (сотни мегабайт) сделала бы прогон
+        # мутаций невыносимо долгим.
+        git_dir = os.path.join(ROOT, ".git")
+        if os.path.isdir(git_dir):
+            cp = subprocess.run(["cp", "-al", git_dir, os.path.join(tmp, ".git")],
+                                capture_output=True, text=True)
+            if cp.returncode != 0:
+                # Жёсткие ссылки недоступны — копируем обычно: медленнее, но верно.
+                # Молча продолжать нельзя: тогда падение проверки «нет git» будет
+                # выдано за пойманную мутацию.
+                subprocess.run(["cp", "-r", git_dir, os.path.join(tmp, ".git")],
+                               capture_output=True)
         for rel, old, new in edits:
             p = os.path.join(tmp, rel)
             os.makedirs(os.path.dirname(p), exist_ok=True)
@@ -137,8 +157,12 @@ def main():
     bad = 0
     for case in CASES:
         name, edits = case[0], case[1]
+        # extra — проверки, которыми мутация ловится, кроме валидатора (например
+        # `build_for_review.py --check`). Раньше он вычислялся, но НЕ передавался,
+        # поэтому мутация for-review.md прогоняла только валидатор — а тот этот файл
+        # не проверяет, и мутация «проходила».
         extra = case[2] if len(case) > 2 else None
-        res = run_case(name, edits)
+        res = run_case(name, edits, extra)
         if "ПРОПУЩЕНО" in res or "ЯКОРЬ" in res:
             bad += 1
         print(res)

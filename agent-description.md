@@ -25,7 +25,7 @@ openmed, Aperivue medsci-skills) плюс три собственных. Дед�
   `skills/abdominal-ct-findings`
 - Архитектура (живая диаграмма) — `docs/vector-health.architecture.html`
 - Инвентарь битых ссылок — `docs/broken-refs.md`
-- Валидатор репозитория — `python3 scripts/validate.py`: 29 проверок (числа, лицензии,
+- Валидатор репозитория — `python3 scripts/validate.py`: 30 проверок (числа, лицензии,
   ссылки, диаграмма, служебные артефакты, происхождение, клинические утверждения)
 - Перед коммитом прогони проверки: `python3 scripts/validate.py`,
   `python3 scripts/broken_refs.py --strict-own`, `python3 tests/test_scripts.py`
@@ -41,7 +41,7 @@ openmed, Aperivue medsci-skills) плюс три собственных. Дед�
 | Навыки верхнего уровня | 1513 каталогов |
 | Вложенные навыки | 28 (внутри каталогов-контейнеров апстримов) |
 | Собственные навыки | 3 (`dicom-vlm-analysis`, `atrial-fibrillation-treatment`, `abdominal-ct-findings`) |
-| Скрипты | 21 (`scripts/`: 13 .py, 1 установщик, 7 JSON, включая `stats.json`) |
+| Скрипты | 22 (`scripts/`: 13 .py, 2 установщик, 7 JSON, включая `stats.json`) |
 | Тесты | 3 файла (`tests/`: `test_scripts.py`, `run_offline.py` — прогон без сети, `mutation_check.py` — 8 мутаций) |
 | Диаграмма | 1 живая (`docs/vector-health.architecture.html`) |
 

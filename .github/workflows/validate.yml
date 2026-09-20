@@ -79,6 +79,13 @@ jobs:
       - name: Мутационные проверки
         run: python3 tests/mutation_check.py
 
+      - name: docs/for-review.md воспроизводится из дерева
+        run: python3 scripts/build_for_review.py --check
+
+      - name: Карточка Vector Health на сайте экосистемы совпадает со stats.json
+        run: python3 scripts/build_hub_card.py --check "$HOME/projects/vector-hub/index.html"
+        continue-on-error: true   # репозитория сайта в CI нет — проверка локальная
+
       # Две ступени для диаграммы: (1) спецификация проходит showcase-проверку,
       # (2) доставленный HTML воспроизводится из спецификации — иначе «живая»
       # диаграмма тихо расходится с тем, что лежит в docs/.

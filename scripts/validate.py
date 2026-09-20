@@ -944,6 +944,42 @@ def check_trials_no_copyright_text(rep: Report) -> None:
              f"результата")
 
 
+def check_notice_artifacts_numbers(rep: Report) -> None:
+    """Числа в разделе NOTICE «Чего в репозитории нет» сверяются с деревом.
+
+    Раздел описывает, что убрано и что осталось. Числа в нём — такие же числа из
+    дерева, как в README, и они уже расходились: NOTICE говорил про 148 файлов в
+    46 каталогах `tests/`, а в дереве 146 в 45. Проверка ловит это без человека.
+    """
+    notice_path = os.path.join(ROOT, "NOTICE.md")
+    if not os.path.isfile(notice_path):
+        rep.fail("NOTICE", "нет NOTICE.md")
+        return
+    body = open(notice_path, encoding="utf-8").read()
+    # факт по дереву
+    files = 0
+    dirs: set[str] = set()
+    for root, dirnames, filenames in os.walk(SKILLS):
+        dirnames[:] = [d for d in dirnames if d != "__pycache__"]
+        if os.path.basename(root) == "tests":
+            dirs.add(root)
+        if "/tests/" in root.replace(os.sep, "/") + "/":
+            files += len(filenames)
+    if not files:
+        rep.fail("NOTICE", "в дереве не найдено файлов под tests/ — проверь раскладку")
+        return
+    m = re.search(r"осталось \*\*(\d+)\*\* в (\d+) каталогах", body)
+    if not m:
+        rep.fail("NOTICE", "в разделе «Чего в репозитории нет» пропало число файлов "
+                           "tests/ — раздел описывает дерево, а не историю")
+        return
+    if int(m.group(1)) != files or int(m.group(2)) != len(dirs):
+        rep.fail("NOTICE", f"числа tests/ разошлись: в NOTICE {m.group(1)} файлов в "
+                           f"{m.group(2)} каталогах, в дереве {files} в {len(dirs)}")
+    rep.note(f"NOTICE: числа раздела «Чего нет» сверены с деревом "
+             f"({files} файлов tests/ в {len(dirs)} каталогах)")
+
+
 def check_notice_structure(rep: Report) -> None:
     """Структура NOTICE: обязательные разделы на месте, включая строку для авторов.
 
@@ -1678,7 +1714,8 @@ CHECKS = (
     check_diagram, check_duplicates, check_clinical_claims, check_restricted_docs,
     check_broken_refs_report, check_sibling_copies, check_readme_prose, check_origin_map,
     check_exclusions_single_source,
-    check_notice_structure, check_trials_no_copyright_text, check_broken_ref_categories,
+    check_notice_structure, check_notice_artifacts_numbers,
+    check_trials_no_copyright_text, check_broken_ref_categories,
     check_doc_counts_dynamic, check_service_artifacts,
     check_diagram_numbers,
     check_secrets, check_cjk, check_language_layers, check_taxonomy_completeness,

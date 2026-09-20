@@ -1,30 +1,30 @@
 # Что проверить повторно (для внешней проверки)
 
-Коммит: `a04bc6b`. Хеши ниже — sha256 файлов в этом коммите: если присланный архив совпадает по ним, значит он не из кеша.
+Коммит: `e3d4a01`. Хеши ниже — sha256 файлов в этом коммите: если присланный архив совпадает по ним, значит он не из кеша.
 
 ## Файлы
 
 | Файл | Байт | sha256 |
 |---|---|---|
-| `README.md` | 24014 | `c97c48d91504ef3f…` |
-| `NOTICE.md` | 12969 | `8faac293f688f307…` |
-| `AGENTS.md` | 8242 | `1961f6f839d45cc9…` |
-| `INSTALL.md` | 14146 | `3fd8ed07bc8b25ed…` |
-| `agent-description.md` | 6089 | `0b77cc52cb8f1039…` |
-| `scripts/validate.py` | 113808 | `f463464c0c2b28b1…` |
+| `README.md` | 24639 | `f3fc4cac56c30f2e…` |
+| `NOTICE.md` | 12969 | `8436f188c65130f3…` |
+| `AGENTS.md` | 8242 | `22119dc7706ded39…` |
+| `INSTALL.md` | 14146 | `f0d544d48ddecf03…` |
+| `agent-description.md` | 6089 | `725bf05400bcd029…` |
+| `scripts/validate.py` | 115983 | `fdecaa5050c423ed…` |
 | `scripts/build_stats.py` | 14620 | `4ef77790eac1f37d…` |
-| `scripts/stats.json` | 13872 | `e60a4430c416163c…` |
+| `scripts/stats.json` | 13872 | `3672008368af09ec…` |
 | `scripts/broken_refs.py` | 44492 | `b30078f825f34722…` |
 | `scripts/service_artifacts.py` | 11725 | `44225b6cfcd489d9…` |
 | `scripts/refs.py` | 12625 | `b9b6b77b259c9a6a…` |
 | `docs/broken-refs.md` | 49764 | `687bcfd4eca26519…` |
 | `docs/tree-digest.json` | 513768 | `561883127f02be4d…` |
 | `docs/trials-verified.json` | 4828 | `e2d97fbf98b97664…` |
-| `tests/test_scripts.py` | 61276 | `dc1bfc75bf4df8af…` |
-| `tests/mutation_check.py` | 9389 | `3f0dcc8dba307195…` |
+| `tests/test_scripts.py` | 63471 | `a05f6b02e996ab44…` |
+| `tests/mutation_check.py` | 11739 | `74c194e9169ba22e…` |
 | `tests/run_offline.py` | 2826 | `0650da41909a0490…` |
 | `skills/atrial-fibrillation-treatment/SKILL.md` | 13021 | `a3369865c38266d0…` |
-| `.github/workflows/validate.yml` | 5977 | `74ae73a7e8e2dc85…` |
+| `.github/workflows/validate.yml` | 6452 | `61c687a459727279…` |
 
 ## Ключевые числа
 
@@ -35,8 +35,8 @@
 - уникальных навыков с ограничениями **317**: проприетарных шапок 308, Anthropic 9, Non-Commercial 2 (сумма видов 319 завышена: два NC — это один навык varCADD в двух местах, и он же входит в проприетарные)
 - ссылок 3528, битых 492, категорий 11
 - копий общих файлов: 5 | пар идентичных навыков: 4 | почти-дублей: 2
-- файлов в `scripts/`: 21 (13 .py, 1 установщик, 7 JSON) | тестовых файлов: 3
-- **проверок валидатора: 29** (число из прогона, сверяется в каждом документе)
+- файлов в `scripts/`: 22 (13 .py, 2 установщик, 7 JSON) | тестовых файлов: 3
+- **проверок валидатора: 30** (число из прогона, сверяется в каждом документе)
 - тестов: прогон `python3 tests/run_offline.py` (сеть заблокирована в процессе)
 
 ## Что изменилось с прошлой проверки
