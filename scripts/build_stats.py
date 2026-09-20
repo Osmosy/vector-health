@@ -126,7 +126,11 @@ def scripts_counts() -> dict[str, int]:
                 sh += 1
             elif fn.endswith(".js") or fn.endswith(".mjs"):
                 js += 1
-            elif fn.endswith(".json") and fn != "stats.json":
+            elif fn.endswith(".json"):
+                # stats.json считается как все: он такой же файл в дереве, и
+                # исключение давало «17 файлов (6 JSON)» при фактических 18 (7 JSON),
+                # а agent-description честно писала «6 JSON, включая stats.json» —
+                # то есть документ противоречил коду, который его число считает.
                 json_files += 1
     return {"py": py, "sh": sh, "js": js, "json": json_files,
             "total": py + sh + js + json_files}

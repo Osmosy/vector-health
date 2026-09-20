@@ -244,20 +244,24 @@ def check_doc_counts(rep: Report, dirs: list[str]) -> None:
         if not sc:
             rep.fail("числа", "stats.json: нет раздела scripts")
         else:
-            real = {"py": 0, "sh": 0, "js": 0, "json": 0}
+            # Подсчёт состава scripts/ живёт ТОЛЬКО в build_stats.py. Здесь была его
+            # копия, и она расходилась с генератором: валидатор пропускал stats.json,
+            # генератор теперь считает его как все — «6 JSON» против «7». Две копии
+            # одной арифметики разошлись ровно так же, как разошлись числа в
+            # документах; правильное место для неё одно, а здесь — сверка с деревом.
+            real: dict[str, int] = {"py": 0, "sh": 0, "js": 0, "json": 0}
             for dirpath, dirnames, filenames in os.walk(os.path.join(ROOT, "scripts")):
                 dirnames[:] = [d for d in dirnames if d != "__pycache__"]
                 for fn in filenames:
-                    if fn == "stats.json":
-                        continue
-                    for ext in (".py", ".sh", ".mjs", ".js", ".json"):
-                        if fn.endswith(ext):
-                            real["js" if ext in (".mjs", ".js") else ext[1:]] += 1
-                            break
-            for key, expect in real.items():
-                if sc.get(key) != expect:
-                    rep.fail("числа", f"stats.json: scripts.{key}={sc.get(key)}, "
-                                      f"в дереве {expect} — пересобери scripts/build_stats.py")
+                    ext = os.path.splitext(fn)[1].lower()
+                    key = {"py": "py", "sh": "sh", "mjs": "js", "js": "js",
+                           "json": "json"}.get(ext.lstrip("."))
+                    if key:
+                        real[key] += 1
+            if sc.get("total") != sum(real.values()):
+                rep.fail("числа", f"stats.json: scripts.total={sc.get('total')}, "
+                                  f"в дереве {sum(real.values())} — "
+                                  f"пересобери scripts/build_stats.py")
             if not re.search(rf"(?<![\d.]){sc.get('total')}(?![\d.])",
                              open(os.path.join(ROOT, "agent-description.md"),
                                   encoding="utf-8").read()):
@@ -907,6 +911,52 @@ def check_doc_counts_dynamic(rep: Report) -> None:
              f"состав scripts/ — {stats['scripts']['total']} файлов")
 
 
+def check_notice_structure(rep: Report) -> None:
+    """Структура NOTICE: обязательные разделы на месте, включая строку для авторов.
+
+    Проверка появилась после регресса: правка таблицы ограничений затёрла хвост
+    NOTICE — файл сократился со 117 до 63 строк, пропали разделы «Чего в
+    репозитории нет и почему», «Как обновляются навыки», «Использовано как
+    источник идей» и строка для авторов навыков. Валидатор проверял ЧИСЛА в
+    NOTICE, но не его структуру, поэтому удаление целого раздела прошло зелёным:
+    мутация «удалить раздел» давала exit 0.
+
+    Урок общий: проверка, сверяющая только числа, не защищает от потери текста.
+    """
+    path = os.path.join(ROOT, "NOTICE.md")
+    if not os.path.isfile(path):
+        rep.fail("NOTICE", "нет NOTICE.md")
+        return
+    body = open(path, encoding="utf-8").read()
+    # Обязательные разделы. Список здесь, а не в stats.json: это свойство документа,
+    # а не число из дерева, и меняется вместе с проверкой.
+    required = (
+        "## Что именно взято",
+        "## RADAR (Alibaba DAMO Academy) — только таксономия, не модель",
+        "## Оговорка по лицензии OpenClaw-Medical-Skills",
+        "## Ограниченные лицензии внутри библиотеки — читать до использования",
+        "## Чего в репозитории нет и почему",
+        "## Как обновляются навыки",
+        "## Использовано как источник идей (файлы не включены)",
+    )
+    missing = [h for h in required if h not in body]
+    if missing:
+        rep.fail("NOTICE", f"нет обязательных разделов: {missing[:3]} — раздел документа "
+                           f"нельзя удалять: его отсутствие никто не заметит")
+    # строки для авторов вендоренных навыков
+    if "создайте issue/PR" not in body:
+        rep.fail("NOTICE", "нет строки для авторов навыков («создайте issue/PR») — "
+                           "атрибуция и удаление должны иметь адрес")
+    # длина: регресс ловится и здесь — 63 строки против ожидаемых >100
+    lines = len(body.splitlines())
+    if lines < 100:
+        rep.fail("NOTICE", f"NOTICE подозрительно короткий: {lines} строк. Регресс "
+                           f"117 → 63 строки никто не заметил именно из-за отсутствия "
+                           f"такой границы")
+    rep.note(f"NOTICE: {len(required)} обязательных разделов на месте, строка для "
+             f"авторов есть, {lines} строк")
+
+
 def check_broken_ref_categories(rep: Report) -> None:
     """Каждая категория битых ссылок в отчёте и в README — сходится с подсчётом.
 
@@ -1513,7 +1563,7 @@ CHECKS = (
     check_restricted, check_links, check_short_docs, check_assets, check_skill_refs,
     check_diagram, check_duplicates, check_clinical_claims, check_restricted_docs,
     check_broken_refs_report, check_sibling_copies, check_readme_prose, check_origin_map,
-    check_broken_ref_categories, check_doc_counts_dynamic, check_service_artifacts,
+    check_notice_structure, check_broken_ref_categories, check_doc_counts_dynamic, check_service_artifacts,
     check_diagram_numbers,
     check_secrets, check_cjk, check_language_layers, check_taxonomy_completeness,
 )

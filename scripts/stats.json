@@ -393,13 +393,13 @@
   }
  },
  "scripts": {
-  "py": 10,
+  "py": 11,
   "sh": 1,
   "js": 0,
-  "json": 6,
-  "total": 17
+  "json": 7,
+  "total": 19
  },
- "validate_checks": 26,
+ "validate_checks": 27,
  "tests": {
   "files": 3,
   "names": [
