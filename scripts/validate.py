@@ -520,7 +520,31 @@ def check_duplicates(rep: Report) -> None:
                           f"обнови scripts/name-duplicates.json или разберись с причиной")
     if gone:
         rep.fail("дубли", f"идентичность исчезла: {[g[:2] for g in gone[:3]]} — обнови список")
-    rep.note(f"дубли: {len(actual)} пар идентичных навыков, все учтены в name-duplicates.json")
+    # Почти-дубли: один `name` во frontmatter, одинаковые вспомогательные файлы, но
+    # SKILL.md различаются шапкой. `torch-geometric` и `torch_geometric` существуют
+    # ОТДЕЛЬНО в апстриме OpenClaw (разные blob sha у SKILL.md) — это его дефект, а
+    # не наша дедупликация; удаление сломало бы синхронизацию, файл вернётся.
+    # Поэтому пара фиксируется списком, и проверка следит, что она на месте.
+    near = listed.get("near_duplicates") or []
+    for item in near:
+        for d in item.get("dirs") or []:
+            if not os.path.isdir(os.path.join(SKILLS, d)):
+                rep.fail("дубли", f"почти-дубль {d} из списка исчез из дерева — обнови "
+                                  f"scripts/name-duplicates.json")
+        dirs = item.get("dirs") or []
+        if len(dirs) == 2:
+            names = set()
+            for d in dirs:
+                md = os.path.join(SKILLS, d, "SKILL.md")
+                if os.path.isfile(md):
+                    m = re.search(r"^name:\s*(.+)$", open(md, encoding="utf-8").read(), re.M)
+                    if m:
+                        names.add(m.group(1).strip())
+            if len(names) != 1:
+                rep.fail("дубли", f"у почти-дублей {dirs} разные `name`: {sorted(names)} — "
+                                  f"пересмотри список")
+    rep.note(f"дубли: {len(actual)} пар идентичных навыков учтены в name-duplicates.json, "
+             f"почти-дублей {len(near)} (один `name`, разные шапки — свойство апстрима)")
 
 
 def check_clinical_claims(rep: Report) -> None:
@@ -789,6 +813,171 @@ def check_broken_refs_report(rep: Report) -> None:
     rep.note(f"ссылки: инвентарь {total} ссылок, битых {broken}, README согласован")
 
 
+def check_readme_prose(rep: Report) -> None:
+    """Проза README сверяется со stats.json: ASCII-схема, лицензии, журнал, состав.
+
+    Девять расхождений, найденных внешней проверкой, держались ровно потому, что
+    валидатор смотрел на таблицы и бейджи, а на схемы, абзацы и журнал — нет.
+    Проверка закрывает именно эти места.
+    """
+    readme_path = os.path.join(ROOT, "README.md")
+    if not os.path.isfile(readme_path):
+        rep.fail("проза", "нет README.md")
+        return
+    readme = open(readme_path, encoding="utf-8").read()
+    with open(os.path.join(ROOT, "scripts", "stats.json"), encoding="utf-8") as f:
+        stats = json.load(f)
+
+    # 1. ASCII-схема: слагаемые должны сходиться с итогом. Схема показывала
+    #    «OpenClaw 777» при итоге 1541 — числа на схеме давали 1513.
+    blocks = re.findall(r"```[^\n]*\n(.+?)```", readme, re.S)
+    scheme = next((b for b in blocks if "sync_upstreams" in b), "")
+    if not scheme:
+        rep.fail("проза", "README: не найдена ASCII-схема сборки")
+    else:
+        # Схема читается по СТРОКАМ: в каждой — label источника и его число,
+        # рядом со словом «собственные» — число своих. Считать все числа подряд
+        # нельзя: в схеме есть и 1541, и «повторный запуск = 0».
+        # У схемы два счётных уровня, и путать их нельзя: слагаемое источника —
+        # это его ВЕРХНИЕ навыки (иначе сумма не сойдётся с top_level), а запись
+        # «777+28» показывает, что вложенные учтены и всего 805. Проверяем оба.
+        top_parts: list[int] = []
+        for line in scheme.splitlines():
+            m = re.match(r"\s*([A-Za-z_]+|собственные)\s+(\d+)(?:\+(\d+))?", line)
+            if not m:
+                continue
+            label, top = m.group(1), int(m.group(2))
+            nested = int(m.group(3)) if m.group(3) else 0
+            top_parts.append(top)
+            # подписи на схеме человеческие («AIPOCH», «собственные»), а ключи
+            # stats — машинные («aipoch», «own»): сопоставляем по регистру и синониму
+            alias = {"собственные": "own"}
+            key = alias.get(label.lower(), next(
+                (k for k in stats["by_source_all"] if k.lower() == label.lower()), label))
+            expect_top = stats["by_source_top"].get(key)
+            expect_all = stats["by_source_all"].get(key)
+            if expect_top is None:
+                rep.fail("проза", f"README: на ASCII-схеме неизвестный источник «{label}»")
+                continue
+            if top != expect_top:
+                rep.fail("проза", f"README: на ASCII-схеме {label} = {top} верхних, "
+                                  f"а в дереве {expect_top}")
+            # источник с вложенными обязан показать «+N», иначе слагаемое
+            # выглядит как полное число, а итог не сходится
+            if expect_all and expect_all != expect_top:
+                if nested != expect_all - expect_top:
+                    rep.fail("проза", f"README: на ASCII-схеме у {label} вложенных {nested}, "
+                                      f"а в дереве {expect_all - expect_top}")
+        total_in_scheme = str(stats["total"]) in scheme
+        if not total_in_scheme:
+            rep.fail("проза", f"README: ASCII-схема не называет итог {stats['total']}")
+        elif top_parts and sum(top_parts) != stats["top_level"]:
+            rep.fail("проза", f"README: слагаемые на ASCII-схеме дают {sum(top_parts)}, "
+                              f"а навыков верхнего уровня {stats['top_level']}")
+        # у OpenClaw со вложенными число должно быть видно
+        for label, meta in stats["by_source_all"].items():
+            if meta > stats["by_source_top"].get(label, 0) and label in scheme:
+                if f"{stats['by_source_top'][label]}+" not in scheme and str(meta) not in scheme:
+                    rep.fail("проза", f"README: на схеме у {label} нет вложенных — "
+                                      f"показано {stats['by_source_top'][label]}, а всего {meta}")
+
+    # 2. Раздел лицензий: RADAR и число собственных навыков
+    lic_start = readme.find("## Лицензии")
+    lic = readme[lic_start:] if lic_start >= 0 else ""
+    if "RADAR" not in lic:
+        rep.fail("проза", "README: в разделе «Лицензии» не упомянут RADAR "
+                          "(текст таксономии — Apache-2.0, это пятый источник данных)")
+    if "Apache-2.0" not in lic:
+        rep.fail("проза", "README: в разделе «Лицензии» нет Apache-2.0")
+
+    # 3. 280/308: если названо «280 своих», вложенные должны быть учтены
+    for m in re.finditer(r"в ([\d]{2,4}) своих навыках", readme):
+        named = int(m.group(1))
+        if named != stats["restricted"]["proprietary_hat"] and m.group(0) in readme:
+            real_total = stats["restricted"]["proprietary_hat"]
+            top = real_total - stats["nested"] if False else None
+            # допустимо только полное число либо явная оговорка про вложенные
+            ctx = readme[max(0, m.start() - 120):m.end() + 120]
+            if "вложенн" not in ctx and named not in (real_total,):
+                rep.fail("проза", f"README: «в {named} своих навыках» без оговорки про "
+                                  f"вложенные — всего проприетарных {real_total}")
+
+    # 4. Журнал версий: числа в записях должны соответствовать текущему состоянию
+    #    либо не называть счётчиков вовсе. Ловится случай «11 категорий» при 11
+    #    реальных — но и «12 файлов scripts», когда их 15.
+    journal = re.findall(r"^\|\s*(\d{4}-\d{2}-\d{2})\s*\|\s*(.+?)\s*\|$", readme, re.M)
+    # Инвентарь нужен только для сверки числа категорий; если его нет, это уже
+    # поймано check_broken_refs_report — здесь не падаем с трейсбеком (отсутствие
+    # файла не должно выглядеть как исключение вместо внятного диагноза).
+    inv_path = os.path.join(ROOT, "docs", "broken-refs.md")
+    ncat = 0
+    if os.path.isfile(inv_path):
+        ncat = len(re.findall(r"^\| ([^|]+?) \| \d+ \|",
+                              open(inv_path, encoding="utf-8").read(), re.M))
+    for _date, text in journal:
+        m = re.search(r"(\d+)\s+категори", text)
+        if m and int(m.group(1)) != ncat:
+            rep.fail("проза", f"README, журнал: заявлено {m.group(1)} категорий, "
+                              f"в инвентаре {ncat}")
+        m = re.search(r"scripts/`? выверен \((\d+)\)", text)
+        if m:
+            real = len([f for f in os.listdir(os.path.join(ROOT, "scripts"))
+                        if os.path.isfile(os.path.join(ROOT, "scripts", f))])
+            if int(m.group(1)) != real:
+                rep.fail("проза", f"README, журнал: состав scripts/ заявлен {m.group(1)}, "
+                                  f"в дереве {real} файлов")
+
+    # 5. Состав scripts/ в дереве README: каждый файл каталога назван.
+    #    Ищем строки дерева по префиксу «│   ├── » и берём те, что относятся к
+    #    scripts/ — по имени файла, а не по позиции блока: блок начинается с docs/.
+    real_files = {f for f in os.listdir(os.path.join(ROOT, "scripts"))
+                  if os.path.isfile(os.path.join(ROOT, "scripts", f))}
+    listed = set(re.findall(r"^│\s*[├└]──\s*([\w.-]+)", readme, re.M))
+    # файлы scripts/ в дереве — это те, что реально лежат в каталоге, минус
+    # исключения: перечисляются не все (тесты и служебные описаны отдельно)
+    missing = sorted(real_files - listed)
+    if missing:
+        rep.fail("проза", f"README: в дереве не названы файлы scripts/: {', '.join(missing)}")
+    # 6. Офисные навыки Anthropic: перечислены ВСЕ имена, без двусмысленного
+    #    «и их -official варианты» — такая запись читается как «4 + варианты = 10»
+    #    при фактических 9.
+    names = sorted(stats["restricted_skills"]["anthropic"])
+    anth_line = next((l for l in readme.splitlines()
+                     if "Офисные навыки Anthropic" in l and l.strip().startswith("|")), "")
+    if anth_line:
+        short = [n for n in names if "/" not in n]
+        for name in short:
+            if f"`{name}`" not in anth_line:
+                rep.fail("проза", f"README: в строке про офисные навыки Anthropic "
+                                  f"не назван `{name}`")
+        if re.search(r"и (?:их )?`?-official`? варианты", anth_line):
+            rep.fail("проза", "README: «и их -official варианты» читается как 10 при 9 — "
+                              "перечислите имена полностью")
+    else:
+        rep.fail("проза", "README: нет строки про офисные навыки Anthropic")
+
+    # 7. Бейдж источников: 4 коллекции синхронизации + RADAR как источник данных
+    badge = re.search(r"badge/([A-Za-z_+]+)", readme)
+    up_badge = next((m.group(1) for m in re.finditer(r"badge/([\w+_]+)-", readme)
+                     if "Upstream" in m.group(1)), None)
+    if up_badge:
+        rep.fail("проза", "README: бейдж «Upstream_sources» врёт — синхронизируются четыре "
+                          "коллекции, RADAR источник данных, а не апстрим синхронизации")
+    if "4_collections_+_RADAR" not in readme and "Sources" not in readme:
+        rep.fail("проза", "README: нет бейджа источников с разделением «4 коллекции + RADAR»")
+
+    # 8. Один и тот же предмет называется одинаково: «структуры», а не «органы»
+    #    (апстрим пишет anatomical structures, и 5 из 18 вне брюшной полости).
+    if "18 органов" in readme:
+        rep.fail("проза", "README: «18 органов» — апстрим пишет anatomical structures, "
+                          "5 из 18 вне брюшной полости; в журнале уже «18 структур»")
+    if "18 анатомических структур" not in readme and "18 структур" not in readme:
+        rep.fail("проза", "README: нигде не сказано, что речь об 18 анатомических структурах")
+
+    rep.note(f"проза: схема, лицензии, журнал, состав scripts/ и формулировки сверены "
+             f"со stats.json ({len(real_files)} файлов)")
+
+
 def check_secrets(rep: Report) -> None:
     """9. Живых секретов в дереве нет."""
     hits = []
@@ -984,6 +1173,7 @@ def main() -> int:
     check_restricted_docs(rep)
     check_broken_refs_report(rep)
     check_sibling_copies(rep)
+    check_readme_prose(rep)
     check_diagram_numbers(rep)
     check_secrets(rep)
     check_cjk(rep)

@@ -704,6 +704,28 @@ check("в отчёте есть категория «Файл чужого на�
 check("отчёт объясняет, почему чужой файл не копируется",
       "17 разных версий" in rep_txt or "176 версий" in rep_txt)
 
+print("\n=== 22. Проза README сверяется со stats.json ===")
+# Девять расхождений внешней проверки держались потому, что валидатор смотрел на
+# таблицы и бейджи, а на ASCII-схему, абзац лицензий, журнал и состав scripts/ — нет.
+r_prose = run([sys.executable, "-B", "scripts/validate.py"])
+check("валидатор с проверкой прозы проходит", r_prose.returncode == 0,
+      (r_prose.stdout or "")[-200:])
+readme_p = open(os.path.join(ROOT, "README.md"), encoding="utf-8").read()
+check("на ASCII-схеме у OpenClaw показаны вложенные", "777+28" in readme_p)
+check("в лицензиях назван RADAR и его лицензия весов",
+      "RADAR" in readme_p[readme_p.find("## Лицензии"):] and "CC BY-NC-SA" in readme_p)
+check("нет двусмысленного «и их -official варианты»",
+      not re.search(r"и (?:их )?`?-official`? варианты", readme_p))
+check("бейдж источников не называется Upstream_sources",
+      "badge/Upstream_sources" not in readme_p)
+check("нет «18 органов» (апстрим пишет anatomical structures)", "18 органов" not in readme_p)
+check("почти-дубль torch зафиксирован списком",
+      "torch_geometric" in json.load(open(os.path.join(ROOT, "scripts", "name-duplicates.json"),
+                                          encoding="utf-8")).get("near_duplicates", [{}])[0].get("dirs", []) + [""] * 0
+      or "torch-geometric" in json.dumps(json.load(open(os.path.join(ROOT, "scripts",
+          "name-duplicates.json"), encoding="utf-8")).get("near_duplicates", []), ensure_ascii=False))
+check("README объясняет почти-дубли", "Почти-дубли" in readme_p)
+
 print(f"\n{'=' * 50}")
 print(f"ИТОГО: {PASS} ok, {FAIL} FAIL")
 sys.exit(1 if FAIL else 0)
