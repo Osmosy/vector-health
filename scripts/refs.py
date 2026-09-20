@@ -19,7 +19,9 @@
    требовать: подстановочные метки (`YYYY`, `xxx`, `your_`, `EXAMPLE`, `<...>`)
    и явные слова-заглушки помечаются как пример.
 """
+import os
 import re
+import subprocess
 
 # Каталоги, в которых навыки держат вспомогательные файлы
 KNOWN_DIRS = ("references", "scripts", "templates", "assets", "prompts", "data",
@@ -167,3 +169,32 @@ def to_skill_relative(ref: str, skill_name: str) -> str | None:
     if ref.startswith("./"):
         return ref[2:]
     return None
+
+# --- Токен для GitHub API -------------------------------------------------------
+# INSTALL обещал, что скрипты читают `GITHUB_TOKEN` из окружения, — и не читал ни
+# один: токен брался только из `gh auth token`, поэтому в CI (где нет настроенного
+# gh) все обращения к API шли анонимно и упирались в лимит 60 запросов в час.
+# Порядок: окружение (GITHUB_TOKEN, затем GH_TOKEN — так называет его Actions),
+# затем gh, затем ~/.hermes/.env.
+
+def github_token() -> str:
+    """Токен GitHub: окружение → gh auth token → ~/.hermes/.env."""
+    for var in ("GITHUB_TOKEN", "GH_TOKEN"):
+        value = os.environ.get(var, "").strip()
+        if value:
+            return value
+    try:
+        out = subprocess.run(["gh", "auth", "token"], capture_output=True, text=True)
+        if out.returncode == 0 and out.stdout.strip():
+            return out.stdout.strip()
+    except OSError:
+        pass
+    env_file = os.path.expanduser("~/.hermes/.env")
+    if os.path.isfile(env_file):
+        try:
+            for line in open(env_file, encoding="utf-8"):
+                if line.strip().startswith(("GITHUB_TOKEN=", "GH_TOKEN=")):
+                    return line.split("=", 1)[1].strip().strip('"').strip("'")
+        except OSError:
+            pass
+    return ""

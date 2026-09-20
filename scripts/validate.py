@@ -795,6 +795,53 @@ def check_diagram_numbers(rep: Report) -> None:
     rep.note(f"диаграмма: числа согласованы с деревом ({total})")
 
 
+def check_broken_ref_categories(rep: Report) -> None:
+    """Каждая категория битых ссылок в отчёте и в README — сходится с подсчётом.
+
+    Раньше валидатор сверял только ИТОГ (492) — и пропускал отчёт, где категории
+    деградировали: без сети «унаследовано 227» становилось 311, «в корне источника»
+    и «тяжёлые» — нулём. Итог при этом оставался 492, потому что сумма категорий не
+    менялась. Числа отчёта цитируются в README, поэтому сверяются по каждой строке.
+    """
+    report_path = os.path.join(ROOT, "docs", "broken-refs.md")
+    if not os.path.isfile(report_path):
+        rep.fail("ссылки", "нет docs/broken-refs.md")
+        return
+    body = open(report_path, encoding="utf-8").read()
+    rows = dict((m.group(1).strip(), int(m.group(2)))
+                for m in re.finditer(r"^\|\s*([^|]+?)\s*\|\s*(\d+)\s*\|", body, re.M))
+    if not rows:
+        rep.fail("ссылки", "в docs/broken-refs.md нет таблицы категорий")
+        return
+    total = sum(rows.values())
+    declared = re.search(r"битых:\s*(\d+)", body)
+    if declared and int(declared.group(1)) != total:
+        rep.fail("ссылки", f"отчёт: заявлено битых {declared.group(1)}, сумма категорий {total}")
+
+    # README обязан называть каждую категорию тем же числом
+    readme_raw = open(os.path.join(ROOT, "README.md"), encoding="utf-8").read()
+    # сверка без учёта регистра: в отчёте категория названа «Внешний ресурс», в README
+    # она идёт в перечислении строчными — это одно и то же, и валить на регистре значит
+    # приучить игнорировать проверку.
+    readme = readme_raw.lower()
+    problems = []
+    for name, value in rows.items():
+        if value == 0:
+            continue
+        low = name.lower()
+        if low not in readme:
+            problems.append(f"{name}: категории нет в README")
+            continue
+        pat = re.compile(re.escape(low) + r"[^\n|]{0,90}?\b" + str(value) + r"\b")
+        if not pat.search(readme):
+            near = re.search(re.escape(low) + r"[^\n]{0,90}", readme)
+            problems.append(f"{name}: в README не {value}"
+                            f" ({near.group(0).strip()[:60] if near else 'нет строки'})")
+    if problems:
+        rep.fail("ссылки", f"категории битых ссылок разошлись: {problems[:3]}")
+    rep.note(f"ссылки: {len(rows)} категорий, сумма {total} сходится с отчётом и README")
+
+
 def check_service_artifacts(rep: Report) -> None:
     """Служебные артефакты апстримов: в дереве только те, на которые ссылаются.
 
@@ -1337,6 +1384,7 @@ def main() -> int:
     check_broken_refs_report(rep)
     check_sibling_copies(rep)
     check_readme_prose(rep)
+    check_broken_ref_categories(rep)
     check_service_artifacts(rep)
     check_diagram_numbers(rep)
     check_secrets(rep)

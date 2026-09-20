@@ -83,17 +83,15 @@ HEAVY_MAX = 1_500_000
 ORIGIN = os.path.join(ROOT, "scripts", "upstream-origin.json")
 
 
-def token() -> str:
-    try:
-        out = subprocess.run(["gh", "auth", "token"], capture_output=True, text=True)
-        if out.returncode == 0 and out.stdout.strip():
-            return out.stdout.strip()
-    except OSError:
-        pass
-    return ""
+# Токен — общий с остальными скриптами (refs.github_token): окружение, затем gh,
+# затем ~/.hermes/.env. Раньше здесь читался только `gh auth token`, поэтому в CI
+# обращения к API шли анонимно, и дерево источника могло не прийти вовсе.
+API_TOKEN = refs_mod.github_token()
 
-
-API_TOKEN = token()
+# Источники, дерево которых получить не удалось. Без этого списка отчёт писался
+# деградировавшими числами: недоступная сеть превращала «унаследовано 227» в 311,
+# «в корне источника» и «тяжёлые» — в 0, и файл отчёта затирался молча.
+MISSING_SOURCES: list[str] = []
 
 
 def api(url: str, tries: int = 4):
@@ -124,12 +122,20 @@ def upstream_blobs() -> dict[str, dict[str, tuple[str, int]]]:
     значит один файл — сравнивать надо содержимое.
     """
     out: dict[str, dict[str, int]] = {}
+    global MISSING_SOURCES
+    MISSING_SOURCES = []
     for label, repo in SOURCES.items():
         try:
             tree = api(f"https://api.github.com/repos/{repo}/git/trees/HEAD?recursive=1")
         except Exception as e:  # noqa: BLE001 — сеть: помечаем источник недоступным
             print(f"  ! {label}: дерево не получено ({e})", file=sys.stderr)
             out[label] = {}
+            MISSING_SOURCES.append(label)
+            continue
+        if not tree.get("tree"):
+            print(f"  ! {label}: пустое дерево", file=sys.stderr)
+            out[label] = {}
+            MISSING_SOURCES.append(label)
             continue
         out[label] = {x["path"]: (x.get("sha", ""), x.get("size", 0))
                       for x in tree.get("tree", []) if x.get("type") == "blob"}
@@ -562,9 +568,22 @@ def main() -> int:
     ap.add_argument("--strict-own", action="store_true",
                     help="упасть, если битые ссылки есть у собственных навыков")
     ap.add_argument("--no-report", action="store_true", help="не писать docs/broken-refs.md")
+    ap.add_argument("--offline", action="store_true",
+                    help="только печать: не ходить в API и НЕ переписывать отчёт")
     args = ap.parse_args()
 
     broken = scan()
+    if args.offline:
+        # Без сети отчёт писался деградировавшими числами: «унаследовано 227» -> 311,
+        # «в корне источника» и «тяжёлые» -> 0, и валидатор такое пропускал, потому что
+        # сверял только итог 492. Отчёт — источник чисел для README и broken-refs.md,
+        # поэтому в офлайне он только печатается.
+        trees: dict = {}
+        print(f"ссылок на файлы: — | битых (без сети): {len(broken)} — "
+              f"категории не считаются, отчёт не переписан")
+        print("OK: --offline — только печать, docs/broken-refs.md не изменён")
+        return 0
+
     trees = upstream_blobs()
     buckets = classify(broken, trees)
 
@@ -584,6 +603,14 @@ def main() -> int:
           f" | в корне источника: {len(buckets['repo_level'])}"
           f" | тяжёлые: {len(buckets['heavy'])}"
           f" | унаследовано: {len(buckets['inherited'])}")
+    if MISSING_SOURCES:
+        print(f"\nдерево не получено у источников: {', '.join(MISSING_SOURCES)}", file=sys.stderr)
+        print("отчёт НЕ перезаписан: без дерева часть категорий посчиталась бы нулём "
+              "(«в корне источника», «тяжёлые»), и «унаследовано» выросло бы за счёт "
+              "разобранного — числа в README разошлись бы с деревом.", file=sys.stderr)
+        if args.no_report:
+            return 2
+        return 2
     if not args.no_report:
         write_report(buckets, total_ok, load_origin())
         print(f"  отчёт: {os.path.relpath(REPORT, ROOT)}")

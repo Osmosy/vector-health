@@ -10,6 +10,7 @@
 """
 import hashlib
 import json
+import gzip
 import os
 import re
 import shutil
@@ -332,8 +333,41 @@ check("клинический навык несёт оговорку в нача
       "не для самолечения" in af[:3000])
 check("в References нет неподтверждённых годов",
       not re.search(r"\*\*(?:ADVENT|CASTLE-AF|EARLY-AF)\*\*\s*—\s*(?:NEJM|JACC|Nature)\s*\d{4}", af))
-check("EAST-AFNET 4 помечен как подтверждённый (2020, PMID)",
-      "32865375" in af and "**2020**" in af or "NEJM **2020**" in af)
+# Все испытания навыка обязаны быть сверены по первоисточнику: PMID и год берутся
+# из docs/trials-verified.json (журнал, год, том, страницы проверены через Europe PMC),
+# а не из текста — иначе тест закрепляет то, что в тексте написано.
+verified = json.load(open(os.path.join(ROOT, "docs", "trials-verified.json"),
+                          encoding="utf-8"))
+check("в docs/trials-verified.json семь испытаний", len(verified) == 7, str(len(verified)))
+for name, v in verified.items():
+    check(f"{name}: PMID {v['pmid']} и год {v['year']} есть в навыке",
+          v["pmid"] in af and v["year"] in af, f"нет PMID или года для {name}")
+    check(f"{name}: выходные данные {v['cite']} есть в навыке",
+          f"{v['vol']}({v['issue']})" in af,
+          f"нет тома для {name}")
+# Строка, где год стоит вплотную к названию испытания («EARLY-AF (NEJM 2021...»), —
+# ровно та форма, в которой был дефект «EARLY-AF (2022)». В такой строке обязан быть
+# PMID. Таблица References держит год отдельной колонкой и под эту форму не попадает,
+# поэтому проверка построчная, а не по всему тексту.
+trial_names = ("EAST-AFNET 4", "EARLY-AF", "STOP-AF First", "CASTLE-AF", "CASTLE-HTx",
+               "ADVENT", "AFFIRM")
+# PMID может стоять своей колонкой таблицы References — тогда он левее по строке,
+# и «нет PMID в строке» тут не дефект. Дефект — форма «Имя (NEJM год ...)» БЕЗ PMID
+# вообще: именно так выглядела строка «EARLY-AF (2022)».
+naked = []
+for line in af.splitlines():
+    if not any(n in line for n in trial_names):
+        continue
+    if not re.search(r"NEJM (?:19|20)\d{2}", line):
+        continue
+    if "PMID" in line:
+        continue
+    # строка таблицы, где год вплотную к имени: «| EARLY-AF (NEJM 2021) |»
+    if re.search(r"(?:EAST-AFNET 4|EARLY-AF|STOP-AF First|CASTLE-AF|CASTLE-HTx|ADVENT|"
+                 r"AFFIRM)\s*\(NEJM", line):
+        naked.append(line.strip()[:60])
+check("в навыке нет года испытания без PMID", not naked, str(naked))
+check("в навыке нет года испытания без PMID", not naked, str(naked))
 
 # каждый короткий документ называет ограничения и ссылается на NOTICE
 for doc in ("AGENTS.md", "INSTALL.md", "agent-description.md"):
@@ -572,21 +606,41 @@ check("внешние ссылки размечены состоянием (со
       "путь совпадает" in sec_ext or "переехал" in sec_ext)
 check("в отчёте есть вид «каталог запуска»", "каталог запуска" in sec_ext)
 
-# деревья апстримов: берём из кеша прошлых прогонов, иначе — через API
-real_trees = {}
-for label, repo in br2.SOURCES.items():
-    cached = f"/tmp/vh_trees/{label}.json"
-    try:
-        if os.path.isfile(cached):
-            real_trees[label] = {e["path"]: e.get("sha", "") for e in
-                                 json.load(open(cached, encoding="utf-8"))["tree"]
-                                 if e["type"] == "blob"}
+# Деревья апстримов. По умолчанию — снимок из репозитория (tests/fixtures),
+# чтобы тесты проходили БЕЗ сети: раньше здесь был /tmp-кеш с падением в API, и в
+# офлайне проверка «общий файл / файл чужого навыка» получала пустое дерево и валила
+# прогон (1 FAIL, код выхода 1). Сеть — только за флагом --network, и там же сверяется,
+# что снимок не устарел.
+NETWORK = "--network" in sys.argv
+FIXTURE = os.path.join(ROOT, "tests", "fixtures", "upstream-trees.json.gz")
+
+
+def load_trees(network: bool) -> dict:
+    trees: dict = {}
+    if os.path.isfile(FIXTURE):
+        with gzip.open(FIXTURE, "rt", encoding="utf-8") as f:
+            trees = json.load(f)["trees"]
+    if network:
+        fresh = {}
+        for label, repo in br2.SOURCES.items():
+            try:
+                tree = br2.api(f"https://api.github.com/repos/{repo}/git/trees/HEAD?recursive=1")
+                fresh[label] = {e["path"]: e.get("sha", "") for e in tree["tree"]
+                                if e.get("type") == "blob"}
+            except Exception:
+                fresh[label] = {}
+        if all(fresh.get(k) for k in br2.SOURCES):
+            drifted = [k for k in fresh if len(fresh[k]) != len(trees.get(k, {}))]
+            if drifted:
+                print(f"  ! снимок tests/fixtures разошёлся с апстримом: {drifted} — "
+                      f"пересобери: python3 tests/test_scripts.py --refresh-fixture")
+            trees = fresh
         else:
-            tree = br2.api(f"https://api.github.com/repos/{repo}/git/trees/HEAD?recursive=1")
-            real_trees[label] = {e["path"]: e.get("sha", "") for e in tree["tree"]
-                                 if e["type"] == "blob"}
-    except Exception:
-        real_trees[label] = {}
+            print("  ! сеть недоступна: остаюсь на снимке tests/fixtures")
+    return trees
+
+
+real_trees = load_trees(NETWORK)
 
 plant = load_module(os.path.join(ROOT, "scripts", "plant_sibling_files.py"), "plant_t")
 
@@ -727,5 +781,21 @@ check("почти-дубль torch зафиксирован списком",
 check("README объясняет почти-дубли", "Почти-дубли" in readme_p)
 
 print(f"\n{'=' * 50}")
-print(f"ИТОГО: {PASS} ok, {FAIL} FAIL")
+if NETWORK:
+    print("\n(сетевые проверки включены: --network)")
+else:
+    print("\n(офлайн: деревья апстримов из tests/fixtures/upstream-trees.json.gz; "
+          "сетевые проверки — с --network)")
+
+if "--refresh-fixture" in sys.argv:
+    fresh = load_trees(network=True)
+    with gzip.open(FIXTURE, "wt", encoding="utf-8") as f:
+        json.dump({"note": "Снимок деревьев апстримов (путь -> blob sha). Нужен, чтобы "
+                           "тесты проходили без сети; сетевые проверки — за флагом "
+                           "--network.",
+                   "sources": {k: br2.SOURCES[k] for k in fresh},
+                   "trees": fresh}, f, ensure_ascii=False)
+    print(f"снимок обновлён: {FIXTURE}")
+
+print(f"\nитог: {PASS} пройдено, {FAIL} провалено")
 sys.exit(1 if FAIL else 0)
