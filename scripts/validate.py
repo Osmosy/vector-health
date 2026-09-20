@@ -962,21 +962,44 @@ def check_notice_artifacts_numbers(rep: Report) -> None:
     # Первая версия проверки считала каталоги «с файлами» — вышло 24 против 44:
     # файл может лежать и во вложенном каталоге (`tests/data/`), тогда верхний
     # `tests/` в этот счёт не попадал.
-    ls = subprocess.run(["git", "ls-files", "skills"], cwd=ROOT,
-                        capture_output=True, text=True)
-    if ls.returncode != 0:
-        rep.fail("NOTICE", "git недоступен — числа tests/ сверить не с чем")
-        return
+    # Источник истины — git (см. выше), но проверка обязана РАБОТАТЬ и без него:
+    # в CI-контейнере без сети git не установлен, и `git ls-files` там падает. Тогда
+    # считаем по диску, пропуская каталоги БЕЗ файлов: пустой каталог git не хранит,
+    # и это ровно то расхождение, из-за которого проверка и появилась.
+    # FileNotFoundError, если git не установлен: subprocess.run его выбрасывает, и
+    # проверка падала с трейсбеком вместо того, чтобы посчитать по диску. Именно
+    # это уронило CI в контейнере без сети (там git нет).
+    try:
+        ls = subprocess.run(["git", "ls-files", "skills"], cwd=ROOT,
+                            capture_output=True, text=True)
+        rc = ls.returncode
+    except (OSError, ValueError):
+        ls, rc = None, 1
     files = 0
     dirs: set[str] = set()
-    for path in ls.stdout.splitlines():
-        posix = "/" + path.replace(os.sep, "/")
-        if "/tests/" not in posix:
-            continue
-        files += 1
-        # каталог tests/ для этого файла: первый сегмент пути, заканчивающийся на /tests
-        head = path.split("/tests/")[0]
-        dirs.add(head + "/tests")
+    if rc == 0 and ls is not None:
+        for path in ls.stdout.splitlines():
+            if "/tests/" not in "/" + path:
+                continue
+            files += 1
+            dirs.add(path.split("/tests/")[0] + "/tests")
+        source = "git"
+    else:
+        # Каталог = первый сегмент пути, оканчивающийся на `tests`. Считать вложенные
+        # (`tests/data/`, `tests/fixtures/`) отдельными каталогами нельзя, и брать
+        # `split("/tests/")[0]` от АБСОЛЮТНОГО пути тоже: у навыка с двумя `tests`
+        # получался другой ключ, и счёт давал 64 вместо 44. Ключ — путь от skills/.
+        for root, dirnames, filenames in os.walk(SKILLS):
+            dirnames[:] = [d for d in dirnames if d != "__pycache__"]
+            if not filenames:
+                continue
+            rel = os.path.relpath(root, SKILLS).replace(os.sep, "/")
+            parts = rel.split("/")
+            if "tests" not in parts:
+                continue
+            files += len(filenames)
+            dirs.add("/".join(parts[:parts.index("tests") + 1]))
+        source = "диску (git нет: пустые каталоги не считаются)"
     if not files:
         rep.fail("NOTICE", "в дереве не найдено файлов под tests/ — проверь раскладку")
         return
@@ -989,7 +1012,7 @@ def check_notice_artifacts_numbers(rep: Report) -> None:
     if int(m.group(1)) != files or int(m.group(2)) != len(dirs):
         rep.fail("NOTICE", f"числа tests/ разошлись: в NOTICE {m.group(1)} файлов в "
                            f"{m.group(2)} каталогах, в дереве {files} в {len(dirs)}")
-    rep.note(f"NOTICE: числа раздела «Чего нет» сверены с деревом и git "
+    rep.note(f"NOTICE: числа раздела «Чего нет» сверены с деревом по {source} "
              f"({files} файлов tests/ в {len(dirs)} каталогах)")
 
 
