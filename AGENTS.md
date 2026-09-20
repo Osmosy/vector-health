@@ -18,13 +18,13 @@ MIT репозитория покрывает **собственный вкла�
 | Что | Навыков | Следствие |
 |---|---|---|
 | Проприетарная шапка в тексте навыка («proprietary and confidential… All Rights Reserved», © MD BABU MIA — из апстрима OpenClaw) | 308 | считать MIT нельзя |
-| Офисные навыки Anthropic (`xlsx`, `pdf`, `docx`, `pptx`, `PPTX-Skill` и их `-official` варианты) | 9 | «© 2025 Anthropic, PBC. All rights reserved» |
+| Офисные навыки Anthropic (`PPTX-Skill`, `docx`, `docx-official`, `pdf`, `pdf-anthropic`, `pptx`, `pptx-official`, `xlsx`, `xlsx-official`) | 9 | «© 2025 Anthropic, PBC. All rights reserved» |
 | `Non-Commercial` | 2 | коммерческое использование запрещено. Это **один навык в двух местах** — `varcadd-pathogenicity` и `variant-interpretation-acmg/varCADD` (одинаковый sha); он же входит в первое ограничение списка |
 | **Итого уникальных навыков с ограничениями** | **317** | сумма по видам (308 + 9 + 2) даёт 319: **два «Non-Commercial» — это один навык** `varCADD` в двух местах (один sha), и он же входит в первое ограничение списка |
 | Таксономия RADAR в `abdominal-ct-findings` | 1 | текст — Apache-2.0 (ок), но **веса модели — CC BY-NC-SA 4.0** и не берутся |
 
 Перед использованием конкретного навыка проверьте его поле `license` и первые строки
-`SKILL.md`. Числа сверяются с деревом: `python3 scripts/validate.py` (21 проверка: числа, лицензии, ссылки, диаграмма).
+`SKILL.md`. Числа сверяются с деревом: `python3 scripts/validate.py` (26 проверок: числа, лицензии, ссылки, диаграмма).
 
 ## Базовые правила
 

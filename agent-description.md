@@ -25,6 +25,8 @@ openmed, Aperivue medsci-skills) плюс три собственных. Дед�
   `skills/abdominal-ct-findings`
 - Архитектура (живая диаграмма) — `docs/vector-health.architecture.html`
 - Инвентарь битых ссылок — `docs/broken-refs.md`
+- Валидатор репозитория — `python3 scripts/validate.py`: 26 проверок (числа, лицензии,
+  ссылки, диаграмма, служебные артефакты, происхождение, клинические утверждения)
 - Перед коммитом прогони проверки: `python3 scripts/validate.py`,
   `python3 scripts/broken_refs.py --strict-own`, `python3 tests/test_scripts.py`
   (то же выполняет CI в `.github/workflows/validate.yml`)
@@ -39,8 +41,8 @@ openmed, Aperivue medsci-skills) плюс три собственных. Дед�
 | Навыки верхнего уровня | 1513 каталогов |
 | Вложенные навыки | 28 (внутри каталогов-контейнеров апстримов) |
 | Собственные навыки | 3 (`dicom-vlm-analysis`, `atrial-fibrillation-treatment`, `abdominal-ct-findings`) |
-| Скрипты | 16 (`scripts/`: 9 .py, 1 установщик, 6 JSON-манифеста) |
-| Тесты | 1 файл (`tests/test_scripts.py`, 187 проверок) |
+| Скрипты | 16 (`scripts/`: 9 .py, 1 установщик, 6 JSON-манифеста) + в дереве есть `stats.json` |
+| Тесты | 3 файла (`tests/`: `test_scripts.py`, `run_offline.py` — прогон без сети, `mutation_check.py` — 8 мутаций) |
 | Диаграмма | 1 живая (`docs/vector-health.architecture.html`) |
 
 ## Ограничения лицензий — обязательно к прочтению
@@ -52,7 +54,7 @@ MIT репозитория покрывает **собственный вкла�
 | Что | Навыков | Следствие |
 |---|---|---|
 | Проприетарная шапка в тексте навыка («proprietary and confidential… All Rights Reserved», © MD BABU MIA — из апстрима OpenClaw) | 308 | считать MIT нельзя |
-| Офисные навыки Anthropic (`xlsx`, `pdf`, `docx`, `pptx`, `PPTX-Skill` и их `-official` варианты) | 9 | «© 2025 Anthropic, PBC. All rights reserved» |
+| Офисные навыки Anthropic (`PPTX-Skill`, `docx`, `docx-official`, `pdf`, `pdf-anthropic`, `pptx`, `pptx-official`, `xlsx`, `xlsx-official`) | 9 | «© 2025 Anthropic, PBC. All rights reserved» |
 | `Non-Commercial` | 2 | коммерческое использование запрещено. Это **один навык в двух местах** — `varcadd-pathogenicity` и `variant-interpretation-acmg/varCADD` (одинаковый sha); он же входит в первое ограничение списка |
 | **Итого уникальных навыков с ограничениями** | **317** | сумма по видам (308 + 9 + 2) даёт 319: **два «Non-Commercial» — это один навык** `varCADD` в двух местах (один sha), и он же входит в первое ограничение списка |
 | Таксономия RADAR в `abdominal-ct-findings` | 1 | текст — Apache-2.0 (ок), но **веса модели — CC BY-NC-SA 4.0** и не берутся |

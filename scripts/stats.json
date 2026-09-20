@@ -398,5 +398,14 @@
   "js": 0,
   "json": 6,
   "total": 16
+ },
+ "validate_checks": 26,
+ "tests": {
+  "files": 3,
+  "names": [
+   "mutation_check.py",
+   "run_offline.py",
+   "test_scripts.py"
+  ]
  }
 }

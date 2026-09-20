@@ -20,6 +20,8 @@ import json
 import os
 import pathlib
 import re
+import subprocess
+import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SKILLS = ROOT / "skills"
@@ -130,6 +132,36 @@ def scripts_counts() -> dict[str, int]:
             "total": py + sh + js + json_files}
 
 
+def validate_checks() -> int:
+    """Число проверок валидатора — из фактического прогона.
+
+    Почему прогон, а не подсчёт по исходнику: статический подсчёт давал 25 против
+    26 фактических (часть проверок даёт две записи) — то есть документ снова
+    называл бы число, которого нет. Вызов идёт с переменной VH_IN_STATS: валидатор
+    по ней пропускает свою проверку stats.json, иначе получается цикл
+    (validate -> build_stats --check -> validate).
+    """
+    import os
+    proc = subprocess.run([sys.executable, "-B", str(ROOT / "scripts" / "validate.py")],
+                          cwd=ROOT, capture_output=True, text=True,
+                          env={**os.environ, "VH_IN_STATS": "1"})
+    out = (proc.stdout or "") + (proc.stderr or "")
+    m = re.search(r"ПРОВЕРОК: (\d+)", out)
+    return int(m.group(1)) if m else 0
+
+
+def tests_counts() -> dict[str, int]:
+    """Тестовые файлы: сколько их и сколько проверок в основном наборе."""
+    tests_dir = ROOT / "tests"
+    files = sorted(f.name for f in tests_dir.iterdir() if f.is_file()) if tests_dir.is_dir() else []
+    # Число проверок тестов НЕ считается здесь: статический подсчёт вызовов даёт
+    # 155 против 213 фактических, потому что часть тестов выполняется в циклах
+    # (по семи испытаниям, по категориям). Называть в документе число, которого
+    # нет, — ровно тот дефект, который эта работа и чинит, поэтому в документах
+    # называется состав файлов, а число прогоняется в CI.
+    return {"files": len(files), "names": files}
+
+
 def build() -> dict:
     skills = all_skills()
     origin = origin_map()
@@ -201,6 +233,8 @@ def build() -> dict:
         "non_commercial_same_skill": nc_dupes,
         "restricted_by_source": restricted_by_source(restricted_lists, origin),
         "scripts": scripts_counts(),
+        "validate_checks": validate_checks(),
+        "tests": tests_counts(),
     }
 
 
@@ -245,3 +279,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

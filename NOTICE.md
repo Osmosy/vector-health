@@ -13,7 +13,7 @@
 | [maziyarpanahi/openmed](https://github.com/maziyarpanahi/openmed) | Apache-2.0 | `skills/` — 74 навыка: клинический NLP, FHIR, деидентификация, HIPAA, ICD-10 | тексты байт-в-байт |
 | [Aperivue/medsci-skills](https://github.com/Aperivue/medsci-skills) | MIT (© Aperivue) | `skills/` — 59 навыков: протоколы, статистика, мета-анализ, гранты, imaging | тексты байт-в-байт |
 | собственные | MIT (© Osmosy) | `skills/dicom-vlm-analysis`, `skills/atrial-fibrillation-treatment`, `skills/abdominal-ct-findings` | написаны здесь (таксономия в последнем — из RADAR, см. ниже) |
-| [alibaba-damo-academy/damo-radar](https://github.com/alibaba-damo-academy/damo-radar) | Apache-2.0 (© Alibaba DAMO Academy) | таксономия 146 находок × 18 органов в `skills/abdominal-ct-findings/references/radar-taxonomy.json` | названия на ZH/EN взяты из `results/RADAR_infer_results_demo.csv` без изменений; переводы на русский — наши |
+| [alibaba-damo-academy/damo-radar](https://github.com/alibaba-damo-academy/damo-radar) | Apache-2.0 (© Alibaba DAMO Academy) | таксономия 146 находок × 18 анатомических структур в `skills/abdominal-ct-findings/references/radar-taxonomy.json` | названия на ZH/EN взяты из `results/RADAR_infer_results_demo.csv` без изменений; переводы на русский — наши |
 
 Коллизии имён разрешались в пользу одного источника: один и тот же навык в
 разных коллекциях бывает с разным содержимым, и в библиотеке остаётся одна
@@ -57,7 +57,7 @@ Apache-2.0 покрывает её использование с сохране�
 | Что | Навыков | Лицензия | Следствие |
 |---|---|---|---|
 | Навыки с проприетарной шапкой в самом тексте | **308** (280 из OpenClaw + 28 вложенных) | «This code is proprietary and confidential… All Rights Reserved», © 2026 MD BABU MIA, PhD (шапка — из апстрима OpenClaw, не наша правка) | текст прямо запрещает копирование; MIT-статус этих файлов не подтверждён |
-| Офисные навыки Anthropic | **9** (`xlsx`, `pdf`, `docx`, `pptx`, `PPTX-Skill` — плюс варианты `xlsx-official`, `pdf-anthropic`, `docx-official`, `pptx-official`) | «© 2025 Anthropic, PBC. All rights reserved» + `LICENSE.txt` рядом, условия — по вашему соглашению с Anthropic | не MIT; использование регулируется договором с Anthropic |
+| Офисные навыки Anthropic | **9** (`PPTX-Skill`, `docx`, `docx-official`, `pdf`, `pdf-anthropic`, `pptx`, `pptx-official`, `xlsx`, `xlsx-official`) | «© 2025 Anthropic, PBC. All rights reserved» + `LICENSE.txt` рядом, условия — по вашему соглашению с Anthropic | не MIT; использование регулируется договором с Anthropic |
 | Non-Commercial | 2 (`varcadd-pathogenicity`, `variant-interpretation-acmg/varCADD`) | `Non-Commercial` | коммерческое использование запрещено |
 
 **Итого уникальных навыков с ограничениями — 317.** Сумма по видам (308 + 9 + 2 = 319) завышена: два «Non-Commercial» — это один навык `varCADD` в двух местах (`varcadd-pathogenicity` и `variant-interpretation-acmg/varCADD`, один и тот же sha), и он же входит в 308 с проприетарной шапкой. Ещё один юридический нюанс: у навыка `deepvariant` вложенная копия (`variant-interpretation-acmg/bioSkills/deepvariant`) несёт проприетарную шапку, а верхняя (`bio-variant-calling-deepvariant`) — нет; обе версии есть в апстриме отдельно, текст не переписывается.

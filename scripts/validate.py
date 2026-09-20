@@ -266,14 +266,18 @@ def check_doc_counts(rep: Report, dirs: list[str]) -> None:
         # stats.json обязан воспроизводиться из дерева: расхождение означает, что
         # документы сверяются с устаревшим снимком
         gen = os.path.join(ROOT, "scripts", "build_stats.py")
-        if os.path.isfile(gen):
-            proc = subprocess.run([sys.executable, "-B", gen, "--check"],
-                                  cwd=ROOT, capture_output=True, text=True)
-            if proc.returncode != 0:
-                rep.fail("числа", "scripts/stats.json не воспроизводится: "
-                                  f"{(proc.stdout or proc.stderr).strip()[:200]}")
-        else:
-            rep.fail("числа", "нет scripts/build_stats.py — stats.json нечем пересобрать")
+        # VH_IN_STATS ставит сам генератор, когда считает число проверок: без флага
+        # validate -> build_stats --check -> validate уходит в рекурсию. Проверка
+        # воспроизводимости при этом пропускается, а не подменяется ложной ошибкой.
+        if not os.environ.get("VH_IN_STATS"):
+            if os.path.isfile(gen):
+                proc = subprocess.run([sys.executable, "-B", gen, "--check"],
+                                      cwd=ROOT, capture_output=True, text=True)
+                if proc.returncode != 0:
+                    rep.fail("числа", "scripts/stats.json не воспроизводится: "
+                                      f"{(proc.stdout or proc.stderr).strip()[:200]}")
+            else:
+                rep.fail("числа", "нет scripts/build_stats.py — stats.json нечем пересобрать")
         # OpenClaw: с учётом вложенных у него больше, чем в верхнеуровневом счёте
         row = next((l for l in readme.splitlines()
                     if "OpenClaw-Medical-Skills" in l and l.startswith("|")), "")
@@ -859,6 +863,50 @@ def check_origin_map(rep: Report) -> None:
              f"({len(origin)} записей в карте)")
 
 
+def check_doc_counts_dynamic(rep: Report) -> None:
+    """Числа проверок и скриптов в документах — из stats.json, а не из текста.
+
+    Число проверок валидатора стояло в трёх местах по-разному («21» в README,
+    AGENTS и INSTALL против фактического) и не сверялось ничем: документ обещал
+    охват, которого нет. Теперь число берётся прогоном (stats.json) и ищется
+    в каждом документе.
+    """
+    stats_path = os.path.join(ROOT, "scripts", "stats.json")
+    if not os.path.isfile(stats_path):
+        rep.fail("числа", "нет scripts/stats.json")
+        return
+    with open(stats_path, encoding="utf-8") as f:
+        stats = json.load(f)
+    checks = stats.get("validate_checks")
+    if not checks:
+        rep.fail("числа", "stats.json: validate_checks не посчитан — "
+                          "пересобери scripts/build_stats.py")
+        return
+    docs = ("README.md", "AGENTS.md", "INSTALL.md", "agent-description.md")
+    found = 0
+    for doc in docs:
+        path = os.path.join(ROOT, doc)
+        if not os.path.isfile(path):
+            continue
+        text = open(path, encoding="utf-8").read()
+        # исторические записи журнала не считаются: там число на дату записи
+        rows = [l for l in text.splitlines()
+                if not re.match(r"\|\s*\d{4}-\d{2}-\d{2}\s*\|", l.strip())]
+        text_now = "\n".join(rows)
+        if not re.search(rf"(?<![\d.]){checks}(?!\d)(?!\.\d)", text_now):
+            rep.fail("числа", f"{doc}: нет числа проверок валидатора ({checks}) — "
+                              f"пересобери scripts/build_stats.py и обнови документ")
+        else:
+            found += 1
+        # устаревшие числа рядом со словом «проверк» — расхождение
+        for m in re.finditer(r"(\d+)\s*(?:проверк|проверок|check)", text_now):
+            if int(m.group(1)) != checks and int(m.group(1)) > 5:
+                rep.fail("числа", f"{doc}: названо {m.group(1)} проверок, "
+                                  f"фактически {checks}")
+    rep.note(f"числа: {checks} проверок валидатора названы в {found} документах, "
+             f"состав scripts/ — {stats['scripts']['total']} файлов")
+
+
 def check_broken_ref_categories(rep: Report) -> None:
     """Каждая категория битых ссылок в отчёте и в README — сходится с подсчётом.
 
@@ -1248,6 +1296,37 @@ def check_readme_prose(rep: Report) -> None:
     if "18 анатомических структур" not in readme and "18 структур" not in readme:
         rep.fail("проза", "README: нигде не сказано, что речь об 18 анатомических структурах")
 
+    # 9. Те же формулировки и списки — во ВСЕХ документах, а не только в README.
+    #    «18 органов» и «и их -official варианты» держались в AGENTS, INSTALL и
+    #    agent-description, потому что проверка смотрела один README.
+    docs_all = ("README.md", "NOTICE.md", "AGENTS.md", "INSTALL.md", "agent-description.md")
+    for doc in docs_all:
+        path = os.path.join(ROOT, doc)
+        if not os.path.isfile(path):
+            continue
+        text = open(path, encoding="utf-8").read()
+        if "18 органов" in text:
+            rep.fail("проза", f"{doc}: «18 органов» — апстрим пишет anatomical structures")
+        if re.search(r"и (?:их )?`?-official`? варианты", text):
+            rep.fail("проза", f"{doc}: «и их -official варианты» читается как 10 при 9 — "
+                              f"перечислите имена полностью")
+        # строка про офисные навыки Anthropic обязана называть все имена
+        # Только строка ТАБЛИЦЫ про офисные навыки: в тексте документа есть и другие
+        # упоминания Anthropic (журнал, пояснения), и первое совпадение дало бы
+        # ложный провал на строке без имён.
+        row = next((l for l in text.splitlines()
+                    if l.strip().startswith(("|", "<tr")) and "Офисные навыки Anthropic" in l), "")
+        if row:
+            for name in [n for n in names if "/" not in n]:
+                if f"`{name}`" not in row:
+                    rep.fail("проза", f"{doc}: в строке про офисные навыки Anthropic "
+                                      f"не назван `{name}`")
+        # «Унаследованные»/«отрезанные tests/» — формулировка, разошедшаяся с фактом
+        if re.search(r"отрезанн?ы[хе] `?tests/", text):
+            rep.fail("проза", f"{doc}: «отрезанные tests/» — файлы не отрезаются при "
+                              f"сборке, а убираются правилами исключения "
+                              f"(scripts/sync_upstreams.py --prune)")
+
     rep.note(f"проза: схема, лицензии, журнал, состав scripts/ и формулировки сверены "
              f"со stats.json ({len(real_files)} файлов)")
 
@@ -1429,42 +1508,47 @@ def check_assets(rep: Report) -> None:
              f"(исключено {len(excluded)} записей)")
 
 
+CHECKS = (
+    check_skills, check_index, check_origin, check_doc_counts, check_licenses,
+    check_restricted, check_links, check_short_docs, check_assets, check_skill_refs,
+    check_diagram, check_duplicates, check_clinical_claims, check_restricted_docs,
+    check_broken_refs_report, check_sibling_copies, check_readme_prose, check_origin_map,
+    check_broken_ref_categories, check_doc_counts_dynamic, check_service_artifacts,
+    check_diagram_numbers,
+    check_secrets, check_cjk, check_language_layers, check_taxonomy_completeness,
+)
+
+
 def main() -> int:
     rep = Report()
     dirs = check_skills(rep)
     check_index(rep, dirs)
-    check_origin(rep)
-    check_doc_counts(rep, dirs)
-    check_licenses(rep)
-    check_restricted(rep)
-    check_links(rep)
-    check_short_docs(rep)
-    check_assets(rep)
-    check_skill_refs(rep)
-    check_diagram(rep)
-    check_duplicates(rep)
-    check_clinical_claims(rep)
-    check_restricted_docs(rep)
-    check_broken_refs_report(rep)
-    check_sibling_copies(rep)
-    check_readme_prose(rep)
-    check_origin_map(rep)
-    check_broken_ref_categories(rep)
-    check_service_artifacts(rep)
-    check_diagram_numbers(rep)
-    check_secrets(rep)
-    check_cjk(rep)
-    check_language_layers(rep)
-    check_taxonomy_completeness(rep)
+    # Остальные проверки — по списку CHECKS. Список нужен, чтобы число проверок
+    # можно было назвать в документах, не запуская валидатор: вызов его из
+    # build_stats.py замыкал цикл (валидатор -> build_stats --check -> валидатор).
+    for fn in CHECKS:
+        if fn in (check_skills, check_index):
+            continue
+        if fn is check_doc_counts:
+            fn(rep, dirs)
+        else:
+            fn(rep)
 
     for note in rep.notes:
         print(f"  · {note}")
+    # Число проверок печатается ВСЕГДА, в том числе при провале: иначе генератор
+    # (build_stats.py) не может его прочитать, а валидатор не может пройти, потому
+    # что числа нет, — получается замкнутый круг. Число берётся из списка CHECKS, а
+    # не из числа записей: одна проверка печатает две записи, и «26 против 25»
+    # плавало именно на этом.
+    print(f"\nПРОВЕРОК: {len(CHECKS)}")
     if rep.errors:
         print(f"\nПРОВАЛ: {len(rep.errors)} проблем")
         for e in rep.errors:
             print(f"  {e}")
         return 1
-    print(f"\nOK: все проверки пройдены ({len(rep.notes)} — счёт в notes).")
+    print(f"\nOK: все проверки пройдены ({len(CHECKS)} проверок, "
+          f"записей в отчёте: {len(rep.notes)}).")
     return 0
 
 
