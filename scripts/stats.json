@@ -369,10 +369,10 @@
   }
  },
  "scripts": {
-  "py": 7,
+  "py": 8,
   "sh": 1,
   "js": 0,
-  "json": 4,
-  "total": 12
+  "json": 5,
+  "total": 14
  }
 }

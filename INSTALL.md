@@ -93,6 +93,7 @@ cp -r skills/dicom-vlm-analysis ~/.hermes/skills/
 ```bash
 python3 scripts/validate.py            # всё: 21 проверка — числа, лицензии, ссылки, диаграмма
 python3 scripts/build_stats.py         # пересобрать единый источник чисел (stats.json)
+python3 scripts/plant_sibling_files.py --apply   # разложить копии общих файлов апстрима
 python3 scripts/broken_refs.py         # ссылки внутри навыков (инвентарь)
 python3 scripts/sync_upstreams.py --dry-run   # что изменилось в апстримах
 ```

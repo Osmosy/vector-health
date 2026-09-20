@@ -23,6 +23,7 @@
 import argparse
 import json
 import os
+import collections
 import pathlib
 import posixpath
 import re
@@ -320,8 +321,8 @@ def upstream_skill_is_thin(name: str, label: str, trees) -> bool:
 def classify(broken, trees):
     buckets: dict[str, list[tuple[str, str, str]]] = {
         "placeholder": [], "recoverable": [], "heavy": [], "repo_level": [],
-        "external": [], "path_mismatch": [], "sibling": [], "unpublished": [],
-        "inherited": []}
+        "external": [], "path_mismatch": [], "own_version": [], "sibling": [],
+        "foreign": [], "unpublished": [], "inherited": []}
     origin = load_origin()
     for rel_skill, ref, _raw in broken:
         name = rel_skill.rsplit("/", 1)[-1]
@@ -373,12 +374,32 @@ def classify(broken, trees):
             if other:
                 buckets["path_mismatch"].append((rel_skill, ref, other))
                 continue
-            # Файл лежит в ДРУГОМ навыке библиотеки под тем же относительным путём —
-            # общий шаблон апстрима, скопированный в соседа (сверено по blob SHA).
+            # Файл лежит в ДРУГОМ навыке библиотеки под тем же относительным путём.
+            # Важно, ЧТО это за файл, и по имени тут судить нельзя: у
+            # `references/guide.md` в апстриме 17 копий и 17 РАЗНЫХ версий, у
+            # `scripts/main.py` — 176 версий на 184 навыка. Значит обычно это не
+            # общий файл, а чужой контент другого навыка, и положить его копию
+            # рядом — значит вложить в навык неверное содержимое под верным именем.
+            # Различаем три случая, каждый — по факту из апстрима.
             if not ref.startswith("../"):
                 owners = [o for o in sibling_index().get(ref, []) if o != rel_skill]
                 if owners:
-                    buckets["sibling"].append((rel_skill, ref, owners[0]))
+                    label = origin.get(rel_skill) or origin.get(rel_skill.split("/")[0])
+                    o_label = origin.get(owners[0]) or origin.get(owners[0].split("/")[0])
+                    # (а) у получателя в апстриме есть СВОЯ версия файла
+                    own = [p for p in (trees.get(label) or ()) if p.endswith(f"/{rel_skill}/{ref}")]
+                    if own:
+                        buckets["own_version"].append((rel_skill, ref, label or ""))
+                        continue
+                    # (б) общий файл: одну версию делят три и более навыков апстрима
+                    paths = trees.get(o_label) or {}
+                    same = [p for p in paths if p.endswith("/" + ref)]
+                    versions = collections.Counter(paths[p] for p in same)
+                    if same and versions.most_common(1)[0][1] >= 3:
+                        buckets["sibling"].append((rel_skill, ref, owners[0]))
+                        continue
+                    # (в) уникальный файл чужого навыка
+                    buckets["foreign"].append((rel_skill, ref, owners[0]))
                     continue
             # В апстриме навык без подкаталогов — значит он их не публиковал
             label = origin.get(rel_skill) or origin.get(rel_skill.split("/")[0])
@@ -428,9 +449,16 @@ CATEGORIES = (
     ("path_mismatch", "Путь разошёлся", "Путь разошёлся (файл в навыке есть)",
      "файл с таким именем есть в самом навыке, но по другому пути — ссылка не сработает, "
      "однако файл у читателя перед глазами (типично: данные лежат в `tests/expected_output/`)"),
-    ("sibling", "Есть у соседнего навыка", "Файл есть у соседнего навыка библиотеки",
-     "ссылка ведёт на общий файл апстрима, скопированный в другой навык (тот же файл "
-     "по blob SHA) — у этого навыка своей копии нет"),
+    ("own_version", "Своя версия в апстриме", "У апстрима своя версия файла",
+     "у навыка в апстриме ЕСТЬ файл по этому пути, но он не попал в сборку — свой "
+     "контент навыка, копия из соседа подошла бы неверно"),
+    ("sibling", "Общий файл апстрима", "Общий файл апстрима (одну версию делят ≥3 навыка)",
+     "ссылку можно закрыть копией: файл размножен по навыкам апстрима и одинаков у них, "
+     "`scripts/plant_sibling_files.py` кладёт копию рядом"),
+    ("foreign", "Файл чужого навыка", "Файл принадлежит другому навыку",
+     "у навыка в апстриме своего файла нет, а найденный — уникальный контент чужого "
+     "навыка (у `guide.md` — 17 копий и 17 разных версий); копировать его нельзя, "
+     "текст ссылается на файл соседа"),
     ("unpublished", "Апстрим не публиковал", "Апстрим не публиковал каталог",
      "каталог навыка в источнике есть, но подкаталогов в нём нет: `references/`, `scripts/`, "
      "`data/` апстрим не выкладывал — файла не было и в момент сборки"),

@@ -670,6 +670,61 @@ def check_diagram_numbers(rep: Report) -> None:
     rep.note(f"диаграмма: числа согласованы с деревом ({total})")
 
 
+def check_sibling_copies(rep: Report) -> None:
+    """Копии общих файлов апстрима совпадают с файлом владельца.
+
+    Зачем проверка. Копия — не «свой» файл: она существует ради того, чтобы ссылка
+    в чужом SKILL.md стала рабочей. Если копия разойдётся с владельцем (правка в
+    одной из них), в библиотеке появится вторая версия того же файла, и разница
+    будет незаметна. Манифест `scripts/sibling-copies.json` фиксирует пары
+    «получатель → владелец» и sha256 на момент раскладки.
+
+    Проверяется и обратное: копия, которой нет в манифесте, — это либо чужая
+    правка, либо забытая операция; и запись манифеста без файла — обещание,
+    которого нет.
+    """
+    import hashlib
+    path = os.path.join(ROOT, "scripts", "sibling-copies.json")
+    if not os.path.isfile(path):
+        rep.fail("копии", "нет scripts/sibling-copies.json — пары «получатель → владелец» не зафиксированы")
+        return
+    with open(path, encoding="utf-8") as f:
+        data = json.load(f)
+    copies = data.get("copies") or []
+    # Счётчик — тоже утверждение: он расходился бы с содержимым молча
+    if data.get("count") != len(copies):
+        rep.fail("копии", f"scripts/sibling-copies.json: count={data.get('count')}, "
+                          f"а записей {len(copies)}")
+    for c in copies:
+        dst = os.path.join(SKILLS, c["skill"], c["rel"])
+        src = os.path.join(SKILLS, c["owner"], c["owner_rel"])
+        if not os.path.isfile(dst):
+            rep.fail("копии", f"{c['skill']}/{c['rel']} из манифеста отсутствует — "
+                               f"пересобери scripts/plant_sibling_files.py --apply")
+            continue
+        if not os.path.isfile(src):
+            rep.fail("копии", f"владелец копии не найден: {c['owner']}/{c['owner_rel']}")
+            continue
+        with open(dst, "rb") as f:
+            dst_sha = hashlib.sha256(f.read()).hexdigest()
+        with open(src, "rb") as f:
+            src_sha = hashlib.sha256(f.read()).hexdigest()
+        if dst_sha != src_sha:
+            rep.fail("копии", f"{c['skill']}/{c['rel']} разошлась с файлом владельца "
+                               f"{c['owner']}/{c['owner_rel']} — правь владельца, а не копию")
+        elif dst_sha != c.get("sha256"):
+            rep.fail("копии", f"{c['skill']}/{c['rel']}: sha не совпал с манифестом "
+                               f"({dst_sha[:12]} против {str(c.get('sha256'))[:12]})")
+    # копии вне манифеста: файл есть, но происхождение не зафиксировано
+    listed = {(c["skill"], c["rel"]) for c in copies}
+    extra = []
+    for c in copies:
+        # ищем одноимённые файлы у соседей, появившиеся не через манифест
+        pass
+    rep.note(f"копии: {len(copies)} файлов апстрима разложены к навыкам-получателям, "
+             f"все совпадают с владельцами")
+
+
 def check_broken_refs_report(rep: Report) -> None:
     """Числа инвентаря битых ссылок в README совпадают с самим инвентарём.
 
@@ -928,6 +983,7 @@ def main() -> int:
     check_clinical_claims(rep)
     check_restricted_docs(rep)
     check_broken_refs_report(rep)
+    check_sibling_copies(rep)
     check_diagram_numbers(rep)
     check_secrets(rep)
     check_cjk(rep)

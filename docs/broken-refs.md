@@ -1,6 +1,6 @@
 # Ссылки на файлы внутри навыков: инвентарь
 
-Сгенерировано `scripts/broken_refs.py`. Ссылок на файлы в дереве: 3528; на месте: 3031; битых: 497.
+Сгенерировано `scripts/broken_refs.py`. Ссылок на файлы в дереве: 3528; на месте: 3036; битых: 492.
 
 Битые ссылки — унаследованное свойство апстримов: файл, который навык упоминает, у них лежал в отрезанном служебном каталоге (`tests/`, `evals/`) либо не был закоммичен. Правится не ссылка в чужом тексте, а знание о том, где файл есть.
 
@@ -11,7 +11,9 @@
 | Внешний ресурс | 81 | путь ведёт в сторонний проект (git-подмодуль) или в каталог, создаваемый при работе (`src/`, `output_dir/`, `/opt`) — в репозитории такого файла быть не может |
 | В корне источника | 9 | файл ЕСТЬ в репозитории-источнике, но вне каталога навыка (`scripts/`, `examples/`, `docs/`) — ссылка писалась под их раскладку, где навыки лежат глубже |
 | Путь разошёлся | 11 | файл с таким именем есть в самом навыке, но по другому пути — ссылка не сработает, однако файл у читателя перед глазами (типично: данные лежат в `tests/expected_output/`) |
-| Есть у соседнего навыка | 80 | ссылка ведёт на общий файл апстрима, скопированный в другой навык (тот же файл по blob SHA) — у этого навыка своей копии нет |
+| Своя версия в апстриме | 0 | у навыка в апстриме ЕСТЬ файл по этому пути, но он не попал в сборку — свой контент навыка, копия из соседа подошла бы неверно |
+| Общий файл апстрима | 3 | ссылку можно закрыть копией: файл размножен по навыкам апстрима и одинаков у них, `scripts/plant_sibling_files.py` кладёт копию рядом |
+| Файл чужого навыка | 72 | у навыка в апстриме своего файла нет, а найденный — уникальный контент чужого навыка (у `guide.md` — 17 копий и 17 разных версий); копировать его нельзя, текст ссылается на файл соседа |
 | Апстрим не публиковал | 73 | каталог навыка в источнике есть, но подкаталогов в нём нет: `references/`, `scripts/`, `data/` апстрим не выкладывал — файла не было и в момент сборки |
 | Тяжёлые данные | 2 | файл есть, но это демо-датасет на мегабайты — сознательно не тянем |
 | Унаследованное | 227 | файла нет ни в источнике, ни у соседнего навыка: апстрим его не выложил. Часть таких ссылок описывает РЕЗУЛЬТАТ работы навыка (выходные файлы `data/*.vcf.gz`), и требовать их не нужно — но отличить это автоматически нельзя: признак только в тексте, поэтому файлы остаются здесь, а не выдаются за «создаётся при работе» |
@@ -155,11 +157,18 @@
 | `tooluniverse-drug-repurposing` | `../tooluniverse-sdk/SKILL.md` | SKILL.md |
 | `univariate-multivariable-cox-regression` | `data/analysis_data.rds` | tests/expected_output/data/analysis_data.rds |
 
-## Файл есть у соседнего навыка библиотеки
+## Общий файл апстрима (одну версию делят ≥3 навыка)
 
 | Навык | Файл | Источник |
 |---|---|---|
-| `Case-control-study-quality-assessment-nos` | `scripts/extract_pdf.py` | quapas-quality-assessment-for-prognosis-studies |
+| `citation-chasing-mapping` | `references/audit-reference.md` | nih-biosketch-builder |
+| `irb-application-assistant` | `references/audit-reference.md` | nih-biosketch-builder |
+| `sample-size-power-calculator` | `references/audit-reference.md` | nih-biosketch-builder |
+
+## Файл принадлежит другому навыку
+
+| Навык | Файл | Источник |
+|---|---|---|
 | `academic-norm-review` | `references/guide.md` | meeting-assistant |
 | `analyze-stats` | `references/exemplar_plots/decision_curve.md` | make-figures |
 | `analyze-stats` | `references/exemplar_plots/mrmc_roc.md` | make-figures |
@@ -170,7 +179,6 @@
 | `buffer-calculator` | `references/troubleshooting.md` | pca-dimensionality-reduction |
 | `calc-sample-size` | `references/templates/sample_size.R` | analyze-stats |
 | `check-reporting` | `references/analysis_guides/burden_decomposition_forecasting.md` | analyze-stats |
-| `citation-chasing-mapping` | `references/audit-reference.md` | nih-biosketch-builder |
 | `citation-chasing-mapping` | `references/guide.md` | meeting-assistant |
 | `citation-chasing-mapping` | `scripts/main.py` | hipaa-compliance-auditor |
 | `citation-formatter` | `references/guide.md` | meeting-assistant |
@@ -180,7 +188,6 @@
 | `clinical-decision-support` | `scripts/generate_schematic.py` | scientific-schematics |
 | `clinical-reports` | `scripts/generate_schematic.py` | scientific-schematics |
 | `code-refactor-for-reproducibility` | `references/guide.md` | meeting-assistant |
-| `cohort-study-quality-assessment-nos` | `scripts/extract_pdf.py` | quapas-quality-assessment-for-prognosis-studies |
 | `cover-letter-generator` | `assets/cover_letter_template.md` | cover-letter-drafter |
 | `cover-letter-generator` | `references/guide.md` | meeting-assistant |
 | `cross-disciplinary-bridge-finder` | `references/guide.md` | meeting-assistant |
@@ -194,7 +201,6 @@
 | `humanize` | `scripts/check_paren_spans.py` | self-review |
 | `humanize` | `scripts/check_rhetorical_density.py` | self-review |
 | `hypothesis-generation` | `scripts/generate_schematic.py` | scientific-schematics |
-| `irb-application-assistant` | `references/audit-reference.md` | nih-biosketch-builder |
 | `irb-application-assistant` | `references/guide.md` | meeting-assistant |
 | `irb-application-assistant` | `scripts/main.py` | hipaa-compliance-auditor |
 | `key-takeaways` | `references/guide.md` | meeting-assistant |
@@ -203,9 +209,7 @@
 | `literature-review` | `scripts/generate_schematic.py` | scientific-schematics |
 | `literature-statistics` | `scripts/process_references.py` | format-references-endnote |
 | `meta-manuscript-generator` | `references/writing-guide.md` | nsfc-grant-writer |
-| `meta-screening-fulltext` | `scripts/extract_pdf.py` | quapas-quality-assessment-for-prognosis-studies |
 | `model-calibration-curve` | `scripts/install_dependencies.R` | sample-group-sankey-plot |
-| `molecular-review-workflow` | `scripts/validate_skill.py` | biomed-outline-generator |
 | `nomogram-construction` | `scripts/install_dependencies.R` | sample-group-sankey-plot |
 | `orchestrate` | `scripts/check_citation_keys.py` | manage-refs |
 | `orchestrate` | `scripts/check_xref.py` | manage-refs |
@@ -216,7 +220,6 @@
 | `pdf-processing-pro` | `scripts/fill_form.py` | fill-protocol |
 | `pdf-processor` | `references/examples.md` | open-notebook |
 | `pdf-processor` | `scripts/requirements.txt` | preprint-surveillance-finder |
-| `pdf-to-ppt-pack` | `scripts/validate_skill.py` | biomed-outline-generator |
 | `render-pdf-doc` | `scripts/render_pandoc.sh` | manage-refs |
 | `research-grants` | `scripts/compliance_checker.py` | clinical-reports |
 | `research-grants` | `scripts/generate_schematic.py` | scientific-schematics |
@@ -225,7 +228,6 @@
 | `revise` | `references/ai_patterns.md` | humanize |
 | `revise` | `references/section_guides/step7_1_classical_qc.md` | write-paper |
 | `revise` | `scripts/check_wordcount_cap.py` | sync-submission |
-| `sample-size-power-calculator` | `references/audit-reference.md` | nih-biosketch-builder |
 | `sample-size-power-calculator` | `scripts/main.py` | hipaa-compliance-auditor |
 | `scientific-critical-thinking` | `scripts/generate_schematic.py` | scientific-schematics |
 | `scientific-slides` | `scripts/generate_schematic.py` | scientific-schematics |

@@ -8,6 +8,7 @@
 
 Запуск: python3 tests/test_scripts.py
 """
+import hashlib
 import json
 import os
 import re
@@ -571,13 +572,30 @@ check("внешние ссылки размечены состоянием (со
       "путь совпадает" in sec_ext or "переехал" in sec_ext)
 check("в отчёте есть вид «каталог запуска»", "каталог запуска" in sec_ext)
 
+# деревья апстримов: берём из кеша прошлых прогонов, иначе — через API
+real_trees = {}
+for label, repo in br2.SOURCES.items():
+    cached = f"/tmp/vh_trees/{label}.json"
+    try:
+        if os.path.isfile(cached):
+            real_trees[label] = {e["path"]: e.get("sha", "") for e in
+                                 json.load(open(cached, encoding="utf-8"))["tree"]
+                                 if e["type"] == "blob"}
+        else:
+            tree = br2.api(f"https://api.github.com/repos/{repo}/git/trees/HEAD?recursive=1")
+            real_trees[label] = {e["path"]: e.get("sha", "") for e in tree["tree"]
+                                 if e["type"] == "blob"}
+    except Exception:
+        real_trees[label] = {}
+
+plant = load_module(os.path.join(ROOT, "scripts", "plant_sibling_files.py"), "plant_t")
+
 print("\n=== 20. Разбор унаследованного остатка по проверяемым признакам ===")
 # 394 «унаследованных» были одной кучей с одним ярлыком. Разбор показал, что причина
 # не одна: файл есть у соседа по библиотеке, апстрим не публиковал каталог, путь
 # разошёлся. Каждый признак проверяется фактом, а не догадкой.
-check("classify возвращает девять корзин",
-      set(br2.classify([], {})) == {"placeholder", "recoverable", "external", "repo_level",
-                                    "path_mismatch", "sibling", "unpublished", "heavy", "inherited"},
+check("classify возвращает одиннадцать корзин (как в CATEGORIES)",
+      set(br2.classify([], {})) == {k for k, _s, _t, _m in br2.CATEGORIES},
       str(sorted(br2.classify([], {}))))
 check("strip_leading_dirs снимает переменную SKILL_DIR (первым же вариантом)",
       refs_mod2.strip_leading_dirs("SKILL_DIR/scripts/b.py")[0] == "scripts/b.py",
@@ -603,11 +621,12 @@ multi = [k for k, v in idx.items() if len(v) >= 2 and k.endswith(".md")]
 check("индекс соседей видит общие файлы апстрима", len(multi) > 0, f"общих путей: {len(multi)}")
 # Классификация конкретной ссылки: без работающего индекса она уедет в «унаследованное»
 # (проверено мутацией: отключение ветки sibling давало 276 вместо 227)
-buckets2 = br2.classify(
-    [("analyze-stats", "scripts/check_reverse_coding.py", "../../scripts/check_reverse_coding.py")],
-    {})
-check("ссылка в соседний навык классифицируется как sibling",
-      len(buckets2["sibling"]) == 1 and not buckets2["inherited"], str({k: len(v) for k, v in buckets2.items()}))
+# «Общий файл» — тот, что размножен по апстриму одной версией (>=3 копии).
+# Уникальный файл владельца должен попадать в foreign, а не в sibling.
+check("различение общий/чужой: порог по числу копий одной версии",
+      plant.is_shared_template("scripts/extract_pdf.py", "aipoch", real_trees)
+      and not plant.is_shared_template("references/guide.md", "aipoch", real_trees),
+      "порог не различает общий и уникальный")
 # path_mismatch: файл есть в навыке, но по другому пути (данные в tests/expected_output/)
 buckets3 = br2.classify([("nomogram-construction", "data/Nomogram_list.qs", "data/Nomogram_list.qs")], {})
 check("ссылка на файл навыка по другому пути → path_mismatch",
@@ -620,15 +639,55 @@ check("sibling не ловит ссылки с ../ (они про корень �
       len(br2.classify([("x", "../../../scripts/y.py", "../../../scripts/y.py")], {})["sibling"]) == 0)
 
 # категории отчёта: имена берутся из CATEGORIES, числа сходятся с числом битых
-check("CATEGORIES — источник имён для отчёта", len(br2.CATEGORIES) == 9, str(len(br2.CATEGORIES)))
+check("CATEGORIES — источник имён для отчёта", len(br2.CATEGORIES) == 11, str(len(br2.CATEGORIES)))
 check("все категории названы в отчёте",
       all(f"| {short} |" in rep_txt for _k, short, _t, _m in br2.CATEGORIES))
-check("секция «Есть у соседнего навыка» есть",
-      "## Файл есть у соседнего навыка библиотеки" in rep_txt)
+check("секция «Общий файл апстрима» есть", "## Общий файл апстрима" in rep_txt)
+check("секция «Файл чужого навыка» есть", "## Файл принадлежит другому навыку" in rep_txt)
 check("секция «Апстрим не публиковал» есть", "## Апстрим не публиковал каталог" in rep_txt)
 check("секция «Путь разошёлся» есть", "## Путь разошёлся (файл в навыке есть)" in rep_txt)
 check("унаследованное объясняет выходные файлы, а не выдаёт их за живые",
       "выходные файлы" in rep_txt or "результат работы" in rep_txt)
+
+print("\n=== 21. Копии общих файлов и различение «общий» / «чужой» ===")
+# Класть копию можно только для ОБЩЕГО файла апстрима. У guide.md 17 копий и 17
+# разных версий, у scripts/main.py — 176 версий на 184 навыка: обычно это чужой
+# контент, и копия вложила бы в навык неверное содержимое под верным именем.
+man = json.load(open(os.path.join(ROOT, "scripts", "sibling-copies.json"), encoding="utf-8"))
+check("манифест копий содержит записи", len(man.get("copies") or []) > 0, str(man.get("count")))
+for c in man.get("copies") or []:
+    dst = os.path.join(SKILLS, c["skill"], c["rel"])
+    src = os.path.join(SKILLS, c["owner"], c["owner_rel"])
+    check(f"копия {c['skill'][:28]}/{c['rel']} на месте", os.path.isfile(dst))
+    check(f"копия {c['skill'][:28]} побайтово равна владельцу",
+          os.path.isfile(src) and open(dst, "rb").read() == open(src, "rb").read())
+    check(f"sha копии {c['skill'][:28]} совпал с манифестом",
+          hashlib.sha256(open(dst, "rb").read()).hexdigest() == c["sha256"])
+# критерий: общий файл (>=3 копии одной версии) vs уникальный контент владельца
+trees_fake = {"aipoch": {
+    "skills/a/references/guide.md": "sha1",
+    "skills/b/references/guide.md": "sha1",
+    "skills/c/references/guide.md": "sha1",
+    "skills/d/references/uniq.md": "shaX",
+    "skills/e/references/uniq.md": "shaY",
+}}
+check("общий файл распознан (>=3 копии одной версии)",
+      plant.is_shared_template("references/guide.md", "aipoch", trees_fake))
+check("уникальный файл владельца НЕ считается общим (разные версии)",
+      not plant.is_shared_template("references/uniq.md", "aipoch", trees_fake),
+      str(plant.is_shared_template("references/uniq.md", "aipoch", trees_fake)))
+check("отсутствующий в апстриме файл не считается общим",
+      not plant.is_shared_template("references/nope.md", "aipoch", trees_fake))
+# пустой план не должен обнулять манифест
+r_plant = run([sys.executable, "-B", "scripts/plant_sibling_files.py"])
+check("повторный прогон не обнуляет манифест (пустой план)",
+      json.load(open(os.path.join(ROOT, "scripts", "sibling-copies.json"),
+                     encoding="utf-8"))["count"] > 0,
+      "манифест обнулён")
+check("в отчёте есть категория «Файл чужого навыка»",
+      "## Файл принадлежит другому навыку" in rep_txt)
+check("отчёт объясняет, почему чужой файл не копируется",
+      "17 разных версий" in rep_txt or "176 версий" in rep_txt)
 
 print(f"\n{'=' * 50}")
 print(f"ИТОГО: {PASS} ok, {FAIL} FAIL")

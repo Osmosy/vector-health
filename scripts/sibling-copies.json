@@ -1,0 +1,52 @@
+{
+ "generated_from": "scripts/plant_sibling_files.py — копии файлов апстрима, разложенные к навыку, который на них ссылается",
+ "note": "Каждая копия побайтово равна файлу владельца (проверяется валидатором). Файлы апстрима не правятся: копия — операция над сборкой.",
+ "count": 5,
+ "copies": [
+  {
+   "skill": "Case-control-study-quality-assessment-nos",
+   "rel": "scripts/extract_pdf.py",
+   "ref": "scripts/extract_pdf.py",
+   "owner": "quapas-quality-assessment-for-prognosis-studies",
+   "owner_rel": "scripts/extract_pdf.py",
+   "sha256": "41188bc91f78bf2335dd3463b4dc38ad2d57588ae3ee16a0efdea6f0cf5d8879",
+   "size": 2705
+  },
+  {
+   "skill": "cohort-study-quality-assessment-nos",
+   "rel": "scripts/extract_pdf.py",
+   "ref": "scripts/extract_pdf.py",
+   "owner": "quapas-quality-assessment-for-prognosis-studies",
+   "owner_rel": "scripts/extract_pdf.py",
+   "sha256": "41188bc91f78bf2335dd3463b4dc38ad2d57588ae3ee16a0efdea6f0cf5d8879",
+   "size": 2705
+  },
+  {
+   "skill": "meta-screening-fulltext",
+   "rel": "scripts/extract_pdf.py",
+   "ref": "scripts/extract_pdf.py",
+   "owner": "quapas-quality-assessment-for-prognosis-studies",
+   "owner_rel": "scripts/extract_pdf.py",
+   "sha256": "41188bc91f78bf2335dd3463b4dc38ad2d57588ae3ee16a0efdea6f0cf5d8879",
+   "size": 2705
+  },
+  {
+   "skill": "molecular-review-workflow",
+   "rel": "scripts/validate_skill.py",
+   "ref": "scripts/validate_skill.py",
+   "owner": "biomed-outline-generator",
+   "owner_rel": "scripts/validate_skill.py",
+   "sha256": "7d717cda0a1829aff8ec0e62e5e5b7d9efd953686f4cf847791d829b84e255cb",
+   "size": 679
+  },
+  {
+   "skill": "pdf-to-ppt-pack",
+   "rel": "scripts/validate_skill.py",
+   "ref": "scripts/validate_skill.py",
+   "owner": "biomed-outline-generator",
+   "owner_rel": "scripts/validate_skill.py",
+   "sha256": "7d717cda0a1829aff8ec0e62e5e5b7d9efd953686f4cf847791d829b84e255cb",
+   "size": 679
+  }
+ ]
+}
