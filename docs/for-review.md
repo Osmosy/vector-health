@@ -1,12 +1,12 @@
 # Что проверить повторно (для внешней проверки)
 
-Коммит: `b7a114c`. Хеши ниже — sha256 файлов в этом коммите: если присланный архив совпадает по ним, значит он не из кеша.
+Коммит: `ccc0fde`. Хеши ниже — sha256 файлов в этом коммите: если присланный архив совпадает по ним, значит он не из кеша.
 
 ## Файлы
 
 | Файл | Байт | sha256 |
 |---|---|---|
-| `README.md` | 24713 | `ec0c4c1a58d742f6…` |
+| `README.md` | 24972 | `c61b529d676fc523…` |
 | `NOTICE.md` | 13407 | `2d1f7a54f8f0ddd5…` |
 | `AGENTS.md` | 8273 | `e81bd27aff9b2379…` |
 | `INSTALL.md` | 14178 | `955f309473b9b5aa…` |
@@ -20,7 +20,7 @@
 | `docs/broken-refs.md` | 49764 | `687bcfd4eca26519…` |
 | `docs/tree-digest.json` | 513768 | `561883127f02be4d…` |
 | `docs/trials-verified.json` | 4828 | `e2d97fbf98b97664…` |
-| `tests/test_scripts.py` | 63471 | `a05f6b02e996ab44…` |
+| `tests/test_scripts.py` | 63510 | `cabd17b1ec0cb4b7…` |
 | `tests/mutation_check.py` | 12660 | `bc5730d8cc8f00b2…` |
 | `tests/run_offline.py` | 2826 | `0650da41909a0490…` |
 | `skills/atrial-fibrillation-treatment/SKILL.md` | 13021 | `a3369865c38266d0…` |
