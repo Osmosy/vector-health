@@ -1,8 +1,8 @@
 # vector-health — часть экосистемы Vector
 
-Библиотека медицинских и биомедицинских навыков: 1541 навык из четырёх
+Библиотека медицинских и биомедицинских навыков: 1542 навыка из четырёх
 открытых коллекций (OpenClaw-Medical-Skills, AIPOCH medical-research-skills,
-openmed, Aperivue medsci-skills) плюс три собственных. Дедупликация по именам,
+openmed, Aperivue medsci-skills) плюс четыре собственных. Дедупликация по именам,
 единая структура `skills/<имя>/SKILL.md`, карта происхождения по каждому навыку.
 
 Содержание — не программа, а справочники и методики: markdown-навыки и скрипты
@@ -19,9 +19,9 @@ openmed, Aperivue medsci-skills) плюс три собственных. Дед�
 ## Для агентов
 
 - Читай сначала `README.md`, для установки — `INSTALL.md`
-- Навыки — `skills/<имя>/SKILL.md` (1541; вендоренные наборы с атрибуцией в `NOTICE.md`)
+- Навыки — `skills/<имя>/SKILL.md` (1542; вендоренные наборы с атрибуцией в `NOTICE.md`)
 - Каталог для поиска — `skills-index.json` (имя, путь, описание)
-- Три собственных навыка — `skills/dicom-vlm-analysis`, `skills/atrial-fibrillation-treatment`,
+- Четыре собственных навыка — `skills/dicom-vlm-analysis`, `skills/atrial-fibrillation-treatment`, `skills/anamnesis-interview`,
   `skills/abdominal-ct-findings`
 - Архитектура (живая диаграмма) — `docs/vector-health.architecture.html`
 - Инвентарь битых ссылок — `docs/broken-refs.md`
@@ -37,10 +37,10 @@ openmed, Aperivue medsci-skills) плюс три собственных. Дед�
 
 | Что | Сколько |
 |-----|---------|
-| Навыки | 1541 (`skills/`), из них 1538 из четырёх сторонних коллекций |
+| Навыки | 1542 (`skills/`), из них 1538 из четырёх сторонних коллекций |
 | Навыки верхнего уровня | 1513 каталогов |
 | Вложенные навыки | 28 (внутри каталогов-контейнеров апстримов) |
-| Собственные навыки | 3 (`dicom-vlm-analysis`, `atrial-fibrillation-treatment`, `abdominal-ct-findings`) |
+| Собственные навыки | 4 (`dicom-vlm-analysis`, `atrial-fibrillation-treatment`, `abdominal-ct-findings`, `anamnesis-interview`) |
 | Скрипты | 22 (`scripts/`: 13 .py, 2 установщик, 7 JSON, включая `stats.json`) |
 | Тесты | 3 файла (`tests/`: `test_scripts.py`, `run_offline.py` — прогон без сети, `mutation_check.py` — 8 мутаций) |
 | Диаграмма | 1 живая (`docs/vector-health.architecture.html`) |

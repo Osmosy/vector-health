@@ -54,7 +54,7 @@ def own_skills() -> set[str]:
                 return set(own)
         except (OSError, json.JSONDecodeError):
             pass
-    return {"dicom-vlm-analysis", "atrial-fibrillation-treatment"}
+    return {"anamnesis-interview", "dicom-vlm-analysis", "atrial-fibrillation-treatment"}
 
 
 OWN_SKILLS = own_skills()

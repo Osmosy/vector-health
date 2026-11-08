@@ -1,7 +1,7 @@
 {
   "project": "vector-health",
-  "generated": "2026-09-20",
-  "total": 1541,
+  "generated": "2026-11-08",
+  "total": 1542,
   "note": "path — каталог навыка относительно skills/. Вложенные навыки (контейнеры вроде spatial-transcriptomics-analysis) включены.",
   "skills": [
     {
@@ -138,6 +138,11 @@
       "name": "analyze-stats",
       "path": "analyze-stats",
       "description": "Statistical analysis for medical research papers. Generates reproducible Python/R code with publication-ready tables and figures. Supports diagnostic accuracy, inter-rater agreement, meta-analysis, survival analysis, survey data, group comparisons, regression, propensity score, and repeated measures."
+    },
+    {
+      "name": "anamnesis-interview",
+      "path": "anamnesis-interview",
+      "description": "Структурированный сбор анамнеза до приёма врача — опрос по протоколу, документ для врача. Use when asked to collect medical history, prepare for a doctor visit, or run a symptom interview."
     },
     {
       "name": "anatomy-quiz-master",

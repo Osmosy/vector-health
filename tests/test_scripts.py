@@ -124,9 +124,10 @@ origin = json.load(open(os.path.join(ROOT, "scripts", "upstream-origin.json"), e
 known = set(su.SOURCES) | {"own"}
 check("нет неизвестных меток источников", all(v in known for v in origin.values()),
       str({v for v in origin.values() if v not in known}))
-check("собственные навыки — только наши (три)",
+check("собственные навыки — только наши (четыре)",
       {n for n, s in origin.items() if s == "own"}
-      == {"dicom-vlm-analysis", "atrial-fibrillation-treatment", "abdominal-ct-findings"},
+      == {"dicom-vlm-analysis", "atrial-fibrillation-treatment", "abdominal-ct-findings",
+          "anamnesis-interview"},
       str({n for n, s in origin.items() if s == "own"}))
 check("medical-specialty-briefs атрибутирован OpenClaw, а не себе",
       origin.get("medical-specialty-briefs") == "OpenClaw", str(origin.get("medical-specialty-briefs")))
