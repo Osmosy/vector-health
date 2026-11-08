@@ -28,11 +28,23 @@ CARD_RE = re.compile(
     r'<div class="proj-desc">)(.*?)(</div>)', re.S)
 
 
+def _plural(n: int, one: str, few: str, many: str) -> str:
+    """Русская форма после числа: 1 навык, 2 навыка, 5 навыков."""
+    if n % 100 in (11, 12, 13, 14):
+        return many
+    if n % 10 == 1:
+        return one
+    if n % 10 in (2, 3, 4):
+        return few
+    return many
+
+
 def card_text() -> str:
     s = json.loads((ROOT / "scripts" / "stats.json").read_text(encoding="utf-8"))
     own = len(s.get("own") or [])
     collectors = len([k for k in s["by_source_all"] if k not in ("own", "unknown")])
-    return (f"Единая медицинская библиотека навыков: {s['total']} навык "
+    return (f"Единая медицинская библиотека навыков: {s['total']} "
+            f"{_plural(s['total'], 'навык', 'навыка', 'навыков')} "
             f"({collectors} открытые коллекции + {own} собственных), включая таксономию "
             f"RADAR для КТ брюшной полости.")
 
