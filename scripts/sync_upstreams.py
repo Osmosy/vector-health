@@ -13,7 +13,7 @@
 Что НЕ трогается:
   - коллизии имён: если навык с таким именем в библиотеке пришёл из другого
     источника, апстрим не перезаписывает его молча;
-  - собственные навыки (dicom-vlm-analysis, atrial-fibrillation-treatment);
+  - собственные навыки (dicom-vlm-analysis, atrial-fibrillation-treatment, anamnesis-interview);
   - тяжёлые служебные каталоги (evals/, fixtures/, repo/, node_modules/) и
     крупные бинарные датасеты — при сборке они отрезались сознательно.
 

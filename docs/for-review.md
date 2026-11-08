@@ -1,20 +1,20 @@
 # Что проверить повторно (для внешней проверки)
 
-Коммит: `edc9457`. Хеши ниже — sha256 файлов в этом коммите: если присланный архив совпадает по ним, значит он не из кеша.
+Коммит: `b7a114c`. Хеши ниже — sha256 файлов в этом коммите: если присланный архив совпадает по ним, значит он не из кеша.
 
 ## Файлы
 
 | Файл | Байт | sha256 |
 |---|---|---|
-| `README.md` | 24639 | `f3fc4cac56c30f2e…` |
-| `NOTICE.md` | 12969 | `c31aec9b18fc65fb…` |
-| `AGENTS.md` | 8242 | `22119dc7706ded39…` |
-| `INSTALL.md` | 14146 | `f0d544d48ddecf03…` |
-| `agent-description.md` | 6089 | `725bf05400bcd029…` |
-| `scripts/validate.py` | 118818 | `41b764fd66640d2e…` |
-| `scripts/build_stats.py` | 14620 | `4ef77790eac1f37d…` |
-| `scripts/stats.json` | 13872 | `3672008368af09ec…` |
-| `scripts/broken_refs.py` | 44492 | `b30078f825f34722…` |
+| `README.md` | 24713 | `ec0c4c1a58d742f6…` |
+| `NOTICE.md` | 13407 | `2d1f7a54f8f0ddd5…` |
+| `AGENTS.md` | 8273 | `e81bd27aff9b2379…` |
+| `INSTALL.md` | 14178 | `955f309473b9b5aa…` |
+| `agent-description.md` | 6156 | `28aee8146046f4ef…` |
+| `scripts/validate.py` | 118841 | `bbdad5eda0bfb1f3…` |
+| `scripts/build_stats.py` | 14643 | `f3d3a46654a9137f…` |
+| `scripts/stats.json` | 13897 | `b97d3d9802f90cc0…` |
+| `scripts/broken_refs.py` | 44515 | `3c8eded9866123f6…` |
 | `scripts/service_artifacts.py` | 11725 | `44225b6cfcd489d9…` |
 | `scripts/refs.py` | 12625 | `b9b6b77b259c9a6a…` |
 | `docs/broken-refs.md` | 49764 | `687bcfd4eca26519…` |
@@ -30,8 +30,8 @@
 
 Все — из `scripts/stats.json`, который генерируется из дерева (`python3 scripts/build_stats.py --check` падает при расхождении):
 
-- навыков всего 1541 = верхних 1513 + вложенных 28
-- по источникам: OpenClaw=805, aipoch=600, openmed=74, Aperivue=59, own=3
+- навыков всего 1542 = верхних 1514 + вложенных 28
+- по источникам: OpenClaw=805, aipoch=600, openmed=74, Aperivue=59, own=4
 - уникальных навыков с ограничениями **317**: проприетарных шапок 308, Anthropic 9, Non-Commercial 2 (сумма видов 319 завышена: два NC — это один навык varCADD в двух местах, и он же входит в проприетарные)
 - ссылок 3528, битых 492, категорий 11
 - копий общих файлов: 5 | пар идентичных навыков: 4 | почти-дублей: 2

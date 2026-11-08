@@ -25,7 +25,7 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SKILLS = ROOT / "skills"
-OWN_DEFAULT = ("abdominal-ct-findings", "atrial-fibrillation-treatment", "dicom-vlm-analysis")
+OWN_DEFAULT = ("abdominal-ct-findings", "anamnesis-interview", "atrial-fibrillation-treatment", "dicom-vlm-analysis")
 
 
 def all_skills() -> list[pathlib.Path]:

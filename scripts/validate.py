@@ -51,7 +51,7 @@ SOURCES = {
     "radar": ("alibaba-damo-academy/damo-radar", "alibaba-damo-academy-damo-radar-APACHE-2.0.txt"),
 }
 THIRD_PARTY = os.path.join(ROOT, "THIRD_PARTY_LICENSES")
-OWN_SKILLS = {"dicom-vlm-analysis", "atrial-fibrillation-treatment", "abdominal-ct-findings"}
+OWN_SKILLS = {"dicom-vlm-analysis", "atrial-fibrillation-treatment", "abdominal-ct-findings", "anamnesis-interview"}
 
 # Живые формы секретов. Тестовые фикстуры (tests/, */tests/) исключены: там
 # фальшивые ключи стоят намеренно, чтобы проверять их обнаружение.

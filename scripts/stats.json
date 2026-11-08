@@ -1,26 +1,27 @@
 {
  "generated_from": "дерево skills/ + scripts/upstream-origin.json + scripts/restricted-licenses.json",
  "generated_by": "scripts/build_stats.py — файл не править руками",
- "total": 1541,
- "top_level": 1513,
+ "total": 1542,
+ "top_level": 1514,
  "nested": 28,
  "by_source_top": {
   "OpenClaw": 777,
   "aipoch": 600,
   "openmed": 74,
   "Aperivue": 59,
-  "own": 3
+  "own": 4
  },
  "by_source_all": {
   "OpenClaw": 805,
   "aipoch": 600,
   "openmed": 74,
   "Aperivue": 59,
-  "own": 3
+  "own": 4
  },
  "unknown_source": 0,
  "own": [
   "abdominal-ct-findings",
+  "anamnesis-interview",
   "atrial-fibrillation-treatment",
   "dicom-vlm-analysis"
  ],
